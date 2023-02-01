@@ -2,16 +2,16 @@ package com.zeyadgasser.core
 
 import android.os.Parcelable
 
-interface State : Parcelable
-
-interface Outcome
-
-interface Result : Outcome
-
-data class Error(val message: String, val cause: Throwable, val input: Input? = null)
-
-interface Effect : Outcome
-
 open class Input(val showProgress: Boolean = true)
 
-data class Progress(val isLoading: Boolean, val input: Input)
+interface Result
+
+interface Output
+
+interface State : Parcelable, Output
+
+data class Error(val message: String, val cause: Throwable, val input: Input? = null) : Output
+
+interface Effect : Output
+
+data class Progress(val isLoading: Boolean, val input: Input) : Output

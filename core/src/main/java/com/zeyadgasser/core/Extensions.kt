@@ -18,4 +18,8 @@ fun Throwable.toErrorOutcome(errorMessage: String? = null): FluxOutcome =
 
 fun Throwable.toErrorOutcomeFlow(): Flow<FluxOutcome> = toErrorOutcome().toFlow()
 
+fun emptyOutcome() = EmptyFluxOutcome
+
+fun emptyOutcomeFlow() = EmptyFluxOutcome.toFlow()
+
 fun FluxOutcome.toFlow() = flowOf(this)

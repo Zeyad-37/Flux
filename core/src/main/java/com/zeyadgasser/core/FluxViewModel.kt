@@ -1,11 +1,14 @@
+@file:OptIn(FlowPreview::class)
+
 package com.zeyadgasser.core
 
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import com.zeyadgasser.core.InputStrategy.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
-import kotlin.properties.Delegates.observable
 
 const val ARG_STATE = "arg_state"
 
@@ -17,7 +20,7 @@ data class InputOutcomeStream(val input: Input, val outcomes: Flow<FluxOutcome>)
 
 internal object EmptyInput : Input()
 
-open class FluxOutcome(open var input: Input = EmptyInput)
+sealed class FluxOutcome(open var input: Input = EmptyInput)
 
 object EmptyFluxOutcome : FluxOutcome()
 
@@ -41,19 +44,9 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     internal data class FluxEffect<E>(val effect: E) : FluxOutcome()
     internal data class FluxResult<R>(val result: R) : FluxOutcome()
 
-    private lateinit var disposable: Job
     private lateinit var currentState: S
 
-    private var viewModelListener: ViewModelListener<S, E>? = null
-        set(value) {
-            value?.states?.invoke(currentState)
-            field = value
-        }
-    private var progress: Progress by observable(
-        Progress(false, EmptyInput)
-    ) { _, oldValue, newValue ->
-        if (newValue != oldValue) notifyProgressChanged(newValue)
-    }
+    private var viewModelListener: MutableStateFlow<Output> = MutableStateFlow(currentState)
 
     private val inputs: MutableSharedFlow<I> = MutableSharedFlow()
     private val throttledInputs: MutableSharedFlow<I> = MutableSharedFlow()
@@ -61,21 +54,13 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     private val trackingListener: TrackingListener<I, R, S, E> = this.initTracking()
     private val loggingListener: LoggingListener<I, R, S, E> = this.initLogging()
 
-    suspend fun bind(
-        initialState: S,
-        inputs: () -> MutableSharedFlow<I>
-    ): FluxViewModel<I, R, S, E> {
+    suspend fun bind(initialState: S): FluxViewModel<I, R, S, E> {
         currentState = savedStateHandle?.get(ARG_STATE) ?: initialState
-        bindInputs(inputs)
+        bindInputs()
         return this
     }
 
-    fun observe(lifecycleOwner: LifecycleOwner, init: ViewModelListenerHelper<S, E>.() -> Unit) {
-        val helper = ViewModelListenerHelper<S, E>()
-        helper.init()
-        viewModelListener = helper
-        removeObservers(lifecycleOwner)
-    }
+    fun observe(): StateFlow<Output> = viewModelListener
 
     /**
      * Input source provider. By default it returns empty
@@ -83,12 +68,11 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
      */
     open fun inputSource(): Flow<I> = emptyFlow()
 
-    suspend fun process(input: I, inputStrategy: InputStrategy = InputStrategy.NONE) =
-        when (inputStrategy) {
-            InputStrategy.NONE -> inputs
-            InputStrategy.THROTTLE -> throttledInputs
-            InputStrategy.DEBOUNCE -> debouncedInputs
-        }.emit(input)
+    suspend fun process(input: I, inputStrategy: InputStrategy = NONE) = when (inputStrategy) {
+        NONE -> inputs
+        THROTTLE -> throttledInputs
+        DEBOUNCE -> debouncedInputs
+    }.emit(input)
 
     open fun log(): LoggingListenerHelper<I, R, S, E>.() -> Unit = {
         inputs { Log.d(this@FluxViewModel::class.simpleName, " - Input: $it") }
@@ -100,14 +84,13 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
 
     open fun track(): TrackingListenerHelper<I, R, S, E>.() -> Unit = { /*empty*/ }
 
-    private suspend fun bindInputs(inputs: () -> MutableSharedFlow<I>) {
-        val outcome = createOutcomes(inputs)
+    private suspend fun bindInputs() {// TODO review here
+        val outcome = createOutcomes()
         val stateResult = if (reducer != null) {
             outcome.filter { it is FluxResult<*> }.map { it as FluxResult<R> }
                 .scan(FluxState(currentState)) { state: FluxState<S>, result: FluxResult<R> ->
-                    FluxState(reducer.reduce(state.state, result.result)).apply {
-                        input = result.input
-                    }
+                    FluxState(reducer.reduce(state.state, result.result))
+                        .apply { input = result.input }
                 }.onEach {
                     trackState(it.state, it.input as I)
                     logState(it.state)
@@ -123,12 +106,11 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
             }
     }
 
-    private fun createOutcomes(inputs: () -> MutableSharedFlow<I>): Flow<FluxOutcome> {
+    private fun createOutcomes(): Flow<FluxOutcome> {
         val streamsToProcess = merge(
-            inputs(),
             inputSource(),
-            this.inputs,// throttledInputs.throttle(InputStrategy.THROTTLE.interval),
-            debouncedInputs.debounce(InputStrategy.DEBOUNCE.interval)
+            inputs,// throttledInputs.throttle(THROTTLE.interval),
+            debouncedInputs.debounce(DEBOUNCE.interval)
         ).flowOn(Dispatchers.IO)
             .onEach {
                 trackInput(it)
@@ -147,29 +129,27 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
         val result = inputOutcomeStream.outcomes
             .map { it.apply { input = inputOutcomeStream.input } }
             .catch { emit(createRxError(it, inputOutcomeStream.input as I)) }
-        return if (inputOutcomeStream.input.showProgress.not()) {
-            result
-        } else {
+        return if (inputOutcomeStream.input.showProgress) {
             result.onStart { emit(FluxProgress(Progress(true, inputOutcomeStream.input))) }
+        } else {
+            result
         }
     }
 
-    private fun trackEvents(event: FluxOutcome) {
-        when (event) {
-            is FluxProgress -> trackingListener.progress(event.progress)
-            is FluxEffect<*> -> trackingListener.effects(event.effect as E, event.input as I)
-            is FluxError -> trackingListener.errors(event.error)
-            is FluxResult<*> -> trackingListener.results(event.result as R, event.input as I)
-        }
+    private fun trackEvents(event: FluxOutcome) = when (event) {
+        is FluxProgress -> trackingListener.progress(event.progress)
+        is FluxEffect<*> -> trackingListener.effects(event.effect as E, event.input as I)
+        is FluxError -> trackingListener.errors(event.error)
+        is FluxResult<*> -> trackingListener.results(event.result as R, event.input as I)
+        is FluxState<*>, EmptyFluxOutcome -> Unit
     }
 
-    private fun logEvents(event: FluxOutcome) {
-        when (event) {
-            is FluxProgress -> loggingListener.progress(event.progress)
-            is FluxEffect<*> -> loggingListener.effects(event.effect as E)
-            is FluxError -> loggingListener.errors(event.error)
-            is FluxResult<*> -> loggingListener.results(event.result as R)
-        }
+    private fun logEvents(event: FluxOutcome) = when (event) {
+        is FluxProgress -> loggingListener.progress(event.progress)
+        is FluxEffect<*> -> loggingListener.effects(event.effect as E)
+        is FluxError -> loggingListener.errors(event.error)
+        is FluxResult<*> -> loggingListener.results(event.result as R)
+        is FluxState<*>, EmptyFluxOutcome -> Unit
     }
 
     private fun trackInput(input: I) = trackingListener.inputs(input)
@@ -183,39 +163,23 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     private fun createRxError(throwable: Throwable, input: I): FluxError =
         FluxError(Error(throwable.message.orEmpty(), throwable, input)).apply { this.input = input }
 
-    private fun handleResult(result: FluxOutcome) {
-        if (result is FluxProgress) {
-            notifyProgressChanged(result.progress)
+    private suspend fun handleResult(fluxOutcome: FluxOutcome) {
+        if (fluxOutcome is FluxProgress) {
+            viewModelListener.emit(fluxOutcome.progress)
         } else {
-            dismissProgressDependingOnInput(result.input as I)
+            if ((fluxOutcome.input as? I)?.showProgress == true)
+                viewModelListener.emit(Progress(false, fluxOutcome.input))
         }
-        when (result) {
-            is FluxError -> notifyError(result.error)
-            is FluxEffect<*> -> notifyEffect(result.effect as E)
+        when (fluxOutcome) {
+            is FluxError -> viewModelListener.emit(fluxOutcome.error)
+            is FluxEffect<*> -> viewModelListener.emit(fluxOutcome.effect as E)
             is FluxState<*> -> {
-                saveState(result.state as S)
-                notifyNewState(result.state)
+                savedStateHandle?.set(ARG_STATE, fluxOutcome.state as S) ?: Unit
+                currentState = fluxOutcome.state as S
+                viewModelListener.emit(fluxOutcome.state)
             }
-            else ->  Unit
+            is FluxResult<*>, is FluxProgress, EmptyFluxOutcome -> Unit
         }
-    }
-
-    private fun dismissProgressDependingOnInput(input: I?) {
-        if (input?.showProgress == true) {
-            notifyProgressChanged(Progress(false, input))
-        }
-    }
-
-    private fun notifyProgressChanged(progress: Progress) =
-        viewModelListener?.progress?.invoke(progress)
-
-    private fun notifyEffect(effect: E) = viewModelListener?.effects?.invoke(effect)
-
-    private fun notifyError(error: Error) = viewModelListener?.errors?.invoke(error)
-
-    private fun notifyNewState(state: S) {
-        currentState = state
-        viewModelListener?.states?.invoke(state)
     }
 
     private fun initTracking(): TrackingListener<I, R, S, E> {
@@ -231,22 +195,4 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
         loggingListenerHelper.init()
         return loggingListenerHelper
     }
-
-    private fun saveState(state: S) = savedStateHandle?.set(ARG_STATE, state) ?: Unit
-
-    private fun removeObservers(lifecycleOwner: LifecycleOwner) =
-        lifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
-            @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-            fun onDestroy() {
-                unBind()
-                lifecycleOwner.lifecycle.removeObserver(this)
-            }
-        })
-
-    private fun unBind() {
-        viewModelListener = null
-        disposable.cancel()
-    }
-
-    override fun onCleared() = unBind()
 }
