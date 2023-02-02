@@ -9,8 +9,14 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Flux"
+        android:theme="@style/AppTheme"
         tools:targetApi="31">
+        <activity
+            android:name=".mvvm.MVVMActivity"
+            android:exported="false" />
+        <activity
+            android:name=".mvi.MVIActivity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -23,5 +29,4 @@
             </intent-filter>
         </activity>
     </application>
-
 </manifest>

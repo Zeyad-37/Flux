@@ -6,7 +6,7 @@ open class Input(val showProgress: Boolean = true)
 
 interface Result
 
-interface Output
+sealed interface Output
 
 interface State : Parcelable, Output
 
