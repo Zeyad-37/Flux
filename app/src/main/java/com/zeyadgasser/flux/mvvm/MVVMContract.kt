@@ -2,7 +2,6 @@ package com.zeyadgasser.flux.mvvm
 
 import com.zeyadgasser.core.Effect
 import com.zeyadgasser.core.Input
-import com.zeyadgasser.core.Result
 import com.zeyadgasser.core.State
 import kotlinx.parcelize.Parcelize
 import kotlin.random.Random
@@ -16,9 +15,6 @@ data class ChangeBackgroundInput(
 
 object ShowDialogInput : MVVMInput()
 object ErrorInput : MVVMInput()
-
-sealed class MVVMResult : Result
-object ChangeBackgroundResult : MVVMResult()
 
 sealed class MVVMEffect : Effect
 

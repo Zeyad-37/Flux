@@ -160,15 +160,6 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     }
 
     private suspend fun handleOutcome(fluxOutcome: FluxOutcome) {
-        if (fluxOutcome is FluxProgress) {
-            if (fluxOutcome.input.showProgress) viewModelListener.emit(fluxOutcome.progress)
-        } else flow<Nothing> {
-            delay(1)
-            Progress(false, fluxOutcome.input).let {
-                logOutcomes(FluxProgress(it))
-                viewModelListener.emit(it)
-            }
-        }.collect()
         when (fluxOutcome) {
             is FluxError -> viewModelListener.emit(fluxOutcome.error)
             is FluxEffect<*> -> viewModelListener.emit(fluxOutcome.effect as E)
@@ -177,7 +168,19 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
                 currentState = it
                 viewModelListener.emit(it)
             }
-            is FluxResult<*>, is FluxProgress, EmptyFluxOutcome -> Unit
+            is FluxProgress -> if (fluxOutcome.input.showProgress) {
+                viewModelListener.emit(fluxOutcome.progress)
+            }
+            is FluxResult<*>, EmptyFluxOutcome -> Unit
+        }
+        if (fluxOutcome !is FluxProgress) {
+            flow<Nothing> {
+                delay(10)
+                Progress(false, fluxOutcome.input).let {
+                    logOutcomes(FluxProgress(it))
+                    viewModelListener.emit(it)
+                }
+            }.collect()
         }
     }
 }
