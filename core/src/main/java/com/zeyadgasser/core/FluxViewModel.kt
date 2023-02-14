@@ -7,11 +7,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zeyadgasser.core.InputStrategy.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
 const val ARG_STATE = "arg_state"
 
@@ -41,6 +39,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     private val inputHandler: InputHandler<I, S>,
     private val reducer: Reducer<S, R>?,
     private val savedStateHandle: SavedStateHandle?,
+    private val ioDispatcher: CoroutineContext = Dispatchers.IO,
 ) : ViewModel() {
 
     internal data class FluxState<S>(val state: S) : FluxOutcome()
@@ -100,12 +99,12 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
         val nonStateOutcomes =
             outcome.filter { it !is FluxState<*> }.filter { it !is FluxResult<*> }
         merge(nonStateOutcomes, states)
-            .flowOn(Dispatchers.Main)
-            .collect {
+            .onEach {
                 trackOutcomes(it)
                 logOutcomes(it)
                 handleOutcome(it)
-            }
+            }.flowOn(ioDispatcher)
+            .collect {}
     }
 
     private fun createOutcomes(): Flow<FluxOutcome> {
@@ -113,12 +112,11 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
             inputs,
             throttledInputs.conflate(),
             debouncedInputs.debounce(DEBOUNCE.interval)
-        ).flowOn(Dispatchers.IO)
-            .map {
-                trackingListener.inputs(it)
-                loggingListener.inputs(it)
-                InputOutcomeStream(it, inputHandler.handleInputs(it, currentState))
-            }
+        ).map {
+            trackingListener.inputs(it)
+            loggingListener.inputs(it)
+            InputOutcomeStream(it, inputHandler.handleInputs(it, currentState))
+        }
         val asyncOutcomes = streamsToProcess.filter { it.outcomes is AsyncOutcomeFlow }
             .map { it.copy(outcomes = (it.outcomes as AsyncOutcomeFlow).Flow) }
             .flatMapMerge { processInputOutcomeStream(it) }

@@ -1,6 +1,5 @@
 package com.zeyadgasser.flux.mvi
 
-import android.graphics.Color
 import com.zeyadgasser.core.Effect
 import com.zeyadgasser.core.Input
 import com.zeyadgasser.core.Result

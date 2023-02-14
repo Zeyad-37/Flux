@@ -9,6 +9,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,6 +22,7 @@ import com.zeyadgasser.core.InputStrategy.THROTTLE
 import com.zeyadgasser.core.Output
 import com.zeyadgasser.core.Progress
 import com.zeyadgasser.flux.ui.theme.FluxTheme
+import kotlinx.coroutines.Dispatchers
 
 class MVIActivity : ComponentActivity() {
 
@@ -35,61 +37,72 @@ class MVIActivity : ComponentActivity() {
 
 @Composable
 fun MVIScreen(viewModel: MVIViewModel) {
-    val context = LocalContext.current
-    val state: State<Output> = viewModel.observe().collectAsState()
-    var successState: MVIState by remember { mutableStateOf(InitialState) }
+    val state: State<Output> = viewModel.observe().collectAsState(Dispatchers.Main)
+    var successState: MVIState by rememberSaveable { mutableStateOf(InitialState) }
     var isLoading: Boolean by remember { mutableStateOf(false) }
     var errorMessage: String by remember { mutableStateOf("") }
     when (val output = state.value) {
-        is Effect -> bindEffect(output as MVIEffect, context)
+        is Effect -> bindEffect(output as MVIEffect, LocalContext.current)
         is Error -> errorMessage = output.message
         is Progress -> isLoading = output.isLoading
         is com.zeyadgasser.core.State -> successState = output as MVIState
     }
-    Scaffold(
-        Modifier.fillMaxSize(),
-        backgroundColor = when (successState) {
-            InitialState -> MaterialTheme.colors.background
-            is ColorBackgroundState -> Color(context.resources.getColor((successState as ColorBackgroundState).color, null))
-        },
-        topBar = {
-            TopAppBar(Modifier.fillMaxWidth()) {
-                Text(text = "MVISample", modifier = Modifier.padding(8.dp))
-            }
-        },
-        content = { paddingValues: PaddingValues ->
-            MVIScreenContent(paddingValues, viewModel, errorMessage, isLoading)
-        })
+    MVIScreenScaffold(successState,
+        isLoading,
+        errorMessage,
+        { viewModel.process(ChangeBackgroundInput(), THROTTLE) },
+        { viewModel.process(ShowDialogInput) },
+        { viewModel.process(ErrorInput) })
 }
+
+@Composable
+fun MVIScreenScaffold(
+    successState: MVIState,
+    isLoading: Boolean,
+    errorMessage: String,
+    changeBackgroundOnClick: () -> Unit,
+    showDialogOnClick: () -> Unit,
+    showErrorOnClick: () -> Unit,
+) = Scaffold(Modifier.fillMaxSize(),
+    backgroundColor = when (successState) {
+        InitialState -> MaterialTheme.colors.background
+        is ColorBackgroundState ->
+            Color(LocalContext.current.resources.getColor(successState.color, null))
+    },
+    topBar = { TopAppBar(Modifier.fillMaxWidth()) { Text("MVISample", Modifier.padding(8.dp)) } },
+    content = { paddingValues: PaddingValues ->
+        MVIScreenContent(
+            paddingValues,
+            changeBackgroundOnClick,
+            showDialogOnClick,
+            showErrorOnClick,
+            errorMessage,
+            isLoading
+        )
+    })
 
 @Composable
 private fun MVIScreenContent(
     paddingValues: PaddingValues,
-    viewModel: MVIViewModel,
+    changeBackgroundOnClick: () -> Unit,
+    showDialogOnClick: () -> Unit,
+    showErrorOnClick: () -> Unit,
     errorMessage: String,
     isLoading: Boolean
+) = Column(
+    modifier = Modifier
+        .fillMaxSize()
+        .padding(paddingValues),
+    horizontalAlignment = Alignment.CenterHorizontally,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Button(onClick = { viewModel.process(ChangeBackgroundInput(), THROTTLE) }) {
-            Text(text = "Change Background")
-        }
-        Button(onClick = { viewModel.process(ShowDialogInput) }) { Text(text = "Show Dialog") }
-        Button(onClick = { viewModel.process(ErrorInput) }) { Text(text = "Show Error") }
-
-        if (errorMessage.isNotEmpty()) Text(text = errorMessage)
-
-        if (isLoading) CircularProgressIndicator(Modifier.size(42.dp))
-    }
+    Button(onClick = changeBackgroundOnClick) { Text(text = "Change Background") }
+    Button(onClick = showDialogOnClick) { Text(text = "Show Dialog in parallel") }
+    Button(onClick = showErrorOnClick) { Text(text = "Show Error") }
+    if (errorMessage.isNotEmpty()) Text(text = errorMessage)
+    if (isLoading) CircularProgressIndicator(Modifier.size(42.dp))
 }
 
 private fun bindEffect(effect: MVIEffect, context: Context) = when (effect) {
-    is ShowDialogEffect -> AlertDialog.Builder(context)
-        .setTitle("Dialog")
-        .setMessage("Dialog effect!")
-        .create().show()
+    is ShowDialogEffect -> AlertDialog.Builder(context).setTitle("Dialog")
+        .setMessage("Dialog effect!").create().show()
 }
