@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.zeyadgasser.core.Effect
 import com.zeyadgasser.core.Error
-import com.zeyadgasser.core.InputStrategy.THROTTLE
 import com.zeyadgasser.core.Progress
 import com.zeyadgasser.core.State
 import com.zeyadgasser.flux.databinding.ActivityMviBinding
@@ -36,11 +35,9 @@ class MVVMActivity : AppCompatActivity() {
     private fun bindViews() {
         binding = ActivityMviBinding.inflate(layoutInflater).apply {
             setContentView(root)
-            changeBackgroundButton.setOnClickListener {
-                viewModel.process(ChangeBackgroundInput(), THROTTLE)
-            }
-            showDialogButton.setOnClickListener { viewModel.process(ShowDialogInput) }
-            showErrorButton.setOnClickListener { viewModel.process(ErrorInput) }
+            changeBackgroundButton.setOnClickListener { viewModel.changeBackground() }
+            showDialogButton.setOnClickListener { viewModel.showDialogInput() }
+            showErrorButton.setOnClickListener { viewModel.errorInput() }
         }
     }
 
