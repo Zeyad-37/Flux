@@ -2,14 +2,16 @@
 
 package com.zeyadgasser.core
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zeyadgasser.core.InputStrategy.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import java.util.logging.Level
+import java.util.logging.Logger
 import kotlin.coroutines.CoroutineContext
+
 
 abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     private var currentState: S,
@@ -17,6 +19,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     private val reducer: Reducer<S, R>?,
     private val savedStateHandle: SavedStateHandle?,
     private val ioDispatcher: CoroutineContext = Dispatchers.IO,
+    private val logger: Logger = Logger.getLogger("flux logger"),
 ) : ViewModel() {
 
     internal data class FluxState<S>(val state: S) : FluxOutcome()
@@ -46,12 +49,12 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     }.let {}
 
     open fun log(): LoggingListenerHelper<I, R, S, E>.() -> Unit = {
-        inputs { Log.d(this@FluxViewModel::class.simpleName, " - Input: $it") }
-        progress { Log.d(this@FluxViewModel::class.simpleName, " - $it") }
-        results { Log.d(this@FluxViewModel::class.simpleName, " - Result: $it") }
-        effects { Log.d(this@FluxViewModel::class.simpleName, " - Effect: $it") }
-        states { Log.d(this@FluxViewModel::class.simpleName, " - State: $it") }
-        errors { Log.d(this@FluxViewModel::class.simpleName, " - $it") }
+        inputs { logger.log(Level.ALL, "${this@FluxViewModel::class.simpleName} - Input: $it") }
+        progress { logger.log(Level.ALL, "${this@FluxViewModel::class.simpleName} - $it") }
+        results { logger.log(Level.ALL, "${this@FluxViewModel::class.simpleName} - Result: $it") }
+        effects { logger.log(Level.ALL, "${this@FluxViewModel::class.simpleName} - Effect: $it") }
+        states { logger.log(Level.ALL, "${this@FluxViewModel::class.simpleName} - State: $it") }
+        errors { logger.log(Level.ALL, "${this@FluxViewModel::class.simpleName} - $it") }
     }
 
     private fun bindInputs() {

@@ -8,13 +8,16 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.zeyadgasser.core.ARG_STATE
 import com.zeyadgasser.core.FluxViewModel
 import com.zeyadgasser.core.InputStrategy.THROTTLE
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 
 class MVVMViewModel(
     initialState: MVVMState,
     inputHandler: MVVMInputHandler,
-    handle: SavedStateHandle?
+    handle: SavedStateHandle?,
+    dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : FluxViewModel<MVVMInput, Nothing, MVVMState, MVVMEffect>(
-    initialState, inputHandler, null, handle
+    initialState, inputHandler, null, handle, dispatcher
 ) {
 
     fun changeBackground() = process(ChangeBackgroundInput(), THROTTLE)

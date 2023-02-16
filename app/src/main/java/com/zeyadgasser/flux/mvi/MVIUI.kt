@@ -128,12 +128,8 @@ private fun MVIScreenContent(
 @Composable
 private fun MVIState.evaluateColorFromState() = when (this) {
     InitialState -> MaterialTheme.colors.background
-    is ColorBackgroundState, is ErrorState -> Color(
-        LocalContext.current.resources.getColor(
-            color,
-            null
-        )
-    )
+    is ColorBackgroundState, is ErrorState ->
+        Color(LocalContext.current.resources.getColor(color, null))
 }
 
 @Composable

@@ -12,7 +12,7 @@ class AsyncOutcomeFlow(val Flow: Flow<FluxOutcome>) : Flow<FluxOutcome> {
 
 data class InputOutcomeStream(val input: Input, val outcomes: Flow<FluxOutcome>)
 
-internal object EmptyInput : Input()
+object EmptyInput : Input()
 
 sealed class FluxOutcome(open var input: Input = EmptyInput)
 
