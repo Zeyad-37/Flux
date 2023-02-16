@@ -11,7 +11,7 @@ class MVVMInputHandler : InputHandler<MVVMInput, MVVMState> {
         return when (input) {
             is ChangeBackgroundInput ->
                 ColorBackgroundState(Color.argb(255, input.r, input.g, input.b))
-                    .toStateOutcomeFlow().onStart { delay(3000) }
+                    .toStateOutcomeFlow().onStart { delay(1000) }
             is ShowDialogInput -> ShowDialogEffect.toEffectOutcomeFlow().executeInParallel()
             is ErrorInput -> IllegalStateException("Test").toErrorOutcomeFlow()
         }

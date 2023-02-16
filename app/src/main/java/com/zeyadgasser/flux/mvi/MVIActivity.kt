@@ -13,14 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.zeyadgasser.core.Effect
 import com.zeyadgasser.core.Error
 import com.zeyadgasser.core.InputStrategy.THROTTLE
 import com.zeyadgasser.core.Output
 import com.zeyadgasser.core.Progress
 import com.zeyadgasser.flux.ui.theme.FluxTheme
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.Main
 import com.zeyadgasser.core.State as MviState
 
 val LocalActivity = staticCompositionLocalOf<ComponentActivity> {
@@ -38,13 +38,12 @@ class MVIActivity : ComponentActivity() {
                 FluxTheme { MVIScreen(viewModel) }
             }
         }
-        lifecycleScope.launchWhenCreated { viewModel.bind(InitialState) }
     }
 }
 
 @Composable
-private fun MVIScreen(viewModel: MVIViewModel) {
-    val outputState: State<Output> = viewModel.observe().collectAsState(Dispatchers.Main)
+private fun MVIScreen(viewModel: MVIViewModel = viewModel(factory = MVIViewModel.Factory)) {
+    val outputState: State<Output> = viewModel.observe().collectAsState(Main)
     var successState: MVIState by rememberSaveable { mutableStateOf(InitialState) }
     var showDialog by rememberSaveable { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }

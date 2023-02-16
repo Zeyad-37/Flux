@@ -5,16 +5,13 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.zeyadgasser.core.Effect
 import com.zeyadgasser.core.Error
 import com.zeyadgasser.core.InputStrategy.THROTTLE
 import com.zeyadgasser.core.Progress
 import com.zeyadgasser.core.State
 import com.zeyadgasser.flux.databinding.ActivityMviBinding
-import kotlinx.coroutines.launch
 
 class MVVMActivity : AppCompatActivity() {
 
@@ -24,16 +21,13 @@ class MVVMActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         bindViews()
-        lifecycleScope.launchWhenCreated { viewModel.bind(InitialState) }
-        lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.observe().collect {
-                    when (it) {
-                        is Error -> bindError(it)
-                        is Effect -> bindEffect(it as MVVMEffect)
-                        is State -> binding.bindState(it as MVVMState)
-                        is Progress -> binding.toggleProgress(it)
-                    }
+        lifecycleScope.launchWhenStarted {
+            viewModel.observe().collect {
+                when (it) {
+                    is Error -> bindError(it)
+                    is Effect -> bindEffect(it as MVVMEffect)
+                    is State -> binding.bindState(it as MVVMState)
+                    is Progress -> binding.toggleProgress(it)
                 }
             }
         }
@@ -42,8 +36,9 @@ class MVVMActivity : AppCompatActivity() {
     private fun bindViews() {
         binding = ActivityMviBinding.inflate(layoutInflater).apply {
             setContentView(root)
-            changeBackgroundButton
-                .setOnClickListener { viewModel.process(ChangeBackgroundInput(), THROTTLE) }
+            changeBackgroundButton.setOnClickListener {
+                viewModel.process(ChangeBackgroundInput(), THROTTLE)
+            }
             showDialogButton.setOnClickListener { viewModel.process(ShowDialogInput) }
             showErrorButton.setOnClickListener { viewModel.process(ErrorInput) }
         }
@@ -58,10 +53,8 @@ class MVVMActivity : AppCompatActivity() {
     private fun bindError(error: Error) = binding.apply { errorText.text = error.message }
 
     private fun bindEffect(effect: MVVMEffect) = when (effect) {
-        is ShowDialogEffect -> AlertDialog.Builder(this)
-            .setTitle("Dialog")
-            .setMessage("Dialog effect!")
-            .create().show()
+        is ShowDialogEffect -> AlertDialog.Builder(this).setTitle("Dialog")
+            .setMessage("Dialog effect!").create().show()
     }
 
     private fun ActivityMviBinding.bindState(state: MVVMState) = when (state) {

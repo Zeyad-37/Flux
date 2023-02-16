@@ -5,13 +5,26 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.zeyadgasser.core.ARG_STATE
 import com.zeyadgasser.core.FluxViewModel
 
-class MVIViewModel(inputHandler: MVIInputHandler, reducer: MVIReducer, handle: SavedStateHandle?) :
-    FluxViewModel<MVIInput, MVIResult, MVIState, MVIEffect>(inputHandler, reducer, handle) {
+class MVIViewModel(
+    initialState: MVIState,
+    inputHandler: MVIInputHandler,
+    reducer: MVIReducer,
+    handle: SavedStateHandle?
+) : FluxViewModel<MVIInput, MVIResult, MVIState, MVIEffect>(
+    initialState, inputHandler, reducer, handle
+) {
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer { MVIViewModel(MVIInputHandler(), MVIReducer(), createSavedStateHandle()) }
+            initializer {
+                createSavedStateHandle().let {
+                    MVIViewModel(
+                        it[ARG_STATE] ?: InitialState, MVIInputHandler(), MVIReducer(), it
+                    )
+                }
+            }
         }
     }
 }

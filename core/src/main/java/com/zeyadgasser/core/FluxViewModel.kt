@@ -36,6 +36,7 @@ internal data class FluxError(var error: Error) : FluxOutcome() {
 }
 
 abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
+    private var currentState: S,
     private val inputHandler: InputHandler<I, S>,
     private val reducer: Reducer<S, R>?,
     private val savedStateHandle: SavedStateHandle?,
@@ -46,9 +47,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     internal data class FluxEffect<E>(val effect: E) : FluxOutcome()
     internal data class FluxResult<R>(val result: R) : FluxOutcome()
 
-    private lateinit var currentState: S
-    private lateinit var viewModelListener: MutableStateFlow<Output>
-
+    private val viewModelListener: MutableStateFlow<Output> = MutableStateFlow(currentState)
     private val inputs: MutableSharedFlow<I> = MutableSharedFlow()
     private val throttledInputs: MutableSharedFlow<I> = MutableSharedFlow()
     private val debouncedInputs: MutableSharedFlow<I> = MutableSharedFlow()
@@ -57,11 +56,8 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     private val loggingListener: LoggingListener<I, R, S, E> =
         LoggingListenerHelper<I, R, S, E>().apply { log().invoke(this) }
 
-    suspend fun bind(initialState: S): FluxViewModel<I, R, S, E> {
-        currentState = savedStateHandle?.get(ARG_STATE) ?: initialState
-        viewModelListener = MutableStateFlow(currentState)
+    init {
         bindInputs()
-        return this
     }
 
     fun observe(): StateFlow<Output> = viewModelListener.asStateFlow()
@@ -84,7 +80,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
 
     open fun track(): TrackingListenerHelper<I, R, S, E>.() -> Unit = { /*empty*/ }
 
-    private suspend fun bindInputs() {
+    private fun bindInputs() {
         val outcome: Flow<FluxOutcome> = createOutcomes()
         val states: Flow<FluxState<S>> = if (reducer != null) {
             outcome.filter { it is FluxResult<*> }
@@ -98,13 +94,13 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
         }
         val nonStateOutcomes =
             outcome.filter { it !is FluxState<*> }.filter { it !is FluxResult<*> }
-        merge(nonStateOutcomes, states)
+        val outcomeFlow = merge(nonStateOutcomes, states)
             .onEach {
                 trackOutcomes(it)
                 logOutcomes(it)
                 handleOutcome(it)
             }.flowOn(ioDispatcher)
-            .collect {}
+        viewModelScope.launch { outcomeFlow.collect {} }
     }
 
     private fun createOutcomes(): Flow<FluxOutcome> {
