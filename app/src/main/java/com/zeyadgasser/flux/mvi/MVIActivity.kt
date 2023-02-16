@@ -1,11 +1,9 @@
 package com.zeyadgasser.flux.mvi
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -23,6 +21,11 @@ import com.zeyadgasser.core.Output
 import com.zeyadgasser.core.Progress
 import com.zeyadgasser.flux.ui.theme.FluxTheme
 import kotlinx.coroutines.Dispatchers
+import com.zeyadgasser.core.State as MviState
+
+val LocalActivity = staticCompositionLocalOf<ComponentActivity> {
+    error("LocalActivity is not present")
+}
 
 class MVIActivity : ComponentActivity() {
 
@@ -30,65 +33,98 @@ class MVIActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { FluxTheme { MVIScreen(viewModel) } }
+        setContent {
+            CompositionLocalProvider(LocalActivity provides this) {
+                FluxTheme { MVIScreen(viewModel) }
+            }
+        }
         lifecycleScope.launchWhenCreated { viewModel.bind(InitialState) }
     }
 }
 
 @Composable
-fun MVIScreen(viewModel: MVIViewModel) {
-    val state: State<Output> = viewModel.observe().collectAsState(Dispatchers.Main)
+private fun MVIScreen(viewModel: MVIViewModel) {
+    val outputState: State<Output> = viewModel.observe().collectAsState(Dispatchers.Main)
     var successState: MVIState by rememberSaveable { mutableStateOf(InitialState) }
-    var isLoading: Boolean by remember { mutableStateOf(false) }
-    var errorMessage: String by remember { mutableStateOf("") }
-    when (val output = state.value) {
-        is Effect -> bindEffect(output as MVIEffect, LocalContext.current)
-        is Error -> errorMessage = output.message
+    var showDialog by rememberSaveable { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+    var uncaughtErrorMessage by remember { mutableStateOf("") }
+    when (val output = outputState.value) {
+        is Effect -> {
+            showDialog = (output as MVIEffect) is ShowDialogEffect
+            BindEffects(output)
+        }
+        is Error -> uncaughtErrorMessage = output.message
         is Progress -> isLoading = output.isLoading
-        is com.zeyadgasser.core.State -> successState = output as MVIState
+        is MviState -> {
+            successState = output as MVIState
+            uncaughtErrorMessage = ""
+        }
     }
-    MVIScreenScaffold(successState,
+    MVIScreenScaffold(
+        successState,
         isLoading,
-        errorMessage,
+        showDialog,
+        uncaughtErrorMessage,
         { viewModel.process(ChangeBackgroundInput(), THROTTLE) },
         { viewModel.process(ShowDialogInput) },
-        { viewModel.process(ErrorInput) })
+        { viewModel.process(ErrorInput) },
+        { viewModel.process(UncaughtErrorInput) },
+        { viewModel.process(NavBackInput) },
+        { showDialog = false },
+    )
+}
+
+@Composable
+private fun BindEffects(effect: MVIEffect) = when (effect) {
+    is NavBackEffect -> LocalActivity.current.onBackPressed()
+    is ShowDialogEffect -> Unit
 }
 
 @Composable
 fun MVIScreenScaffold(
     successState: MVIState,
     isLoading: Boolean,
-    errorMessage: String,
+    showDialog: Boolean,
+    uncaughtErrorMessage: String,
     changeBackgroundOnClick: () -> Unit,
     showDialogOnClick: () -> Unit,
-    showErrorOnClick: () -> Unit,
+    showErrorStateOnClick: () -> Unit,
+    showUncaughtErrorOnClick: () -> Unit,
+    goBackOnClick: () -> Unit,
+    onDismissClick: () -> Unit,
 ) = Scaffold(Modifier.fillMaxSize(),
-    backgroundColor = when (successState) {
-        InitialState -> MaterialTheme.colors.background
-        is ColorBackgroundState ->
-            Color(LocalContext.current.resources.getColor(successState.color, null))
-    },
+    backgroundColor = successState.evaluateColorFromState(),
     topBar = { TopAppBar(Modifier.fillMaxWidth()) { Text("MVISample", Modifier.padding(8.dp)) } },
     content = { paddingValues: PaddingValues ->
         MVIScreenContent(
-            paddingValues,
-            changeBackgroundOnClick,
-            showDialogOnClick,
-            showErrorOnClick,
-            errorMessage,
-            isLoading
+            errorMessage = successState.evaluateErrorMessageFromState(),
+            uncaughtErrorMessage = uncaughtErrorMessage,
+            isLoading = isLoading,
+            showDialog = showDialog,
+            paddingValues = paddingValues,
+            changeBackgroundOnClick = changeBackgroundOnClick,
+            showDialogOnClick = showDialogOnClick,
+            showErrorStateOnClick = showErrorStateOnClick,
+            showUncaughtErrorOnClick = showUncaughtErrorOnClick,
+            goBackOnClick = goBackOnClick,
+            onDismissClick = onDismissClick,
         )
     })
 
 @Composable
 private fun MVIScreenContent(
+    errorMessage: String,
+    uncaughtErrorMessage: String,
+    isLoading: Boolean,
+    showDialog: Boolean,
     paddingValues: PaddingValues,
     changeBackgroundOnClick: () -> Unit,
     showDialogOnClick: () -> Unit,
-    showErrorOnClick: () -> Unit,
-    errorMessage: String,
-    isLoading: Boolean
+    showErrorStateOnClick: () -> Unit,
+    showUncaughtErrorOnClick: () -> Unit,
+    goBackOnClick: () -> Unit,
+    onDismissClick: () -> Unit,
 ) = Column(
     modifier = Modifier
         .fillMaxSize()
@@ -97,12 +133,30 @@ private fun MVIScreenContent(
 ) {
     Button(onClick = changeBackgroundOnClick) { Text(text = "Change Background") }
     Button(onClick = showDialogOnClick) { Text(text = "Show Dialog in parallel") }
-    Button(onClick = showErrorOnClick) { Text(text = "Show Error") }
+    Button(onClick = showErrorStateOnClick) { Text(text = "Show Error State") }
+    Button(onClick = showUncaughtErrorOnClick) { Text(text = "Show Uncaught Error") }
+    Button(onClick = goBackOnClick) { Text(text = "Go Back") }
     if (errorMessage.isNotEmpty()) Text(text = errorMessage)
+    if (uncaughtErrorMessage.isNotEmpty()) Text(text = uncaughtErrorMessage)
     if (isLoading) CircularProgressIndicator(Modifier.size(42.dp))
+    if (showDialog) AlertDialog(
+        onDismissRequest = onDismissClick,
+        confirmButton = { TextButton(onDismissClick) { Text("Confirm") } },
+        dismissButton = { TextButton(onDismissClick) { Text("Dismiss") } },
+        title = { Text("Dialog") },
+        text = { Text("Dialog effect!") },
+    )
 }
 
-private fun bindEffect(effect: MVIEffect, context: Context) = when (effect) {
-    is ShowDialogEffect -> AlertDialog.Builder(context).setTitle("Dialog")
-        .setMessage("Dialog effect!").create().show()
+@Composable
+private fun MVIState.evaluateColorFromState() = when (this) {
+    InitialState -> MaterialTheme.colors.background
+    is ColorBackgroundState, is ErrorState ->
+        Color(LocalContext.current.resources.getColor(color, null))
+}
+
+@Composable
+private fun MVIState.evaluateErrorMessageFromState() = when (this) {
+    is ErrorState -> message
+    is ColorBackgroundState, InitialState -> ""
 }

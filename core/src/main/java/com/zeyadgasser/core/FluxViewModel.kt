@@ -140,8 +140,8 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
         FluxError(Error(throwable.message.orEmpty(), throwable, input)).apply { this.input = input }
 
     private fun trackOutcomes(outcome: FluxOutcome) = when (outcome) {
-        is FluxProgress -> trackingListener.progress(outcome.progress)
         is FluxError -> trackingListener.errors(outcome.error)
+        is FluxProgress -> trackingListener.progress(outcome.progress)
         is FluxState<*> -> trackingListener.states(outcome.state as S, outcome.input as I)
         is FluxEffect<*> -> trackingListener.effects(outcome.effect as E, outcome.input as I)
         is FluxResult<*> -> trackingListener.results(outcome.result as R, outcome.input as I)
@@ -149,8 +149,8 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     }
 
     private fun logOutcomes(outcome: FluxOutcome) = when (outcome) {
-        is FluxProgress -> loggingListener.progress(outcome.progress)
         is FluxError -> loggingListener.errors(outcome.error)
+        is FluxProgress -> loggingListener.progress(outcome.progress)
         is FluxState<*> -> loggingListener.states(outcome.state as S)
         is FluxEffect<*> -> loggingListener.effects(outcome.effect as E)
         is FluxResult<*> -> loggingListener.results(outcome.result as R)
@@ -172,7 +172,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
             is FluxResult<*>, EmptyFluxOutcome -> Unit
         }
         if (fluxOutcome !is FluxProgress) {
-            flow<Nothing> {
+            flow<Nothing> {// TODO improve
                 delay(10)
                 Progress(false, fluxOutcome.input).let {
                     logOutcomes(FluxProgress(it))

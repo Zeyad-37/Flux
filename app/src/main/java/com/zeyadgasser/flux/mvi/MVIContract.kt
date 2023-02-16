@@ -15,19 +15,25 @@ data class ChangeBackgroundInput(
 ) : MVIInput()
 
 object ShowDialogInput : MVIInput()
+object UncaughtErrorInput : MVIInput()
 object ErrorInput : MVIInput()
+object NavBackInput : MVIInput()
 
 sealed class MVIResult : Result
 data class ChangeBackgroundResult(val color: Int) : MVIResult()
+data class ErrorResult(val message: String) : MVIResult()
 
 sealed class MVIEffect : Effect
-
 object ShowDialogEffect : MVIEffect()
+object NavBackEffect : MVIEffect()
 
-sealed class MVIState : State
+sealed class MVIState(open val color: Int = android.R.color.white) : State
 
 @Parcelize
-data class ColorBackgroundState(val color: Int) : MVIState()
+data class ErrorState(val message: String) : MVIState(android.R.color.holo_red_light)
+
+@Parcelize
+data class ColorBackgroundState(override val color: Int) : MVIState(color)
 
 @Parcelize
 object InitialState : MVIState()
