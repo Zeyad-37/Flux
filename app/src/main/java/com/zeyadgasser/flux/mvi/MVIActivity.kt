@@ -7,10 +7,12 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.zeyadgasser.flux.ui.theme.FluxTheme
+import dagger.hilt.android.AndroidEntryPoint
 
 val LocalActivity: ProvidableCompositionLocal<ComponentActivity> =
     staticCompositionLocalOf { error("LocalActivity is not present") }
 
+@AndroidEntryPoint
 class MVIActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

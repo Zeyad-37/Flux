@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:name=".FluxApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -11,12 +12,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="31">
-        <activity
-            android:name=".mvvm.MVVMActivity"
-            android:exported="false" />
-        <activity
-            android:name=".mvi.MVIActivity"
-            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -28,5 +23,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".mvvm.MVVMActivity"
+            android:exported="false" />
+        <activity
+            android:name=".mvi.MVIActivity"
+            android:exported="false" />
     </application>
 </manifest>

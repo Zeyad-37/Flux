@@ -8,10 +8,14 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.zeyadgasser.core.ARG_STATE
 import com.zeyadgasser.core.FluxViewModel
 import com.zeyadgasser.core.InputStrategy.THROTTLE
+import dagger.assisted.Assisted
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import javax.inject.Inject
 
-class MVIViewModel(
+@HiltViewModel
+class MVIViewModel @Inject constructor(
     initialState: MVIState,
     inputHandler: MVIInputHandler,
     reducer: MVIReducer,

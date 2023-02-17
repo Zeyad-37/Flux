@@ -19,7 +19,7 @@ import kotlinx.coroutines.Dispatchers.Main
 import androidx.compose.runtime.State as ComposeState
 
 @Composable
-fun MVIScreen(viewModel: MVIViewModel = viewModel(factory = MVIViewModel.Factory)) {
+fun MVIScreen(viewModel: MVIViewModel = viewModel(/*factory = MVIViewModel.Factory*/)) {
     val outputState: ComposeState<Output> = viewModel.observe().collectAsState(Main)
     var successState: MVIState by rememberSaveable { mutableStateOf(InitialState) }
     var showDialog by rememberSaveable { mutableStateOf(false) }
