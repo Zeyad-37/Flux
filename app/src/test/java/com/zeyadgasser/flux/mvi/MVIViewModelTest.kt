@@ -3,16 +3,19 @@ package com.zeyadgasser.flux.mvi
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.zeyadgasser.core.*
+import com.zeyadgasser.flux.CoroutineTestExtension
 import com.zeyadgasser.flux.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Rule
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@ExtendWith(CoroutineTestExtension::class)
 class MVIViewModelTest {
 
     @get:Rule
@@ -20,7 +23,7 @@ class MVIViewModelTest {
 
     private lateinit var mviViewModel: MVIViewModel
 
-    @Before
+    @BeforeEach
     fun before() {
         mviViewModel = MVIViewModel(
             InitialState,

@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-parcelize'
+    id "de.mannodermaus.android-junit5" version "1.8.2.1"
 }
 
 android {
@@ -16,6 +17,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArgument "runnerBuilder", "de.mannodermaus.junit5.AndroidJUnit5Builder"
         vectorDrawables {
             useSupportLibrary true
         }
@@ -63,6 +65,11 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.8.0'
 
+    // (Required) Writing and executing Unit Tests on the JUnit Platform
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.8.2"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:5.8.2" // (Optional) If you need "Parameterized Tests"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.8.2"
+    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:5.8.2" // (Optional) If you also have JUnit 4-based tests
     testImplementation 'junit:junit:4.13.2'
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
     testImplementation 'app.cash.turbine:turbine:0.12.1'
@@ -71,6 +78,11 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui_version"
+
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
+    androidTestImplementation("de.mannodermaus.junit5:android-test-core:1.2.2")
+    androidTestRuntimeOnly("de.mannodermaus.junit5:android-test-runner:1.2.2")
 
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
