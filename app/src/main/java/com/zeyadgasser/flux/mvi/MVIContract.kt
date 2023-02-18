@@ -8,12 +8,7 @@ import kotlinx.parcelize.Parcelize
 import kotlin.random.Random
 
 sealed class MVIInput : Input()
-data class ChangeBackgroundInput(
-    val r: Int = Random.nextInt(255),
-    val g: Int = Random.nextInt(255),
-    val b: Int = Random.nextInt(255)
-) : MVIInput()
-
+object ChangeBackgroundInput : MVIInput()
 object ShowDialogInput : MVIInput()
 object UncaughtErrorInput : MVIInput()
 object ErrorInput : MVIInput()

@@ -25,7 +25,7 @@ class MVIViewModel @Inject constructor(
     initialState, inputHandler, reducer, handle, dispatcher
 ) {
 
-    fun changeBackground() = process(ChangeBackgroundInput(), THROTTLE)
+    fun changeBackground() = process(ChangeBackgroundInput, THROTTLE)
     fun showDialogInput() = process(ShowDialogInput)
     fun errorInput() = process(ErrorInput)
     fun uncaughtErrorInput() = process(UncaughtErrorInput)

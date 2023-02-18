@@ -20,9 +20,11 @@ class MVVMViewModel(
     initialState, inputHandler, null, handle, dispatcher
 ) {
 
-    fun changeBackground() = process(ChangeBackgroundInput(), THROTTLE)
+    fun changeBackground() = process(ChangeBackgroundInput, THROTTLE)
     fun showDialogInput() = process(ShowDialogInput)
     fun errorInput() = process(ErrorInput)
+    fun uncaughtErrorInput() = process(UncaughtErrorInput)
+    fun navBackInput() = process(NavBackInput)
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {

@@ -10,10 +10,10 @@ import kotlin.random.Random
 class MVIInputHandler : InputHandler<MVIInput, MVIState> {
     override fun handleInputs(input: MVIInput, currentState: MVIState): Flow<FluxOutcome> =
         when (input) {
-            is ChangeBackgroundInput -> ChangeBackgroundResult(getRandomColorId())
+            ChangeBackgroundInput -> ChangeBackgroundResult(getRandomColorId())
                 .toResultOutcomeFlow().onStart { delay(1373) }
-            is ShowDialogInput -> ShowDialogEffect.toEffectOutcomeFlow().executeInParallel()
-            is UncaughtErrorInput -> IllegalStateException("UncaughtError").toErrorOutcomeFlow()
+            ShowDialogInput -> ShowDialogEffect.toEffectOutcomeFlow().executeInParallel()
+            UncaughtErrorInput -> IllegalStateException("UncaughtError").toErrorOutcomeFlow()
             NavBackInput -> NavBackEffect.toEffectOutcomeFlow()
             ErrorInput -> ErrorResult("Error").toResultOutcomeFlow()
         }

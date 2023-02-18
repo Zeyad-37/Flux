@@ -37,7 +37,7 @@ class MVIViewModelTest {
     @Test
     fun changeBackground() = runTest {
         mviViewModel.observe().test {
-            val input = ChangeBackgroundInput()
+            val input = ChangeBackgroundInput
             mviViewModel.process(input, InputStrategy.THROTTLE)
             assertEquals(InitialState, awaitItem())
             assertEquals(Progress(false, EmptyInput), awaitItem())
