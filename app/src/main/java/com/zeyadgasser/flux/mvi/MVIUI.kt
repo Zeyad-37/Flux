@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.zeyadgasser.core.Effect
 import com.zeyadgasser.core.Error
 import com.zeyadgasser.core.Output
@@ -22,7 +22,7 @@ import androidx.compose.runtime.State as ComposeState
 
 @Composable
 fun MVIScreen(
-    viewModel: MVIViewModel = viewModel(factory = MVIViewModel.Factory),
+    viewModel: MVIViewModel = hiltViewModel(),
     onBackClicked: () -> Unit
 ) {
     val outputState: ComposeState<Output> = viewModel.observe().collectAsState(Main)

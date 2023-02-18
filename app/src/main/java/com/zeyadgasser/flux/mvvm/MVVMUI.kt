@@ -5,7 +5,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.zeyadgasser.core.Effect
 import com.zeyadgasser.core.Error
 import com.zeyadgasser.core.Output
@@ -17,7 +17,7 @@ import androidx.compose.runtime.State as ComposeState
 
 @Composable
 fun MVVMScreen(
-    viewModel: MVVMViewModel = viewModel(factory = MVVMViewModel.Factory),
+    viewModel: MVVMViewModel = hiltViewModel(),
     onBackClicked: () -> Unit
 ) {
     val outputState: ComposeState<Output> = viewModel.observe().collectAsState(Main)
