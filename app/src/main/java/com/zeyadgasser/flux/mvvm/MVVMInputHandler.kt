@@ -2,22 +2,37 @@ package com.zeyadgasser.flux.mvvm
 
 import com.zeyadgasser.core.*
 import com.zeyadgasser.flux.R
+import com.zeyadgasser.flux.mvi.ChangeBackgroundResult
+import com.zeyadgasser.flux.mvi.FluxTask
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onStart
 import kotlin.random.Random
 
 class MVVMInputHandler : InputHandler<MVVMInput, MVVMState> {
+
+    private val tasks = List(30) { i -> FluxTask(i, "Task # $i") }.toMutableList()
+
     override fun handleInputs(input: MVVMInput, currentState: MVVMState): Flow<FluxOutcome> {
         return when (input) {
-            ChangeBackgroundInput -> ColorBackgroundState(getRandomColorId())
-                    .toStateOutcomeFlow().onStart { delay(1000) }
+            ChangeBackgroundInput -> ColorBackgroundState(getRandomColorId(), tasks)
+                .toStateOutcomeFlow().onStart { delay(1000) }
             ShowDialogInput -> ShowDialogEffect.toEffectOutcomeFlow().executeInParallel()
             UncaughtErrorInput -> IllegalStateException("UncaughtError").toErrorOutcomeFlow()
             NavBackInput -> NavBackEffect.toEffectOutcomeFlow()
             ErrorInput -> ErrorState("Error").toStateOutcomeFlow()
+            is ChangeTaskChecked -> onChangeTaskChecked(input)
+            is RemoveTask -> onRemoveTask(input.fluxTask)
         }
     }
+
+    private fun onRemoveTask(task: FluxTask): Flow<FluxOutcome> = tasks.remove(task)
+        .run { ChangeBackgroundResult(getRandomColorId(), tasks).toResultOutcomeFlow() }
+
+    private fun onChangeTaskChecked(input: ChangeTaskChecked): Flow<FluxOutcome> =
+        tasks.find { it.id == input.fluxTask.id }
+            ?.let { task -> task.checked = input.checked }
+            .run { ChangeBackgroundResult(getRandomColorId(), tasks).toResultOutcomeFlow() }
 
     private fun getRandomColorId(): Int = when (Random.nextInt(10)) {
         0 -> R.color.purple_200

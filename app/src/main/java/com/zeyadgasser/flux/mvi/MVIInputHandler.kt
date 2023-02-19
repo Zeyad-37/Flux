@@ -8,15 +8,27 @@ import kotlinx.coroutines.flow.onStart
 import kotlin.random.Random
 
 class MVIInputHandler : InputHandler<MVIInput, MVIState> {
+    private val tasks = List(30) { i -> FluxTask(i, "Task # $i") }.toMutableList()
+
     override fun handleInputs(input: MVIInput, currentState: MVIState): Flow<FluxOutcome> =
         when (input) {
-            ChangeBackgroundInput -> ChangeBackgroundResult(getRandomColorId())
+            ChangeBackgroundInput -> ChangeBackgroundResult(getRandomColorId(), tasks)
                 .toResultOutcomeFlow().onStart { delay(1373) }
             ShowDialogInput -> ShowDialogEffect.toEffectOutcomeFlow().executeInParallel()
             UncaughtErrorInput -> IllegalStateException("UncaughtError").toErrorOutcomeFlow()
             NavBackInput -> NavBackEffect.toEffectOutcomeFlow()
             ErrorInput -> ErrorResult("Error").toResultOutcomeFlow()
+            is ChangeTaskChecked -> onChangeTaskChecked(input)
+            is RemoveTask -> onRemoveTask(input.fluxTask)
         }
+
+    private fun onRemoveTask(task: FluxTask): Flow<FluxOutcome> = tasks.remove(task)
+        .run { ChangeBackgroundResult(getRandomColorId(), tasks).toResultOutcomeFlow() }
+
+    private fun onChangeTaskChecked(input: ChangeTaskChecked): Flow<FluxOutcome> =
+        tasks.find { it.id == input.fluxTask.id }
+            ?.let { task -> task.checked = input.checked }
+            .run { ChangeBackgroundResult(getRandomColorId(), tasks).toResultOutcomeFlow() }
 
     private fun getRandomColorId(): Int = when (Random.nextInt(10)) {
         0 -> R.color.purple_200

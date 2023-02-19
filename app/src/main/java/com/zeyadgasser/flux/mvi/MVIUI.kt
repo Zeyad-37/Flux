@@ -1,9 +1,11 @@
 package com.zeyadgasser.flux.mvi
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -43,8 +45,8 @@ fun MVIScreen(
         }
     }
     MVScreenContent(
-        color = successState.evaluateColorFromState(),
-        errorMessage = successState.evaluateErrorMessageFromState(),
+        color = successState.evaluateColor(),
+        errorMessage = successState.evaluateErrorMessage(),
         uncaughtErrorMessage = uncaughtErrorMessage,
         isLoading = isLoading,
         showDialog = showDialog,
@@ -53,7 +55,11 @@ fun MVIScreen(
         showErrorStateOnClick = { viewModel.errorInput() },
         showUncaughtErrorOnClick = { viewModel.uncaughtErrorInput() },
         goBackOnClick = { viewModel.navBackInput() },
-        onDismissClick = { showDialog = false })
+        onDismissClick = { showDialog = false },
+        list = successState.evaluateList(),
+        onCloseTask = { task -> viewModel.removeTask(task) },
+        onCheckedTask = { task, checked -> viewModel.changeTaskChecked(task, checked) }
+    )
 }
 
 @Composable
@@ -69,6 +75,9 @@ fun MVScreenContent(
     showUncaughtErrorOnClick: () -> Unit,
     goBackOnClick: () -> Unit,
     onDismissClick: () -> Unit,
+    list: List<FluxTask> = List(30) { i -> FluxTask(i, "Task # $i") },
+    onCloseTask: (FluxTask) -> Unit = {},
+    onCheckedTask: (FluxTask, Boolean) -> Unit = { _, _ -> }
 ) = Surface(
     modifier = Modifier.fillMaxSize(),
     color = color,
@@ -92,8 +101,37 @@ fun MVScreenContent(
             title = { Text("Dialog") },
             text = { Text("Dialog effect!") },
         )
+        LazyColumn(Modifier.fillMaxWidth()) {
+            items(list, { item -> item.id }) { task ->
+                FluxTask(
+                    taskName = task.label,
+                    checked = task.checked,
+                    onCheckedChange = { checked -> onCheckedTask(task, checked) },
+                    onClose = { onCloseTask(task) },
+                )
+            }
+        }
     }
 }
+
+@Composable
+fun FluxTask(
+    taskName: String,
+    modifier: Modifier = Modifier,
+    checked: Boolean = false,
+    onCheckedChange: (Boolean) -> Unit = {},
+    onClose: () -> Unit = {},
+) = Row(modifier, verticalAlignment = Alignment.CenterVertically) {
+    Text(
+        taskName,
+        Modifier
+            .weight(1f)
+            .padding(start = 16.dp)
+    )
+    Checkbox(checked = checked, onCheckedChange = onCheckedChange)
+    IconButton(onClick = onClose) { Icon(Icons.Filled.Close, "Close") }
+}
+
 
 @Composable
 private fun BindEffects(effect: MVIEffect, onBackClicked: () -> Unit) = when (effect) {
@@ -102,14 +140,20 @@ private fun BindEffects(effect: MVIEffect, onBackClicked: () -> Unit) = when (ef
 }
 
 @Composable
-private fun MVIState.evaluateColorFromState() = when (this) {
+private fun MVIState.evaluateColor() = when (this) {
     InitialState -> MaterialTheme.colors.background
     is ColorBackgroundState, is ErrorState ->
         Color(LocalContext.current.resources.getColor(color, null))
 }
 
 @Composable
-private fun MVIState.evaluateErrorMessageFromState() = when (this) {
+private fun MVIState.evaluateErrorMessage() = when (this) {
     is ErrorState -> message
     is ColorBackgroundState, InitialState -> ""
+}
+
+@Composable
+private fun MVIState.evaluateList(): List<FluxTask> = when (this) {
+    is ErrorState, InitialState -> emptyList()
+    is ColorBackgroundState -> list.toMutableStateList()
 }

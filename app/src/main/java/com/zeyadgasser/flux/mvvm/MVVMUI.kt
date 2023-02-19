@@ -11,6 +11,7 @@ import com.zeyadgasser.core.Error
 import com.zeyadgasser.core.Output
 import com.zeyadgasser.core.Progress
 import com.zeyadgasser.core.State
+import com.zeyadgasser.flux.mvi.FluxTask
 import com.zeyadgasser.flux.mvi.MVScreenContent
 import kotlinx.coroutines.Dispatchers.Main
 import androidx.compose.runtime.State as ComposeState
@@ -38,8 +39,8 @@ fun MVVMScreen(
         }
     }
     MVScreenContent(
-        color = successState.evaluateColorFromState(),
-        errorMessage = successState.evaluateErrorMessageFromState(),
+        color = successState.evaluateColor(),
+        errorMessage = successState.evaluateErrorMessage(),
         uncaughtErrorMessage = uncaughtErrorMessage,
         isLoading = isLoading,
         showDialog = showDialog,
@@ -48,7 +49,11 @@ fun MVVMScreen(
         showErrorStateOnClick = { viewModel.errorInput() },
         showUncaughtErrorOnClick = { viewModel.uncaughtErrorInput() },
         goBackOnClick = { viewModel.navBackInput() },
-        onDismissClick = { showDialog = false })
+        onDismissClick = { showDialog = false },
+        list = successState.evaluateList(),
+        onCloseTask = { task -> viewModel.removeTask(task) },
+        onCheckedTask = { task, checked -> viewModel.changeTaskChecked(task, checked) }
+    )
 }
 
 @Composable
@@ -58,14 +63,21 @@ private fun BindEffects(effect: MVVMEffect, onBackClicked: () -> Unit) = when (e
 }
 
 @Composable
-private fun MVVMState.evaluateColorFromState() = when (this) {
+private fun MVVMState.evaluateColor() = when (this) {
     InitialState -> MaterialTheme.colors.background
     is ColorBackgroundState, is ErrorState ->
         Color(LocalContext.current.resources.getColor(color, null))
 }
 
 @Composable
-private fun MVVMState.evaluateErrorMessageFromState() = when (this) {
+private fun MVVMState.evaluateErrorMessage() = when (this) {
     is ColorBackgroundState, InitialState -> ""
     is ErrorState -> message
 }
+
+@Composable
+private fun MVVMState.evaluateList(): List<FluxTask> = when (this) {
+    is ErrorState, InitialState -> emptyList()
+    is ColorBackgroundState -> list.toMutableStateList()
+}
+

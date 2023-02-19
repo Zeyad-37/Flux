@@ -1,5 +1,6 @@
 package com.zeyadgasser.flux.mvi
 
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.SavedStateHandle
 import com.zeyadgasser.core.FluxViewModel
 import com.zeyadgasser.core.InputStrategy.THROTTLE
@@ -23,4 +24,6 @@ class MVIViewModel @Inject constructor(
     fun errorInput() = process(ErrorInput)
     fun uncaughtErrorInput() = process(UncaughtErrorInput)
     fun navBackInput() = process(NavBackInput)
+    fun removeTask(task: FluxTask) = process(RemoveTask(task))
+    fun changeTaskChecked(task: FluxTask, checked: Boolean) = process(ChangeTaskChecked(task, checked))
 }
