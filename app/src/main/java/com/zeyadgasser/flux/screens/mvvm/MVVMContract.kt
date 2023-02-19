@@ -1,9 +1,9 @@
-package com.zeyadgasser.flux.mvvm
+package com.zeyadgasser.flux.screens.mvvm
 
 import com.zeyadgasser.core.Effect
 import com.zeyadgasser.core.Input
 import com.zeyadgasser.core.State
-import com.zeyadgasser.flux.mvi.FluxTask
+import com.zeyadgasser.flux.screens.mvi.FluxTask
 import kotlinx.parcelize.Parcelize
 
 sealed class MVVMInput : Input()

@@ -1,4 +1,4 @@
-package com.zeyadgasser.flux.mvi
+package com.zeyadgasser.flux.screens.mvi
 
 import android.os.Parcelable
 import androidx.compose.runtime.getValue

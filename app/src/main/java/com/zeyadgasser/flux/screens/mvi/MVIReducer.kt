@@ -1,6 +1,7 @@
-package com.zeyadgasser.flux.mvi
+package com.zeyadgasser.flux.screens.mvi
 
 import com.zeyadgasser.core.Reducer
+import com.zeyadgasser.flux.screens.mvi.*
 
 class MVIReducer : Reducer<MVIState, MVIResult> {
     override fun reduce(state: MVIState, result: MVIResult): MVIState = when (result) {

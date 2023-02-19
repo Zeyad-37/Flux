@@ -5,6 +5,8 @@ import app.cash.turbine.test
 import com.zeyadgasser.core.*
 import com.zeyadgasser.flux.CoroutineTestExtension
 import com.zeyadgasser.flux.MainDispatcherRule
+import com.zeyadgasser.flux.screens.main.mvvm.*
+import com.zeyadgasser.flux.screens.mvvm.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule

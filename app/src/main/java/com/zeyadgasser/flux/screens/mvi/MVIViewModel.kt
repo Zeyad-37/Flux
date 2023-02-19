@@ -1,9 +1,9 @@
-package com.zeyadgasser.flux.mvi
+package com.zeyadgasser.flux.screens.mvi
 
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.SavedStateHandle
 import com.zeyadgasser.core.FluxViewModel
 import com.zeyadgasser.core.InputStrategy.THROTTLE
+import com.zeyadgasser.flux.screens.mvi.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers

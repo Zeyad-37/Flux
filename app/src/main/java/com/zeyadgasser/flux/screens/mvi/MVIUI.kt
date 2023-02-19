@@ -1,4 +1,4 @@
-package com.zeyadgasser.flux.mvi
+package com.zeyadgasser.flux.screens.mvi
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn

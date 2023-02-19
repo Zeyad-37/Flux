@@ -1,4 +1,4 @@
-package com.zeyadgasser.flux.mvvm
+package com.zeyadgasser.flux.screens.mvvm
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
@@ -11,8 +11,8 @@ import com.zeyadgasser.core.Error
 import com.zeyadgasser.core.Output
 import com.zeyadgasser.core.Progress
 import com.zeyadgasser.core.State
-import com.zeyadgasser.flux.mvi.FluxTask
-import com.zeyadgasser.flux.mvi.MVScreenContent
+import com.zeyadgasser.flux.screens.mvi.FluxTask
+import com.zeyadgasser.flux.screens.mvi.MVScreenContent
 import kotlinx.coroutines.Dispatchers.Main
 import androidx.compose.runtime.State as ComposeState
 

@@ -1,4 +1,4 @@
-package com.zeyadgasser.flux.main
+package com.zeyadgasser.flux.screens.main
 
 sealed interface Destination {
     val route: String
