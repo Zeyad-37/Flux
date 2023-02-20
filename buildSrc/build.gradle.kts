@@ -1,5 +1,3 @@
-import org.gradle.kotlin.dsl.`kotlin-dsl`
-
 plugins {
     `kotlin-dsl`
 }
@@ -7,3 +5,12 @@ plugins {
 repositories {
     mavenCentral()
 }
+
+//gradlePlugin {
+//    plugins {
+//        create("androidModulePlugin") {
+//            id = "com.zeyadgasser.flux.gradle.android-module-plugin"
+//            implementationClass = "com.example.AndroidModulePlugin"
+//        }
+//    }
+//}

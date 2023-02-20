@@ -1,4 +1,4 @@
-package com.zeyadgasser.flux.gradle
+package com.zeyadgasser.flux.gradle.plugins
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -22,7 +22,6 @@ class JUnit5Plugin : Plugin<Project> {
         dependencies.add("testImplementation", "org.junit.jupiter:junit-jupiter:5.8.2")
         dependencies.add("testRuntimeOnly", "org.junit.jupiter:junit-jupiter-params:5.8.2")
         dependencies.add("testRuntimeOnly", "org.junit.vintage:junit-vintage-engine:5.8.2")
-
     }
 
     private fun Project.addDependenciesForAndroid() {
