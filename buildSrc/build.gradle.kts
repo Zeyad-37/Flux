@@ -3,14 +3,7 @@ plugins {
 }
 
 repositories {
+    google()
     mavenCentral()
+    gradlePluginPortal()
 }
-
-//gradlePlugin {
-//    plugins {
-//        create("androidModulePlugin") {
-//            id = "com.zeyadgasser.flux.gradle.android-module-plugin"
-//            implementationClass = "com.example.AndroidModulePlugin"
-//        }
-//    }
-//}
