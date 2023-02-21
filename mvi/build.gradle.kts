@@ -1,3 +1,4 @@
+//project.apply<com.zeyadgasser.flux.gradle.AndroidModulePlugin>()
 plugins {
     id("com.android.library")
     kotlin("android")

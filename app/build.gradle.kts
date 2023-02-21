@@ -17,10 +17,10 @@ android {
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "com.zeyadgasser.flux.FluxTestRunner"
-        testInstrumentationRunnerArguments["runnerBuilder"] = "de.mannodermaus.junit5.AndroidJUnit5Builder"
-        vectorDrawables { useSupportLibrary = true }
+        testInstrumentationRunnerArguments["runnerBuilder"] =
+            "de.mannodermaus.junit5.AndroidJUnit5Builder"
+        vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
@@ -35,20 +35,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
-    }
-    buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.2"
-    }
-    packagingOptions {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
+    buildFeatures.compose = true
+    composeOptions.kotlinCompilerExtensionVersion = "1.4.2"
+    packagingOptions.resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
 }
 
 dependencies {

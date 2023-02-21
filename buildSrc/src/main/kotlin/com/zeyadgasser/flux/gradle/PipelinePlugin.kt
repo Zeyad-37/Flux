@@ -1,4 +1,4 @@
-package com.zeyadgasser.flux.gradle.plugins
+package com.zeyadgasser.flux.gradle
 
 //import asDocument
 //import com.android.build.gradle.LibraryExtension

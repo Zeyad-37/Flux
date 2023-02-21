@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Flux"
-include(":app", ":core", ":mvi-sample")
+include(":app", ":core", ":mvi")

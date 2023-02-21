@@ -1,4 +1,4 @@
-package com.zeyadgasser.flux.gradle.plugins
+package com.zeyadgasser.flux.gradle
 
 //import io.gitlab.arturbosch.detekt.DetektPlugin
 //import io.gitlab.arturbosch.detekt.extensions.DetektExtension

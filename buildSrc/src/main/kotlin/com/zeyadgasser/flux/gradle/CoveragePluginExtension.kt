@@ -1,4 +1,4 @@
-package com.zeyadgasser.flux.gradle.plugins
+package com.zeyadgasser.flux.gradle
 
 import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.api.tasks.util.PatternSet

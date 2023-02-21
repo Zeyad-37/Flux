@@ -1,4 +1,4 @@
-package com.zeyadgasser.flux.gradle.plugins
+package com.zeyadgasser.flux.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
