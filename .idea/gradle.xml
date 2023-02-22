@@ -13,7 +13,11 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/domain" />
             <option value="$PROJECT_DIR$/mvi" />
+            <option value="$PROJECT_DIR$/mvvm" />
+            <option value="$PROJECT_DIR$/shared-composables" />
+            <option value="$PROJECT_DIR$/test-base" />
           </set>
         </option>
       </GradleProjectSettings>

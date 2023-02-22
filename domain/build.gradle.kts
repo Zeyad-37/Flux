@@ -1,5 +1,6 @@
+//project.apply<com.zeyadgasser.flux.gradle.AndroidModulePlugin>()
 plugins {
-    id("com.android.application")
+    id("com.android.library")
     id("org.jetbrains.kotlin.android")
     id("kotlin-parcelize")
     id("kotlin-kapt")
@@ -8,15 +9,11 @@ plugins {
 }
 
 android {
-    namespace = "com.zeyadgasser.flux"
+    namespace = "com.zeyadgasser.flux.domain"
     compileSdk = 33
 
     defaultConfig {
-        applicationId = "com.zeyadgasser.flux"
         minSdk = 24
-        targetSdk = 33
-        versionCode = 1
-        versionName = "1.0"
         testInstrumentationRunner = "com.zeyadgasser.flux.FluxTestRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] =
             "de.mannodermaus.junit5.AndroidJUnit5Builder"
@@ -42,36 +39,16 @@ android {
 }
 
 dependencies {
-    implementation(project(":mvi"))
-    implementation(project(":mvvm"))
     implementation(project(":core"))
     val lifecycleVersion = "2.5.1"
-    val navVersion = "2.5.3"
     val junit5Version = "5.8.2"
     val hiltVersion = "2.44.2"
     val composeUIVersion = "1.3.3"
 
-    debugImplementation("androidx.compose.ui:ui-tooling:$composeUIVersion")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:$composeUIVersion")
     implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
-    implementation("androidx.activity:activity-compose:1.6.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.compose.ui:ui:$composeUIVersion")
-    implementation("androidx.compose.ui:ui-tooling-preview:$composeUIVersion")
-    implementation("androidx.compose.ui:ui-viewbinding:$composeUIVersion")
-    implementation("androidx.compose.runtime:runtime:$composeUIVersion")
-    implementation("androidx.compose.foundation:foundation:1.3.1")
-    implementation("androidx.compose.material:material:1.3.1")
-    implementation("androidx.navigation:navigation-compose:$navVersion")
-    implementation("androidx.navigation:navigation-fragment:$navVersion")
-    implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
-    implementation("androidx.navigation:navigation-ui:$navVersion")
-    implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
+    implementation("androidx.activity:activity-compose:1.6.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0-alpha01")
-    implementation("com.google.android.material:material:1.8.0")
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     kapt("com.google.dagger:hilt-compiler:$hiltVersion")
 
@@ -92,8 +69,6 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:$composeUIVersion")
 
-    testImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")
-    kaptTest("com.google.dagger:hilt-android-compiler:$hiltVersion")
     androidTestImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")
     kaptAndroidTest("com.google.dagger:hilt-android-compiler:$hiltVersion")
 
@@ -102,7 +77,7 @@ dependencies {
     androidTestImplementation("de.mannodermaus.junit5:android-test-core:1.2.2")
     androidTestRuntimeOnly("de.mannodermaus.junit5:android-test-runner:1.2.2")
 }
-// Allow references to generated code
+
 kapt {
     correctErrorTypes = true
 }

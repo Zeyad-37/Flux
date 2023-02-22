@@ -1,5 +1,3 @@
-@file:OptIn(FlowPreview::class)
-
 package com.zeyadgasser.core
 
 import androidx.lifecycle.SavedStateHandle
@@ -12,7 +10,7 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import kotlin.coroutines.CoroutineContext
 
-
+@OptIn(FlowPreview::class)
 abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     private var currentState: S,
     private val inputHandler: InputHandler<I, S>,
@@ -69,12 +67,10 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
         } else {
             outcome.filter { it is FluxState<*> }.map { it as FluxState<S> }
         }
-        val nonStateOutcomes =
-            outcome.filter { it !is FluxState<*> }.filter { it !is FluxResult<*> }
-        val outcomeFlow = merge(nonStateOutcomes, states)
-            .onEach { handleOutcome(it) }
-            .flowOn(ioDispatcher)
-        job = viewModelScope.launch { outcomeFlow.collect {} }
+        val nonStates = outcome.filter { it !is FluxState<*> }.filter { it !is FluxResult<*> }
+        job = viewModelScope.launch {
+            merge(nonStates, states).onEach { handleOutcome(it) }.flowOn(ioDispatcher).collect()
+        }
     }
 
     private fun createOutcomes(): Flow<FluxOutcome> =

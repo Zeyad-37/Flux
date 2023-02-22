@@ -1,5 +1,6 @@
+//project.apply<com.zeyadgasser.flux.gradle.AndroidModulePlugin>()
 plugins {
-    id("com.android.application")
+    id("com.android.library")
     id("org.jetbrains.kotlin.android")
     id("kotlin-parcelize")
     id("kotlin-kapt")
@@ -8,15 +9,11 @@ plugins {
 }
 
 android {
-    namespace = "com.zeyadgasser.flux"
+    namespace = "com.zeyadgasser.mvvm"
     compileSdk = 33
 
     defaultConfig {
-        applicationId = "com.zeyadgasser.flux"
         minSdk = 24
-        targetSdk = 33
-        versionCode = 1
-        versionName = "1.0"
         testInstrumentationRunner = "com.zeyadgasser.flux.FluxTestRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] =
             "de.mannodermaus.junit5.AndroidJUnit5Builder"
@@ -42,9 +39,10 @@ android {
 }
 
 dependencies {
-    implementation(project(":mvi"))
-    implementation(project(":mvvm"))
     implementation(project(":core"))
+    implementation(project(":domain"))
+    implementation(project(":shared-composables"))
+    testImplementation(project(":test-base"))
     val lifecycleVersion = "2.5.1"
     val navVersion = "2.5.3"
     val junit5Version = "5.8.2"
@@ -102,7 +100,7 @@ dependencies {
     androidTestImplementation("de.mannodermaus.junit5:android-test-core:1.2.2")
     androidTestRuntimeOnly("de.mannodermaus.junit5:android-test-runner:1.2.2")
 }
-// Allow references to generated code
+
 kapt {
     correctErrorTypes = true
 }
