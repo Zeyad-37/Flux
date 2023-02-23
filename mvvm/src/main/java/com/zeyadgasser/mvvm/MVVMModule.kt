@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.zeyadgasser.composables.mappers.FluxTaskItemMapper
 import com.zeyadgasser.core.ARG_STATE
 import com.zeyadgasser.domain_pure.FluxTaskUseCases
-import com.zeyadgasser.domain_pure.GetRandomColorIdUseCase
+import com.zeyadgasser.domain.GetRandomColorIdUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

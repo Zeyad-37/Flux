@@ -21,15 +21,15 @@ fun MVScreenContent(
     uncaughtErrorMessage: String,
     isLoading: Boolean,
     showDialog: Boolean,
+    list: List<FluxTaskItem>,
     changeBackgroundOnClick: () -> Unit,
     showDialogOnClick: () -> Unit,
     showErrorStateOnClick: () -> Unit,
     showUncaughtErrorOnClick: () -> Unit,
     goBackOnClick: () -> Unit,
     onDismissClick: () -> Unit,
-    list: List<FluxTaskItem>,
-    onCloseTask: (Long) -> Unit = {},
-    onCheckedTask: (Long, Boolean) -> Unit = { _, _ -> }
+    onCloseTask: (Long) -> Unit,
+    onCheckedTask: (Long, Boolean) -> Unit
 ) = Surface(
     modifier = Modifier.fillMaxSize(),
     color = color,

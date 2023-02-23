@@ -30,6 +30,6 @@ dependencies {
     runtimeOnly("org.junit.vintage:junit-vintage-engine:$junit5Version")
     implementation("junit:junit:4.13.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
-    implementation("org.mockito:mockito-core:5.1.1")
-    implementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
+    implementation("androidx.test:runner:1.5.2")
+    implementation("com.google.dagger:hilt-android-testing:2.44.2")
 }

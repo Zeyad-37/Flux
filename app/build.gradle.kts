@@ -17,7 +17,7 @@ android {
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
-        testInstrumentationRunner = "com.zeyadgasser.flux.FluxTestRunner"
+        testInstrumentationRunner = "com.zeyadgasser.test_base.FluxTestRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] =
             "de.mannodermaus.junit5.AndroidJUnit5Builder"
         vectorDrawables.useSupportLibrary = true
@@ -42,6 +42,7 @@ android {
 dependencies {
     implementation(project(":mvi"))
     implementation(project(":mvvm"))
+    implementation(project(":shared-composables"))
     val lifecycleVersion = "2.5.1"
     val navVersion = "2.5.3"
     val junit5Version = "5.9.2"

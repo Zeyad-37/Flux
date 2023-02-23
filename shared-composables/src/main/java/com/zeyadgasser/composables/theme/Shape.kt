@@ -1,4 +1,4 @@
-package com.zeyadgasser.flux.ui.theme
+package com.zeyadgasser.composables.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes

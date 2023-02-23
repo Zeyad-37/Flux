@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         minSdk = 24
-        testInstrumentationRunner = "com.zeyadgasser.flux.FluxTestRunner"
+        testInstrumentationRunner = "com.zeyadgasser.test_base.FluxTestRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] =
             "de.mannodermaus.junit5.AndroidJUnit5Builder"
         vectorDrawables.useSupportLibrary = true
@@ -39,7 +39,6 @@ android {
 dependencies {
     implementation(project(":core"))
     implementation(project(":domain"))
-    implementation(project(":domain-pure"))
     implementation(project(":shared-composables"))
     testImplementation(project(":test-base"))
     val lifecycleVersion = "2.5.1"

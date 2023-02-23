@@ -21,6 +21,5 @@ include(
     ":mvvm",
     ":shared-composables",
     ":test-base",
-    ":domain-pure",
     ":data",
 )

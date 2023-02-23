@@ -1,4 +1,4 @@
-package com.zeyadgasser.flux
+package com.zeyadgasser.test_base
 
 import android.app.Application
 import android.content.Context

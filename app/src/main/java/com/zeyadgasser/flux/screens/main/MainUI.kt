@@ -12,7 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.zeyadgasser.flux.ui.theme.FluxTheme
+import com.zeyadgasser.composables.theme.FluxTheme
 import com.zeyadgasser.mvi.MVIScreen
 import com.zeyadgasser.mvvm.MVVMScreen
 
