@@ -28,10 +28,8 @@ android {
             )
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
+    compileOptions.sourceCompatibility = JavaVersion.VERSION_11
+    compileOptions.targetCompatibility = JavaVersion.VERSION_11
     kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
     buildFeatures.compose = true
     composeOptions.kotlinCompilerExtensionVersion = "1.4.2"
@@ -41,6 +39,7 @@ android {
 dependencies {
     implementation(project(":core"))
     implementation(project(":domain"))
+    implementation(project(":domain-pure"))
     implementation(project(":shared-composables"))
     testImplementation(project(":test-base"))
     val lifecycleVersion = "2.5.1"

@@ -12,7 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.zeyadgasser.domain.FluxTask
+import com.zeyadgasser.composables.presentation_models.FluxTaskItem
 
 @Composable
 fun MVScreenContent(
@@ -27,9 +27,9 @@ fun MVScreenContent(
     showUncaughtErrorOnClick: () -> Unit,
     goBackOnClick: () -> Unit,
     onDismissClick: () -> Unit,
-    list: List<FluxTask>,
-    onCloseTask: (FluxTask) -> Unit = {},
-    onCheckedTask: (FluxTask, Boolean) -> Unit = { _, _ -> }
+    list: List<FluxTaskItem>,
+    onCloseTask: (Long) -> Unit = {},
+    onCheckedTask: (Long, Boolean) -> Unit = { _, _ -> }
 ) = Surface(
     modifier = Modifier.fillMaxSize(),
     color = color,
@@ -58,8 +58,8 @@ fun MVScreenContent(
                 FluxTask(
                     taskName = task.label,
                     checked = task.checked,
-                    onCheckedChange = { checked -> onCheckedTask(task, checked) },
-                    onClose = { onCloseTask(task) },
+                    onCheckedChange = { checked -> onCheckedTask(task.id, checked) },
+                    onClose = { onCloseTask(task.id) },
                 )
             }
         }

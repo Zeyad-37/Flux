@@ -1,17 +1,16 @@
-package com.zeyadgasser.flux.di
+package com.zeyadgasser.composables
 
+import com.zeyadgasser.composables.mappers.FluxTaskItemMapper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers.IO
 
 @Module
 @InstallIn(ViewModelComponent::class)
-object ViewModelModule {
+object PresentationModule {
     @Provides
     @ViewModelScoped
-    fun provideIOCoroutineDispatcher(): CoroutineDispatcher = IO
+    fun provideFluxTaskItemMapper() = FluxTaskItemMapper()
 }

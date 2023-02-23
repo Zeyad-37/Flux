@@ -4,15 +4,14 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zeyadgasser.composables.MVScreenContent
+import com.zeyadgasser.composables.presentation_models.FluxTaskItem
 import com.zeyadgasser.core.Effect
 import com.zeyadgasser.core.Error
 import com.zeyadgasser.core.Output
 import com.zeyadgasser.core.Progress
 import com.zeyadgasser.core.State
-import com.zeyadgasser.domain.FluxTask
 import kotlinx.coroutines.Dispatchers.Main
 import androidx.compose.runtime.State as ComposeState
 
@@ -51,8 +50,8 @@ fun MVIScreen(
         goBackOnClick = { viewModel.navBackInput() },
         onDismissClick = { showDialog = false },
         list = successState.evaluateList(),
-        onCloseTask = { task -> viewModel.removeTask(task) },
-        onCheckedTask = { task, checked -> viewModel.changeTaskChecked(task, checked) }
+        onCloseTask = { id -> viewModel.removeTask(id) },
+        onCheckedTask = { id, checked -> viewModel.changeTaskChecked(id, checked) }
     )
 }
 
@@ -75,7 +74,7 @@ private fun MVIState.evaluateErrorMessage() = when (this) {
 }
 
 @Composable
-private fun MVIState.evaluateList(): List<FluxTask> = when (this) {
+private fun MVIState.evaluateList(): List<FluxTaskItem> = when (this) {
     is ErrorState, InitialState -> emptyList()
     is ColorBackgroundState -> list.toMutableStateList()
 }

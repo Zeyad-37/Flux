@@ -14,5 +14,13 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Flux"
 include(
-    ":app", ":core", ":mvi", ":domain", ":mvvm", ":shared-composables", ":test-base", ":domain-pure"
+    ":app",
+    ":core",
+    ":mvi",
+    ":domain",
+    ":mvvm",
+    ":shared-composables",
+    ":test-base",
+    ":domain-pure",
+    ":data",
 )

@@ -1,9 +1,10 @@
 package com.zeyadgasser.mvvm
 
 import androidx.lifecycle.SavedStateHandle
+import com.zeyadgasser.composables.mappers.FluxTaskItemMapper
 import com.zeyadgasser.core.ARG_STATE
-import com.zeyadgasser.domain.FluxTaskUseCases
-import com.zeyadgasser.domain.GetRandomColorIdUseCase
+import com.zeyadgasser.domain_pure.FluxTaskUseCases
+import com.zeyadgasser.domain_pure.GetRandomColorIdUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,7 +13,7 @@ import dagger.hilt.android.scopes.ViewModelScoped
 
 @Module
 @InstallIn(ViewModelComponent::class)
-class MVVMModule {
+object MVVMModule {
     @Provides
     @ViewModelScoped
     fun provideMVVMInitialState(savedStateHandle: SavedStateHandle): MVVMState =
@@ -22,6 +23,7 @@ class MVVMModule {
     @ViewModelScoped
     fun provideMVIInputHandler(
         getRandomColorIdUseCase: GetRandomColorIdUseCase,
-        fluxTaskUseCases: FluxTaskUseCases
-    ): MVVMInputHandler = MVVMInputHandler(getRandomColorIdUseCase, fluxTaskUseCases)
+        fluxTaskUseCases: FluxTaskUseCases,
+        fluxTaskItemMapper: FluxTaskItemMapper,
+    ) = MVVMInputHandler(getRandomColorIdUseCase, fluxTaskUseCases, fluxTaskItemMapper)
 }

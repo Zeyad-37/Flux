@@ -1,9 +1,9 @@
 package com.zeyadgasser.mvvm
 
+import com.zeyadgasser.composables.presentation_models.FluxTaskItem
 import com.zeyadgasser.core.Effect
 import com.zeyadgasser.core.Input
 import com.zeyadgasser.core.State
-import com.zeyadgasser.domain.FluxTask
 import kotlinx.parcelize.Parcelize
 
 sealed class MVVMInput : Input()
@@ -12,8 +12,8 @@ object ShowDialogInput : MVVMInput()
 object ErrorInput : MVVMInput()
 object UncaughtErrorInput : MVVMInput()
 object NavBackInput : MVVMInput()
-data class RemoveTask(val fluxTask: FluxTask) : MVVMInput()
-data class ChangeTaskChecked(val fluxTask: FluxTask, val checked: Boolean) : MVVMInput()
+data class RemoveTask(val id: Long) : MVVMInput()
+data class ChangeTaskChecked(val id: Long, val checked: Boolean) : MVVMInput()
 
 sealed class MVVMEffect : Effect
 object NavBackEffect : MVVMEffect()
@@ -27,7 +27,7 @@ object InitialState : MVVMState()
 @Parcelize
 data class ColorBackgroundState(
     override val color: Long,
-    val list: List<FluxTask>,
+    val list: List<FluxTaskItem>,
 ) : MVVMState(color)
 
 @Parcelize

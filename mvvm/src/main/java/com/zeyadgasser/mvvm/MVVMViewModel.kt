@@ -3,7 +3,6 @@ package com.zeyadgasser.mvvm
 import androidx.lifecycle.SavedStateHandle
 import com.zeyadgasser.core.FluxViewModel
 import com.zeyadgasser.core.InputStrategy.THROTTLE
-import com.zeyadgasser.domain.FluxTask
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -23,7 +22,6 @@ class MVVMViewModel @Inject constructor(
     fun errorInput() = process(ErrorInput)
     fun uncaughtErrorInput() = process(UncaughtErrorInput)
     fun navBackInput() = process(NavBackInput)
-    fun removeTask(task: FluxTask) = process(RemoveTask(task))
-    fun changeTaskChecked(task: FluxTask, checked: Boolean) =
-        process(ChangeTaskChecked(task, checked))
+    fun removeTask(id: Long) = process(RemoveTask(id))
+    fun changeTaskChecked(id: Long, checked: Boolean) = process(ChangeTaskChecked(id, checked))
 }

@@ -40,7 +40,7 @@ class MVVMViewModelTest {
     fun changeBackground() = runTest {// FIXME
         val input = ChangeBackgroundInput
         whenever(inputHandler.handleInputs(input, initialState))
-            .thenReturn(ColorBackgroundState(anyInt(), anyList()).toStateOutcomeFlow())
+            .thenReturn(ColorBackgroundState(anyLong(), anyList()).toStateOutcomeFlow())
         mviViewModel.observe().test {
             mviViewModel.process(input, THROTTLE)
             assertEquals(initialState, awaitItem())

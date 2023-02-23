@@ -28,10 +28,8 @@ android {
             )
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
+    compileOptions.sourceCompatibility = JavaVersion.VERSION_11
+    compileOptions.targetCompatibility = JavaVersion.VERSION_11
     kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
     buildFeatures.compose = true
     composeOptions.kotlinCompilerExtensionVersion = "1.4.2"
@@ -40,6 +38,7 @@ android {
 
 dependencies {
     implementation(project(":core"))
+    implementation(project(":domain-pure"))
     val junit5Version = "5.8.2"
     val hiltVersion = "2.44.2"
     val composeUIVersion = "1.3.3"

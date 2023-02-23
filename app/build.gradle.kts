@@ -31,10 +31,8 @@ android {
             )
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
+    compileOptions.sourceCompatibility = JavaVersion.VERSION_11
+    compileOptions.targetCompatibility = JavaVersion.VERSION_11
     kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
     buildFeatures.compose = true
     composeOptions.kotlinCompilerExtensionVersion = "1.4.2"
@@ -44,7 +42,6 @@ android {
 dependencies {
     implementation(project(":mvi"))
     implementation(project(":mvvm"))
-    implementation(project(":core"))
     val lifecycleVersion = "2.5.1"
     val navVersion = "2.5.3"
     val junit5Version = "5.9.2"

@@ -7,10 +7,7 @@ plugins {
 android {
     namespace = "com.zeyadgasser.test_base"
     compileSdk = 33
-
-    defaultConfig {
-        minSdk = 24
-    }
+    defaultConfig.minSdk = 24
 
     buildTypes {
         release {
@@ -20,10 +17,8 @@ android {
             )
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
+    compileOptions.sourceCompatibility = JavaVersion.VERSION_11
+    compileOptions.targetCompatibility = JavaVersion.VERSION_11
     kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
     packagingOptions.resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
 }

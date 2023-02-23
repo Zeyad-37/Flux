@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace = "com.zeyadgasser.mvvm"
+    namespace = "com.zeyadgasser.data"
     compileSdk = 33
 
     defaultConfig {
@@ -37,10 +37,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":core"))
-    implementation(project(":domain"))
     implementation(project(":domain-pure"))
-    implementation(project(":shared-composables"))
     testImplementation(project(":test-base"))
     val lifecycleVersion = "2.5.1"
     val navVersion = "2.5.3"

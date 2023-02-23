@@ -14,8 +14,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentMatchers.anyInt
-import org.mockito.ArgumentMatchers.anyList
+import org.mockito.ArgumentMatchers.*
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -47,7 +46,7 @@ class MVIViewModelTest {
     fun changeBackground() = runTest {
         val input = ChangeBackgroundInput
         whenever(inputHandler.handleInputs(input, initialState))
-            .thenReturn(ChangeBackgroundResult(anyInt(), anyList()).toResultOutcomeFlow())
+            .thenReturn(ChangeBackgroundResult(anyLong(), anyList()).toResultOutcomeFlow())
         mviViewModel.observe().test {
             mviViewModel.process(input, THROTTLE)
             assertEquals(initialState, awaitItem())

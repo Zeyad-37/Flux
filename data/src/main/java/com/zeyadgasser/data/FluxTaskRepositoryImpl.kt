@@ -1,19 +1,10 @@
-package com.zeyadgasser.domain_pure
+package com.zeyadgasser.data
 
+import com.zeyadgasser.domain_pure.FluxTask
+import com.zeyadgasser.domain_pure.FluxTaskRepository
 import javax.inject.Inject
 
-//class FluxTaskUseCases @Inject constructor(private val fluxTaskRepository: FluxTaskRepository) { //FIXME
-class FluxTaskUseCases(private val fluxTaskRepository: FluxTaskRepositoryImpl) {
-
-    fun getFluxTasks(): List<FluxTask> = fluxTaskRepository.getFluxTasks()
-
-    fun onChangeTaskChecked(id: Long, checked: Boolean): List<FluxTask> =
-        fluxTaskRepository.onChangeTaskChecked(id, checked)
-
-    fun removeTask(id: Long): List<FluxTask> = fluxTaskRepository.removeTask(id)
-}
-
-class FluxTaskRepositoryImpl (
+class FluxTaskRepositoryImpl @Inject constructor(
     private val fluxTaskDTOMapper: FluxTaskDTOMapper
 ) : FluxTaskRepository {
 
@@ -29,10 +20,3 @@ class FluxTaskRepositoryImpl (
         tasks.map { task -> if (task.id == id) task.copy(checked = checked) else task }
             .apply { tasks = this.toMutableList() }.map { fluxTaskDTOMapper.map(it) }
 }
-
-class FluxTaskDTOMapper {
-    fun map(fluxTaskDto: FluxTaskDTO) = with(fluxTaskDto) { FluxTask(id, label, checked) }
-}
-
-data class FluxTaskDTO(val id: Long, val label: String, val checked: Boolean = false)
-

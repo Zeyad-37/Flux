@@ -10,6 +10,7 @@ java {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.10")
+    implementation("javax.inject:javax.inject:1")
 
     testImplementation(platform("org.junit:junit-bom:5.9.2"))
     testRuntimeOnly("org.junit.platform:junit-platform-launcher") {
