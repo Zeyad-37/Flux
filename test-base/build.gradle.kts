@@ -29,7 +29,7 @@ android {
 }
 
 dependencies {
-    val junit5Version = "5.8.2"
+    val junit5Version = "5.9.2"
     implementation("org.junit.jupiter:junit-jupiter-api:$junit5Version")
     runtimeOnly("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
     runtimeOnly("org.junit.vintage:junit-vintage-engine:$junit5Version")

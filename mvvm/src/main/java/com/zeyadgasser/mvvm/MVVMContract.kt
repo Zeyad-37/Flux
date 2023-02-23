@@ -19,16 +19,16 @@ sealed class MVVMEffect : Effect
 object NavBackEffect : MVVMEffect()
 object ShowDialogEffect : MVVMEffect()
 
-sealed class MVVMState(open val color: Int = android.R.color.white) : State
+sealed class MVVMState(open val color: Long = 0xffffffff /*white*/) : State
 
 @Parcelize
 object InitialState : MVVMState()
 
 @Parcelize
 data class ColorBackgroundState(
-    override val color: Int,
-    val list: List<FluxTask>
+    override val color: Long,
+    val list: List<FluxTask>,
 ) : MVVMState(color)
 
 @Parcelize
-data class ErrorState(val message: String) : MVVMState(android.R.color.holo_red_light)
+data class ErrorState(val message: String) : MVVMState(0xffff4444 /*holo_red_light*/)

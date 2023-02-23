@@ -17,20 +17,21 @@ data class RemoveTask(val fluxTask: FluxTask) : MVIInput()
 data class ChangeTaskChecked(val fluxTask: FluxTask, val checked: Boolean) : MVIInput()
 
 sealed class MVIResult : Result
-data class ChangeBackgroundResult(val color: Int, val list: List<FluxTask>) : MVIResult()
+data class ChangeBackgroundResult(val color: Long, val list: List<FluxTask>) : MVIResult()
 data class ErrorResult(val message: String) : MVIResult()
 
 sealed class MVIEffect : Effect
 object ShowDialogEffect : MVIEffect()
 object NavBackEffect : MVIEffect()
 
-sealed class MVIState(open val color: Int = android.R.color.white) : State
+sealed class MVIState(open val color: Long = 0xffffffff /*white*/) : State
 
 @Parcelize
-data class ErrorState(val message: String) : MVIState(android.R.color.holo_red_light)
+data class ErrorState(val message: String) : MVIState(0xffff4444 /*holo_red_light*/)
 
 @Parcelize
-data class ColorBackgroundState(override val color: Int, val list: List<FluxTask>) : MVIState(color)
+data class ColorBackgroundState(override val color: Long, val list: List<FluxTask>) :
+    MVIState(color)
 
 @Parcelize
 object InitialState : MVIState()

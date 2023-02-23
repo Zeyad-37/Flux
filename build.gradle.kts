@@ -8,6 +8,7 @@ plugins {
     id("java-gradle-plugin")
     id("maven-publish")
     id("com.gradle.plugin-publish") version "0.16.0"
+    id("org.jetbrains.kotlin.jvm") version "1.8.0" apply false
 }
 
 pluginBundle {

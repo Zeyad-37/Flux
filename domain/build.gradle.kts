@@ -40,7 +40,6 @@ android {
 
 dependencies {
     implementation(project(":core"))
-    val lifecycleVersion = "2.5.1"
     val junit5Version = "5.8.2"
     val hiltVersion = "2.44.2"
     val composeUIVersion = "1.3.3"

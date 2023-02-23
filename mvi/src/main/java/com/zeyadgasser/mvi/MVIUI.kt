@@ -65,8 +65,7 @@ private fun BindEffects(effect: MVIEffect, onBackClicked: () -> Unit) = when (ef
 @Composable
 private fun MVIState.evaluateColor() = when (this) {
     InitialState -> MaterialTheme.colors.background
-    is ColorBackgroundState, is ErrorState ->
-        Color(LocalContext.current.resources.getColor(color, null))
+    is ColorBackgroundState, is ErrorState -> Color(color)
 }
 
 @Composable
