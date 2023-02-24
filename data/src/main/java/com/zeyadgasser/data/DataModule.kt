@@ -18,10 +18,3 @@ object DataModule {
     fun provideFluxTaskRepositoryImpl(fluxTaskDTOMapper: FluxTaskDTOMapper): FluxTaskRepositoryImpl =
         FluxTaskRepositoryImpl(fluxTaskDTOMapper)
 }
-
-//@Module
-//@InstallIn(ViewModelComponent::class)
-//abstract class BindingModule {
-//    @Binds
-//    abstract fun bindFluxTaskRepository(fluxTaskRepository: FluxTaskRepositoryImpl): FluxTaskRepository
-//}

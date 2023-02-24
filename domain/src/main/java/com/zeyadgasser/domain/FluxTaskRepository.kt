@@ -1,4 +1,4 @@
-package com.zeyadgasser.domain_pure
+package com.zeyadgasser.domain
 
 interface FluxTaskRepository {
     fun getFluxTasks(): List<FluxTask>

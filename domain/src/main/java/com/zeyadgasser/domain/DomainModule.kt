@@ -1,8 +1,5 @@
 package com.zeyadgasser.domain
 
-import com.zeyadgasser.domain_pure.FluxTaskDTOMapper
-import com.zeyadgasser.domain_pure.FluxTaskRepositoryImpl
-import com.zeyadgasser.domain_pure.FluxTaskUseCases
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,13 +13,8 @@ object DomainModule {
     @ViewModelScoped
     fun provideGetRandomColorIdUseCase() = GetRandomColorIdUseCase
 
-//    @Provides
-//    @ViewModelScoped
-//    fun provideFluxTaskUseCases(fluxTaskRepository: FluxTaskRepository): FluxTaskUseCases =
-//        FluxTaskUseCases(fluxTaskRepository)
-
     @Provides
     @ViewModelScoped
-    fun provideFluxTaskUseCases(): FluxTaskUseCases =
-        FluxTaskUseCases(FluxTaskRepositoryImpl(FluxTaskDTOMapper()))
+    fun provideFluxTaskUseCases(fluxTaskRepository: FluxTaskRepository): FluxTaskUseCases =
+        FluxTaskUseCases(fluxTaskRepository)
 }
