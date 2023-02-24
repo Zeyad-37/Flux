@@ -1,3 +1,8 @@
+import com.zeyadgasser.flux.gradle.DepVersions.composeUIVersion
+import com.zeyadgasser.flux.gradle.DepVersions.hiltVersion
+import com.zeyadgasser.flux.gradle.DepVersions.junit5Version
+import com.zeyadgasser.flux.gradle.DepVersions.lifecycleVersion
+import com.zeyadgasser.flux.gradle.DepVersions.navVersion
 //project.apply<com.zeyadgasser.flux.gradle.AndroidModulePlugin>()
 plugins {
     id("com.android.library")
@@ -41,12 +46,6 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":domain"))
     implementation(project(":shared-composables"))
-    testImplementation(project(":test-base"))
-    val lifecycleVersion = "2.5.1"
-    val navVersion = "2.5.3"
-    val junit5Version = "5.9.2"
-    val hiltVersion = "2.44.2"
-    val composeUIVersion = "1.3.3"
 
     debugImplementation("androidx.compose.ui:ui-tooling:$composeUIVersion")
     debugImplementation("androidx.compose.ui:ui-test-manifest:$composeUIVersion")
@@ -72,6 +71,7 @@ dependencies {
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     kapt("com.google.dagger:hilt-compiler:$hiltVersion")
 
+    testImplementation(project(":test-base"))
     // (Required) Writing and executing Unit Tests on the JUnit Platform
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junit5Version")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junit5Version")
