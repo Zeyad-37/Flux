@@ -1,8 +1,6 @@
-package com.zeyadgasser.domain
+package com.zeyadgasser.domain_pure
 
-import javax.inject.Inject
-
-class FluxTaskUseCases @Inject constructor(private val fluxTaskRepository: FluxTaskRepository) {
+class FluxTaskUseCases(private val fluxTaskRepository: FluxTaskRepository) {
 
     fun getFluxTasks(): List<FluxTask> = fluxTaskRepository.getFluxTasks()
 

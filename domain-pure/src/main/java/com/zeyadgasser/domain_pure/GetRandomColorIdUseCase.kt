@@ -1,4 +1,4 @@
-package com.zeyadgasser.domain
+package com.zeyadgasser.domain_pure
 
 import kotlin.random.Random
 

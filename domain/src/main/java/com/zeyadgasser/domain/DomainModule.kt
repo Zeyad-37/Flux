@@ -1,5 +1,8 @@
 package com.zeyadgasser.domain
 
+import com.zeyadgasser.domain_pure.FluxTaskRepository
+import com.zeyadgasser.domain_pure.FluxTaskUseCases
+import com.zeyadgasser.domain_pure.GetRandomColorIdUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

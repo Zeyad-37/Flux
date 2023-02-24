@@ -1,6 +1,6 @@
 package com.zeyadgasser.data
 
-import com.zeyadgasser.domain.FluxTaskRepository
+import com.zeyadgasser.domain_pure.FluxTaskRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

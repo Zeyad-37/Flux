@@ -38,6 +38,7 @@ android {
 
 dependencies {
     implementation(project(":core"))
+    api(project(":domain-pure"))
     val junit5Version = "5.8.2"
     val hiltVersion = "2.44.2"
     val composeUIVersion = "1.3.3"

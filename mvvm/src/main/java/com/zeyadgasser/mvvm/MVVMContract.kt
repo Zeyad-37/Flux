@@ -4,6 +4,8 @@ import com.zeyadgasser.composables.presentation_models.FluxTaskItem
 import com.zeyadgasser.core.Effect
 import com.zeyadgasser.core.Input
 import com.zeyadgasser.core.State
+import com.zeyadgasser.domain_pure.RedLight
+import com.zeyadgasser.domain_pure.White
 import kotlinx.parcelize.Parcelize
 
 sealed class MVVMInput : Input()
@@ -19,7 +21,7 @@ sealed class MVVMEffect : Effect
 object NavBackEffect : MVVMEffect()
 object ShowDialogEffect : MVVMEffect()
 
-sealed class MVVMState(open val color: Long = 0xffffffff /*white*/) : State
+sealed class MVVMState(open val color: Long = White) : State
 
 @Parcelize
 object InitialState : MVVMState()
@@ -31,4 +33,4 @@ data class ColorBackgroundState(
 ) : MVVMState(color)
 
 @Parcelize
-data class ErrorState(val message: String) : MVVMState(0xffff4444 /*holo_red_light*/)
+data class ErrorState(val message: String) : MVVMState(RedLight)

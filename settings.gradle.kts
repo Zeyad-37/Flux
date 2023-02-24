@@ -18,6 +18,7 @@ include(
     ":core",
     ":mvi",
     ":domain",
+    ":domain-pure",
     ":mvvm",
     ":shared-composables",
     ":test-base",
