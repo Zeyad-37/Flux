@@ -33,9 +33,7 @@ class AndroidModulePlugin : Plugin<Project> {
                 versionName = AndroidConfig.versionName
             }
             buildFeatures.compose = true
-            composeOptions {
-                kotlinCompilerExtensionVersion = "1.4.2"
-            }
+            composeOptions.kotlinCompilerExtensionVersion = "1.4.2"
             buildTypes {
                 getByName("debug") {
                     isDebuggable = true
@@ -47,20 +45,15 @@ class AndroidModulePlugin : Plugin<Project> {
                     )
                 }
             }
-            compileOptions {
-                sourceCompatibility = JavaVersion.VERSION_11
-                targetCompatibility = JavaVersion.VERSION_11
-            }
-            testOptions {
-                unitTests.isReturnDefaultValues = true
-            }
+            compileOptions.sourceCompatibility = JavaVersion.VERSION_11
+            compileOptions.targetCompatibility = JavaVersion.VERSION_11
+            testOptions.unitTests.isReturnDefaultValues = true
             packagingOptions {
                 exclude("META-INF/DEPENDENCIES")
                 exclude("META-INF/NOTICE")
                 exclude("META-INF/LICENSE")
             }
         }
-
         setupIfApplication()
         addDependencies()
     }

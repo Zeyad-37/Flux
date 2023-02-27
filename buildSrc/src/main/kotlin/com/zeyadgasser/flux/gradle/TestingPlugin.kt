@@ -1,7 +1,6 @@
 package com.zeyadgasser.flux.gradle
 
 import com.android.build.gradle.BaseExtension
-import com.zeyadgasser.flux.gradle.AndroidConfig.testInstrumentationRunnerArguments
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
@@ -42,7 +41,7 @@ class TestingPlugin : Plugin<Project> {
             "com.google.dagger:hilt-android-testing:${DepVersions.hiltVersion}"
         )
         dependencies.add(
-            "androidTestAnnotationProcessor", // "kaptAndroidTest",
+            "kaptAndroidTest",
             "com.google.dagger:hilt-android-compiler:${DepVersions.hiltVersion}"
         )
     }

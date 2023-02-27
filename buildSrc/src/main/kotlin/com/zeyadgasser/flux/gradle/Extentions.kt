@@ -1,5 +1,3 @@
-@file:Suppress("unused")
-
 package com.zeyadgasser.flux.gradle
 
 import com.android.build.gradle.AppExtension
