@@ -1,3 +1,8 @@
+import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
+import io.gitlab.arturbosch.detekt.report.ReportMergeTask
+import kotlinx.kover.api.DefaultIntellijEngine
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     id("com.android.application") version "7.4.0" apply false
@@ -9,16 +14,61 @@ plugins {
     id("maven-publish")
     id("com.gradle.plugin-publish") version "0.16.0"
     id("org.jetbrains.kotlin.jvm") version "1.8.0" apply false
+    id("io.gitlab.arturbosch.detekt") version ("1.22.0") apply false
+}
+
+val detektReportMergeSarif by tasks.registering(ReportMergeTask::class) {
+    output.set(layout.buildDirectory.file("reports/detekt/merge.sarif"))
 }
 
 allprojects {
+    configureDetekt()
+    configureKover()
+}
+
+subprojects {
+//    if (plugins.hasPlugin("kotlin-android")) { // TODO verify if needed
+//        with(android()) {
+//            testOptions.unitTests.all {
+//                if (it.name == "testDebugUnitTest") {
+//                    it.extensions.configure(kotlinx.kover.api.KoverTaskExtension::class) {
+//                        // set to true to disable instrumentation of this task,
+//                        // Kover reports will not depend on the results of its execution
+//                        isDisabled.set(false)
+//                        // set file name of binary report
+//                        reportFile.set(file("$buildDir/custom/debug-report.bin"))
+//                        // for details, see "Instrumentation inclusion rules" below
+//                        includes.addAll(listOf("com.example.*"))
+//                        // for details, see "Instrumentation exclusion rules" below
+//                        excludes.addAll(listOf("com.example.subpackage.*"))
+//                    }
+//                }
+//            }
+//        }
+//    }
+    kover {
+        instrumentation {
+            // exclude testReleaseUnitTest from instrumentation
+            excludeTasks += "testReleaseUnitTest"
+            excludeTasks += "testReleaseUnitTest"
+        }
+    }
+}
+
+pluginBundle {
+    website = "<substitute your project website>"
+    vcsUrl = "<uri to project source repository>"
+    tags = listOf("tags", "for", "your", "plugins")
+}
+
+fun Project.configureKover() {
     apply(plugin = "kover")
 
     kover {
         // true to disable instrumentation and all Kover tasks in this project
         isDisabled.set(false)
         // to change engine, use kotlinx.kover.api.IntellijEngine("xxx") or kotlinx.kover.api.JacocoEngine("xxx")
-        engine.set(kotlinx.kover.api.DefaultIntellijEngine)
+        engine.set(DefaultIntellijEngine)
         // common filters for all default Kover tasks
         filters {
             // common class filter for all default Kover tasks in this project
@@ -70,37 +120,20 @@ allprojects {
     }
 }
 
-subprojects {
-//    if (plugins.hasPlugin("kotlin-android")) { // TODO verify if needed
-//        with(android()) {
-//            testOptions.unitTests.all {
-//                if (it.name == "testDebugUnitTest") {
-//                    it.extensions.configure(kotlinx.kover.api.KoverTaskExtension::class) {
-//                        // set to true to disable instrumentation of this task,
-//                        // Kover reports will not depend on the results of its execution
-//                        isDisabled.set(false)
-//                        // set file name of binary report
-//                        reportFile.set(file("$buildDir/custom/debug-report.bin"))
-//                        // for details, see "Instrumentation inclusion rules" below
-//                        includes.addAll(listOf("com.example.*"))
-//                        // for details, see "Instrumentation exclusion rules" below
-//                        excludes.addAll(listOf("com.example.subpackage.*"))
-//                    }
-//                }
-//            }
-//        }
-//    }
-    kover {
-        instrumentation {
-            // exclude testReleaseUnitTest from instrumentation
-            excludeTasks += "testReleaseUnitTest"
-            excludeTasks += "testReleaseUnitTest"
+fun Project.configureDetekt() {
+    apply(plugin = "io.gitlab.arturbosch.detekt")
+    tasks.withType<Detekt>().configureEach {
+        buildUponDefaultConfig = true
+//        baseline.set(file("$rootDir/config/detekt/baseline.xml"))
+        jvmTarget = JavaVersion.VERSION_11.toString()
+        reports {
+            html.required.set(true)
+            sarif.required.set(true)
         }
+        basePath = rootDir.absolutePath
+        finalizedBy(detektReportMergeSarif)
     }
-}
-
-pluginBundle {
-    website = "<substitute your project website>"
-    vcsUrl = "<uri to project source repository>"
-    tags = listOf("tags", "for", "your", "plugins")
+    detektReportMergeSarif { input.from(tasks.withType<Detekt>().map { it.sarifReportFile }) }
+    tasks.withType<DetektCreateBaselineTask>()
+        .configureEach { jvmTarget = JavaVersion.VERSION_11.toString() }
 }
