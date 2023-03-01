@@ -2,7 +2,11 @@ package com.zeyadgasser.mvvm
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
-import com.zeyadgasser.core.*
+import com.zeyadgasser.core.Output
+import com.zeyadgasser.core.toStateOutcomeFlow
+import com.zeyadgasser.core.toEffectOutcomeFlow
+import com.zeyadgasser.core.toErrorOutcomeFlow
+import com.zeyadgasser.core.Progress
 import com.zeyadgasser.core.InputStrategy.THROTTLE
 import com.zeyadgasser.test_base.CoroutineTestExtension
 import com.zeyadgasser.test_base.MainDispatcherRule
@@ -14,9 +18,12 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentMatchers.*
+import org.mockito.ArgumentMatchers.anyList
+import org.mockito.ArgumentMatchers.anyLong
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import kotlin.Error
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(CoroutineTestExtension::class)
@@ -37,9 +44,9 @@ class MVVMViewModelTest {
     }
 
     @Test
-    fun changeBackground() = runTest {// FIXME
+    fun changeBackground() = runTest {
         val input = ChangeBackgroundInput
-        whenever(inputHandler.handleInputs(input, initialState))
+        whenever(inputHandler.handleInputs(any<ChangeBackgroundInput>(), any()))
             .thenReturn(ColorBackgroundState(anyLong(), anyList()).toStateOutcomeFlow())
         mviViewModel.observe().test {
             mviViewModel.process(input, THROTTLE)
@@ -64,9 +71,9 @@ class MVVMViewModelTest {
     }
 
     @Test
-    fun errorInput() = runTest {// FIXME
+    fun errorInput() = runTest {
         val input = ErrorInput
-        whenever(inputHandler.handleInputs(input, initialState))
+        whenever(inputHandler.handleInputs(any<ErrorInput>(), any()))
             .thenReturn(ErrorState("Error").toStateOutcomeFlow())
         mviViewModel.observe().test {
             mviViewModel.process(input)
