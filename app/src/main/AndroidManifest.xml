@@ -24,11 +24,5 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".mvvm.MVVMActivity"
-            android:exported="false" />
-        <activity
-            android:name=".mvi.MVIActivity"
-            android:exported="false" />
     </application>
 </manifest>
