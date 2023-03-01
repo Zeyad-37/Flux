@@ -10,9 +10,6 @@ plugins {
     id("org.jetbrains.kotlin.android") version "1.8.10" apply false
     id("com.google.dagger.hilt.android") version "2.44" apply false
     id("org.jetbrains.kotlinx.kover") version "0.6.1"
-    id("java-gradle-plugin")
-    id("maven-publish")
-    id("com.gradle.plugin-publish") version "0.16.0"
     id("org.jetbrains.kotlin.jvm") version "1.8.0" apply false
     id("io.gitlab.arturbosch.detekt") version ("1.22.0") apply false
 }
@@ -27,25 +24,6 @@ allprojects {
 }
 
 subprojects {
-//    if (plugins.hasPlugin("kotlin-android")) { // TODO verify if needed
-//        with(android()) {
-//            testOptions.unitTests.all {
-//                if (it.name == "testDebugUnitTest") {
-//                    it.extensions.configure(kotlinx.kover.api.KoverTaskExtension::class) {
-//                        // set to true to disable instrumentation of this task,
-//                        // Kover reports will not depend on the results of its execution
-//                        isDisabled.set(false)
-//                        // set file name of binary report
-//                        reportFile.set(file("$buildDir/custom/debug-report.bin"))
-//                        // for details, see "Instrumentation inclusion rules" below
-//                        includes.addAll(listOf("com.example.*"))
-//                        // for details, see "Instrumentation exclusion rules" below
-//                        excludes.addAll(listOf("com.example.subpackage.*"))
-//                    }
-//                }
-//            }
-//        }
-//    }
     kover {
         instrumentation {
             // exclude testReleaseUnitTest from instrumentation
@@ -55,15 +33,8 @@ subprojects {
     }
 }
 
-pluginBundle {
-    website = "<substitute your project website>"
-    vcsUrl = "<uri to project source repository>"
-    tags = listOf("tags", "for", "your", "plugins")
-}
-
 fun Project.configureKover() {
     apply(plugin = "kover")
-
     kover {
         // true to disable instrumentation and all Kover tasks in this project
         isDisabled.set(false)
@@ -90,7 +61,6 @@ fun Project.configureKover() {
             reportDir.set(layout.buildDirectory.dir("my-project-report/html-result"))
         }
     }
-
     koverMerged {
         // create Kover merged report tasks from this project and subprojects with enabled Kover plugin
         enable()
