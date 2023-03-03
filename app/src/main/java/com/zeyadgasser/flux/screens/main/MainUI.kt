@@ -1,11 +1,19 @@
 package com.zeyadgasser.flux.screens.main
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -16,6 +24,7 @@ import com.zeyadgasser.composables.theme.FluxTheme
 import com.zeyadgasser.mvi.MVIScreen
 import com.zeyadgasser.mvvm.MVVMScreen
 
+@SuppressWarnings("FunctionNaming")
 @Composable
 fun HomeScreen() {
     Scaffold(
@@ -32,6 +41,7 @@ fun HomeScreen() {
     }
 }
 
+@SuppressWarnings("FunctionNaming")
 @Composable
 fun FluxNavHost(
     navController: NavHostController,
@@ -51,13 +61,15 @@ fun FluxNavHost(
     composable(MVVM.route) { MVVMScreen { navController.navigateSingleTopTo(Main.route) } }
 }
 
+@SuppressWarnings("FunctionNaming")
 @Composable
 fun HomeScreenContent(mviOnClick: () -> Unit, mvvmOnClick: () -> Unit) =
-    Column(Modifier.padding(PaddingValues(Dp(28f)))) {
+    Column(Modifier.padding(PaddingValues(28.dp))) {
         Button(onClick = mviOnClick) { Text(text = "MVI Sample") }
         Button(onClick = mvvmOnClick) { Text(text = "MVVM Sample") }
     }
 
+@SuppressWarnings("FunctionNaming")
 @Composable
 fun HomeScreenTopBar() =
     TopAppBar(Modifier.fillMaxWidth()) { Text("Flux Samples", Modifier.padding(8.dp)) }
@@ -68,6 +80,7 @@ fun NavHostController.navigateSingleTopTo(route: String) = this.navigate(route) 
     restoreState = true
 }
 
+@SuppressWarnings("FunctionNaming")
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() = FluxTheme { HomeScreen() }

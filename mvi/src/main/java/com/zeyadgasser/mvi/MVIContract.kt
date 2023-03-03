@@ -1,12 +1,12 @@
 package com.zeyadgasser.mvi
 
-import com.zeyadgasser.composables.presentation_models.FluxTaskItem
+import com.zeyadgasser.composables.presentationModels.FluxTaskItem
 import com.zeyadgasser.core.Effect
 import com.zeyadgasser.core.Input
 import com.zeyadgasser.core.Result
 import com.zeyadgasser.core.State
-import com.zeyadgasser.domainPure.RedLight
-import com.zeyadgasser.domainPure.White
+import com.zeyadgasser.domainPure.RED_LIGHT
+import com.zeyadgasser.domainPure.WHITE
 import kotlinx.parcelize.Parcelize
 
 sealed class MVIInput : Input()
@@ -26,13 +26,13 @@ sealed class MVIEffect : Effect
 object ShowDialogEffect : MVIEffect()
 object NavBackEffect : MVIEffect()
 
-sealed class MVIState(open val color: Long = White) : State
+sealed class MVIState(open val color: Long = WHITE) : State
 
 @Parcelize
 object InitialState : MVIState()
 
 @Parcelize
-data class ErrorState(val message: String) : MVIState(RedLight)
+data class ErrorState(val message: String) : MVIState(RED_LIGHT)
 
 @Parcelize
 data class ColorBackgroundState(override val color: Long, val list: List<FluxTaskItem>) :

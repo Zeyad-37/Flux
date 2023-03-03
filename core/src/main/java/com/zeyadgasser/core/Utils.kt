@@ -1,12 +1,18 @@
+@file:SuppressWarnings("TooManyFunctions")
+
 package com.zeyadgasser.core
 
+import com.zeyadgasser.core.FluxViewModel.FluxEffect
+import com.zeyadgasser.core.FluxViewModel.FluxResult
+import com.zeyadgasser.core.FluxViewModel.FluxState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flowOf
 
 const val ARG_STATE = "arg_state"
+const val DELAY = 10L // TODO remove
 
-class AsyncOutcomeFlow(val Flow: Flow<FluxOutcome>) : Flow<FluxOutcome> {
+class AsyncOutcomeFlow(val flow: Flow<FluxOutcome>) : Flow<FluxOutcome> {
     override suspend fun collect(collector: FlowCollector<FluxOutcome>) = Unit
 }
 
@@ -30,15 +36,15 @@ internal data class FluxError(var error: Error) : FluxOutcome() {
 
 fun Flow<FluxOutcome>.executeInParallel(): AsyncOutcomeFlow = AsyncOutcomeFlow(this)
 
-fun <S : State> S.toStateOutcome(): FluxOutcome = FluxViewModel.FluxState(this)
+fun <S : State> S.toStateOutcome(): FluxOutcome = FluxState(this)
 
 fun <S : State> S.toStateOutcomeFlow(): Flow<FluxOutcome> = toStateOutcome().toFlow()
 
-fun <E : Effect> E.toEffectOutcome(): FluxOutcome = FluxViewModel.FluxEffect(this)
+fun <E : Effect> E.toEffectOutcome(): FluxOutcome = FluxEffect(this)
 
 fun <E : Effect> E.toEffectOutcomeFlow(): Flow<FluxOutcome> = toEffectOutcome().toFlow()
 
-fun <R : Result> R.toResultOutcome(): FluxOutcome = FluxViewModel.FluxResult(this)
+fun <R : Result> R.toResultOutcome(): FluxOutcome = FluxResult(this)
 
 fun <R : Result> R.toResultOutcomeFlow(): Flow<FluxOutcome> = toResultOutcome().toFlow()
 

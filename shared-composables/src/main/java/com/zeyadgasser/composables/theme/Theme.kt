@@ -27,6 +27,7 @@ private val LightColorPalette = lightColors(
     */
 )
 
+@SuppressWarnings("FunctionNaming")
 @Composable
 fun FluxTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     MaterialTheme(

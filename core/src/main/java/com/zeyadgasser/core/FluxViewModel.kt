@@ -3,9 +3,33 @@ package com.zeyadgasser.core
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zeyadgasser.core.InputStrategy.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import com.zeyadgasser.core.InputStrategy.DEBOUNCE
+import com.zeyadgasser.core.InputStrategy.NONE
+import com.zeyadgasser.core.InputStrategy.THROTTLE
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.scan
+import kotlinx.coroutines.launch
 import java.util.logging.Level
 import java.util.logging.Logger
 import kotlin.coroutines.CoroutineContext
@@ -25,6 +49,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     internal data class FluxResult<R>(val result: R) : FluxOutcome()
 
     private var job: Job? = null
+
     private val viewModelListener: MutableStateFlow<Output> = MutableStateFlow(currentState)
     private val inputs: MutableSharedFlow<I> = MutableSharedFlow()
     private val throttledInputs: MutableSharedFlow<I> = MutableSharedFlow()
@@ -80,7 +105,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
                 InputOutcomeStream(it, inputHandler.handleInputs(it, currentState))
             }.run {
                 val asyncOutcomes = this.filter { it.outcomes is AsyncOutcomeFlow }
-                    .map { it.copy(outcomes = (it.outcomes as AsyncOutcomeFlow).Flow) }
+                    .map { it.copy(outcomes = (it.outcomes as AsyncOutcomeFlow).flow) }
                     .flatMapMerge { processInputOutcomeStream(it) }
                 val sequentialOutcomes = this.filter { it.outcomes !is AsyncOutcomeFlow }
                     .flatMapConcat { processInputOutcomeStream(it) }
@@ -120,14 +145,13 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
                 currentState = state
                 viewModelListener.emit(state)
             }
-            is FluxProgress -> if (fluxOutcome.input.showProgress) {
-                viewModelListener.emit(fluxOutcome.progress)
-            }
+            is FluxProgress ->
+                if (fluxOutcome.input.showProgress) viewModelListener.emit(fluxOutcome.progress)
             is FluxResult<*>, EmptyFluxOutcome -> Unit
         }
         if (fluxOutcome !is FluxProgress) {
-            flow<Nothing> {// TODO improve
-                delay(10)
+            flow<Nothing> { // TODO improve
+                delay(DELAY)
                 Progress(false, fluxOutcome.input).let {
                     logOutcomes(FluxProgress(it))
                     viewModelListener.emit(it)

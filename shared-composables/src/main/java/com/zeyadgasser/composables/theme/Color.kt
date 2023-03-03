@@ -1,32 +1,32 @@
 package com.zeyadgasser.composables.theme
 
 import androidx.compose.ui.graphics.Color
-import com.zeyadgasser.domainPure.Black
-import com.zeyadgasser.domainPure.BlueDark
-import com.zeyadgasser.domainPure.BlueGrey800
-import com.zeyadgasser.domainPure.DarkerGray
-import com.zeyadgasser.domainPure.GreenDark
-import com.zeyadgasser.domainPure.GreenLight
-import com.zeyadgasser.domainPure.OrangeDark
-import com.zeyadgasser.domainPure.Purple200
-import com.zeyadgasser.domainPure.Purple500
-import com.zeyadgasser.domainPure.Purple700
-import com.zeyadgasser.domainPure.RedLight
-import com.zeyadgasser.domainPure.Teal200
-import com.zeyadgasser.domainPure.Teal700
-import com.zeyadgasser.domainPure.White
+import com.zeyadgasser.domainPure.BLACK
+import com.zeyadgasser.domainPure.BLUE_DARK
+import com.zeyadgasser.domainPure.BLUE_GREY_800
+import com.zeyadgasser.domainPure.DARKER_GRAY
+import com.zeyadgasser.domainPure.GREEN_DARK
+import com.zeyadgasser.domainPure.GREEN_LIGHT
+import com.zeyadgasser.domainPure.ORANGE_DARK
+import com.zeyadgasser.domainPure.PURPLE_200
+import com.zeyadgasser.domainPure.PURPLE_500
+import com.zeyadgasser.domainPure.PURPLE_700
+import com.zeyadgasser.domainPure.RED_LIGHT
+import com.zeyadgasser.domainPure.TEAL_200
+import com.zeyadgasser.domainPure.TEAL_700
+import com.zeyadgasser.domainPure.WHITE
 
-val Purple200 = Color(Purple200)
-val Purple500 = Color(Purple500)
-val Purple700 = Color(Purple700)
-val Teal200 = Color(Teal200)
-val OrangeDark = Color(OrangeDark)
-val Teal700 = Color(Teal700)
-val BlueGrey800 = Color(BlueGrey800)
-val GreenLight = Color(GreenLight)
-val DarkerGray = Color(DarkerGray)
-val RedLight = Color(RedLight)
-val BlueDark = Color(BlueDark)
-val GreenDark = Color(GreenDark)
-val Black = Color(Black)
-val White = Color(White)
+val Purple200 = Color(PURPLE_200)
+val Purple500 = Color(PURPLE_500)
+val Purple700 = Color(PURPLE_700)
+val Teal200 = Color(TEAL_200)
+val OrangeDark = Color(ORANGE_DARK)
+val Teal700 = Color(TEAL_700)
+val BlueGrey800 = Color(BLUE_GREY_800)
+val GreenLight = Color(GREEN_LIGHT)
+val DarkerGray = Color(DARKER_GRAY)
+val RedLight = Color(RED_LIGHT)
+val BlueDark = Color(BLUE_DARK)
+val GreenDark = Color(GREEN_DARK)
+val Black = Color(BLACK)
+val White = Color(WHITE)

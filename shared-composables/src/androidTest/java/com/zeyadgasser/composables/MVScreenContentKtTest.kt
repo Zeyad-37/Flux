@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
-import com.zeyadgasser.composables.presentation_models.FluxTaskItem
+import com.zeyadgasser.composables.presentationModels.FluxTaskItem
 import com.zeyadgasser.composables.theme.FluxTheme
 import org.junit.Rule
 import org.junit.Test

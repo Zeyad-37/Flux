@@ -1,13 +1,20 @@
 package com.zeyadgasser.mvvm
 
 import com.zeyadgasser.composables.mappers.FluxTaskItemMapper
-import com.zeyadgasser.core.*
+import com.zeyadgasser.core.FluxOutcome
+import com.zeyadgasser.core.InputHandler
+import com.zeyadgasser.core.toEffectOutcomeFlow
+import com.zeyadgasser.core.toStateOutcomeFlow
+import com.zeyadgasser.core.toErrorOutcomeFlow
+import com.zeyadgasser.core.executeInParallel
 import com.zeyadgasser.domainPure.FluxTaskUseCases
 import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
+
+private const val DELAY = 1000L
 
 class MVVMInputHandler @Inject constructor(
     private val getRandomColorIdUseCase: GetRandomColorIdUseCase,
@@ -20,7 +27,7 @@ class MVVMInputHandler @Inject constructor(
             ChangeBackgroundInput -> ColorBackgroundState(
                 getRandomColorIdUseCase.getRandomColorId(),
                 fluxTaskUseCases.getFluxTasks().map { fluxTaskItemMapper.map(it) }
-            ).toStateOutcomeFlow().onStart { delay(1000) }
+            ).toStateOutcomeFlow().onStart { delay(DELAY) }
             ShowDialogInput -> ShowDialogEffect.toEffectOutcomeFlow().executeInParallel()
             UncaughtErrorInput -> IllegalStateException("UncaughtError").toErrorOutcomeFlow()
             NavBackInput -> NavBackEffect.toEffectOutcomeFlow()

@@ -2,10 +2,14 @@ package com.zeyadgasser.mvvm
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
-import com.zeyadgasser.core.*
+import com.zeyadgasser.core.toEffectOutcomeFlow
+import com.zeyadgasser.core.toStateOutcomeFlow
+import com.zeyadgasser.core.toErrorOutcomeFlow
+import com.zeyadgasser.core.Progress
+import com.zeyadgasser.core.Output
 import com.zeyadgasser.core.InputStrategy.THROTTLE
-import com.zeyadgasser.test_base.CoroutineTestExtension
-import com.zeyadgasser.test_base.MainDispatcherRule
+import com.zeyadgasser.testBase.CoroutineTestExtension
+import com.zeyadgasser.testBase.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule

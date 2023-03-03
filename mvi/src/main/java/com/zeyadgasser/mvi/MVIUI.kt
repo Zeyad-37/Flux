@@ -1,12 +1,18 @@
 package com.zeyadgasser.mvi
 
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zeyadgasser.composables.MVScreenContent
-import com.zeyadgasser.composables.presentation_models.FluxTaskItem
+import com.zeyadgasser.composables.presentationModels.FluxTaskItem
 import com.zeyadgasser.core.Effect
 import com.zeyadgasser.core.Error
 import com.zeyadgasser.core.Output
@@ -15,6 +21,7 @@ import com.zeyadgasser.core.State
 import kotlinx.coroutines.Dispatchers.Main
 import androidx.compose.runtime.State as ComposeState
 
+@SuppressWarnings("FunctionNaming")
 @Composable
 fun MVIScreen(
     viewModel: MVIViewModel = hiltViewModel(),
@@ -28,7 +35,7 @@ fun MVIScreen(
     when (val output = outputState.value) {
         is Effect -> {
             showDialog = (output as MVIEffect) is ShowDialogEffect
-            BindEffects(output, onBackClicked)
+            bindEffects(output, onBackClicked)
         }
         is Error -> uncaughtErrorMessage = output.message
         is Progress -> isLoading = output.isLoading
@@ -55,25 +62,23 @@ fun MVIScreen(
     )
 }
 
-@Composable
-private fun BindEffects(effect: MVIEffect, onBackClicked: () -> Unit) = when (effect) {
+private fun bindEffects(effect: MVIEffect, onBackClicked: () -> Unit) = when (effect) {
     is NavBackEffect -> onBackClicked()
     is ShowDialogEffect -> Unit
 }
 
+@SuppressWarnings("FunctionNaming")
 @Composable
 private fun MVIState.evaluateColor() = when (this) {
     InitialState -> MaterialTheme.colors.background
     is ColorBackgroundState, is ErrorState -> Color(color)
 }
 
-@Composable
 private fun MVIState.evaluateErrorMessage() = when (this) {
     is ErrorState -> message
     is ColorBackgroundState, InitialState -> ""
 }
 
-@Composable
 private fun MVIState.evaluateList(): List<FluxTaskItem> = when (this) {
     is ErrorState, InitialState -> emptyList()
     is ColorBackgroundState -> list.toMutableStateList()

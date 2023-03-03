@@ -1,4 +1,4 @@
-package com.zeyadgasser.composables.presentation_models
+package com.zeyadgasser.composables.presentationModels
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

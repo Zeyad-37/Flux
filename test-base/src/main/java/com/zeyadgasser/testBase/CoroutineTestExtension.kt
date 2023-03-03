@@ -1,4 +1,4 @@
-package com.zeyadgasser.test_base
+package com.zeyadgasser.testBase
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

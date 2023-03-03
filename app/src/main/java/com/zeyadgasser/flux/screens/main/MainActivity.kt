@@ -17,6 +17,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@SuppressWarnings("FunctionNaming")
 @Preview(showBackground = true)
 @Composable
 fun MainPreview() = FluxTheme { HomeScreen() }

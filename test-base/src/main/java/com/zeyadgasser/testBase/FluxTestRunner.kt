@@ -1,4 +1,4 @@
-package com.zeyadgasser.test_base
+package com.zeyadgasser.testBase
 
 import android.app.Application
 import android.content.Context

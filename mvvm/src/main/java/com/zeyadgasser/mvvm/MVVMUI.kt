@@ -1,12 +1,18 @@
 package com.zeyadgasser.mvvm
 
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zeyadgasser.composables.MVScreenContent
-import com.zeyadgasser.composables.presentation_models.FluxTaskItem
+import com.zeyadgasser.composables.presentationModels.FluxTaskItem
 import com.zeyadgasser.core.Effect
 import com.zeyadgasser.core.Error
 import com.zeyadgasser.core.Output
@@ -15,6 +21,7 @@ import com.zeyadgasser.core.State
 import kotlinx.coroutines.Dispatchers.Main
 import androidx.compose.runtime.State as ComposeState
 
+@SuppressWarnings("FunctionNaming")
 @Composable
 fun MVVMScreen(
     viewModel: MVVMViewModel = hiltViewModel(),
@@ -55,6 +62,7 @@ fun MVVMScreen(
     )
 }
 
+@SuppressWarnings("FunctionNaming")
 @Composable
 private fun BindEffects(effect: MVVMEffect, onBackClicked: () -> Unit) = when (effect) {
     is ShowDialogEffect -> Unit
@@ -67,13 +75,11 @@ private fun MVVMState.evaluateColor() = when (this) {
     is ColorBackgroundState, is ErrorState -> Color(color)
 }
 
-@Composable
 private fun MVVMState.evaluateErrorMessage() = when (this) {
     is ColorBackgroundState, InitialState -> ""
     is ErrorState -> message
 }
 
-@Composable
 private fun MVVMState.evaluateList(): List<FluxTaskItem> = when (this) {
     is ErrorState, InitialState -> emptyList()
     is ColorBackgroundState -> list.toMutableStateList()

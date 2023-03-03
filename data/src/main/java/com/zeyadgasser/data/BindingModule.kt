@@ -8,6 +8,7 @@ import dagger.hilt.android.components.ViewModelComponent
 
 @Module
 @InstallIn(ViewModelComponent::class)
+@SuppressWarnings("UnnecessaryAbstractClass")
 abstract class BindingModule {
     @Binds
     abstract fun bindFluxTaskRepository(fluxTaskRepository: FluxTaskRepositoryImpl): FluxTaskRepository
