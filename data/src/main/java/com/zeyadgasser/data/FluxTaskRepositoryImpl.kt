@@ -1,7 +1,7 @@
 package com.zeyadgasser.data
 
-import com.zeyadgasser.domain_pure.FluxTask
-import com.zeyadgasser.domain_pure.FluxTaskRepository
+import com.zeyadgasser.domainPure.FluxTask
+import com.zeyadgasser.domainPure.FluxTaskRepository
 import javax.inject.Inject
 
 class FluxTaskRepositoryImpl @Inject constructor(

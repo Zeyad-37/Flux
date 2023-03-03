@@ -1,4 +1,4 @@
-package com.zeyadgasser.domain_pure
+package com.zeyadgasser.domainPure
 
 const val Purple200 = 0xFFBB86FC
 const val Purple500 = 0xFF6200EE

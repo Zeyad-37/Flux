@@ -5,8 +5,8 @@ import com.zeyadgasser.core.Effect
 import com.zeyadgasser.core.Input
 import com.zeyadgasser.core.Result
 import com.zeyadgasser.core.State
-import com.zeyadgasser.domain_pure.RedLight
-import com.zeyadgasser.domain_pure.White
+import com.zeyadgasser.domainPure.RedLight
+import com.zeyadgasser.domainPure.White
 import kotlinx.parcelize.Parcelize
 
 sealed class MVIInput : Input()

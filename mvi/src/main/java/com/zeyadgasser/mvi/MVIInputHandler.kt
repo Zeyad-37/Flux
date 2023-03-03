@@ -2,8 +2,8 @@ package com.zeyadgasser.mvi
 
 import com.zeyadgasser.composables.mappers.FluxTaskItemMapper
 import com.zeyadgasser.core.*
-import com.zeyadgasser.domain_pure.FluxTaskUseCases
-import com.zeyadgasser.domain_pure.GetRandomColorIdUseCase
+import com.zeyadgasser.domainPure.FluxTaskUseCases
+import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onStart

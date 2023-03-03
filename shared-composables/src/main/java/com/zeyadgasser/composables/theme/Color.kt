@@ -1,20 +1,20 @@
 package com.zeyadgasser.composables.theme
 
 import androidx.compose.ui.graphics.Color
-import com.zeyadgasser.domain_pure.Black
-import com.zeyadgasser.domain_pure.BlueDark
-import com.zeyadgasser.domain_pure.BlueGrey800
-import com.zeyadgasser.domain_pure.DarkerGray
-import com.zeyadgasser.domain_pure.GreenDark
-import com.zeyadgasser.domain_pure.GreenLight
-import com.zeyadgasser.domain_pure.OrangeDark
-import com.zeyadgasser.domain_pure.Purple200
-import com.zeyadgasser.domain_pure.Purple500
-import com.zeyadgasser.domain_pure.Purple700
-import com.zeyadgasser.domain_pure.RedLight
-import com.zeyadgasser.domain_pure.Teal200
-import com.zeyadgasser.domain_pure.Teal700
-import com.zeyadgasser.domain_pure.White
+import com.zeyadgasser.domainPure.Black
+import com.zeyadgasser.domainPure.BlueDark
+import com.zeyadgasser.domainPure.BlueGrey800
+import com.zeyadgasser.domainPure.DarkerGray
+import com.zeyadgasser.domainPure.GreenDark
+import com.zeyadgasser.domainPure.GreenLight
+import com.zeyadgasser.domainPure.OrangeDark
+import com.zeyadgasser.domainPure.Purple200
+import com.zeyadgasser.domainPure.Purple500
+import com.zeyadgasser.domainPure.Purple700
+import com.zeyadgasser.domainPure.RedLight
+import com.zeyadgasser.domainPure.Teal200
+import com.zeyadgasser.domainPure.Teal700
+import com.zeyadgasser.domainPure.White
 
 val Purple200 = Color(Purple200)
 val Purple500 = Color(Purple500)
