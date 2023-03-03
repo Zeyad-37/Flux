@@ -25,4 +25,5 @@ class MVIViewModel @Inject constructor(
     fun navBackInput() = process(NavBackInput)
     fun removeTask(id: Long) = process(RemoveTask(id))
     fun changeTaskChecked(id: Long, checked: Boolean) = process(ChangeTaskChecked(id, checked))
+    fun doNothing() = process(DoNothing)
 }

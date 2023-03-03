@@ -3,6 +3,7 @@ package com.zeyadgasser.mvvm
 import com.zeyadgasser.composables.mappers.FluxTaskItemMapper
 import com.zeyadgasser.core.FluxOutcome
 import com.zeyadgasser.core.InputHandler
+import com.zeyadgasser.core.emptyOutcomeFlow
 import com.zeyadgasser.core.toEffectOutcomeFlow
 import com.zeyadgasser.core.toStateOutcomeFlow
 import com.zeyadgasser.core.toErrorOutcomeFlow
@@ -34,6 +35,7 @@ class MVVMInputHandler @Inject constructor(
             ErrorInput -> ErrorState("Error").toStateOutcomeFlow()
             is ChangeTaskChecked -> onChangeTaskChecked(input)
             is RemoveTask -> onRemoveTask(input.id)
+            DoNothing -> emptyOutcomeFlow()
         }
 
     private fun onRemoveTask(id: Long): Flow<FluxOutcome> = ColorBackgroundState(

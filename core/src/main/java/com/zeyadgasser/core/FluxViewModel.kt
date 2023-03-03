@@ -48,14 +48,14 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     internal data class FluxEffect<E>(val effect: E) : FluxOutcome()
     internal data class FluxResult<R>(val result: R) : FluxOutcome()
 
-    private var job: Job? = null
+    private lateinit var job: Job
 
     private val viewModelListener: MutableStateFlow<Output> = MutableStateFlow(currentState)
     private val inputs: MutableSharedFlow<I> = MutableSharedFlow()
     private val throttledInputs: MutableSharedFlow<I> = MutableSharedFlow()
     private val debouncedInputs: MutableSharedFlow<I> = MutableSharedFlow()
     private val loggingListener: LoggingListener<I, R, S, E> =
-        LoggingListenerHelper<I, R, S, E>().apply { log().invoke(this) }
+        LoggingListenerHelper<I, R, S, E>().also { log().invoke(it) }
 
     init {
         bindInputs()
@@ -69,7 +69,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
             THROTTLE -> throttledInputs
             DEBOUNCE -> debouncedInputs
         }.emit(input)
-    }.let {}
+    }.let {} // TODO explore operation cancellation
 
     open fun log(): LoggingListenerHelper<I, R, S, E>.() -> Unit = {
         inputs { logger.log(Level.ALL, "${this@FluxViewModel::class.simpleName} - Input: $it") }
@@ -104,10 +104,10 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
                 loggingListener.inputs(it)
                 InputOutcomeStream(it, inputHandler.handleInputs(it, currentState))
             }.run {
-                val asyncOutcomes = this.filter { it.outcomes is AsyncOutcomeFlow }
+                val asyncOutcomes = filter { it.outcomes is AsyncOutcomeFlow }
                     .map { it.copy(outcomes = (it.outcomes as AsyncOutcomeFlow).flow) }
                     .flatMapMerge { processInputOutcomeStream(it) }
-                val sequentialOutcomes = this.filter { it.outcomes !is AsyncOutcomeFlow }
+                val sequentialOutcomes = filter { it.outcomes !is AsyncOutcomeFlow }
                     .flatMapConcat { processInputOutcomeStream(it) }
                 merge(asyncOutcomes, sequentialOutcomes)
             }
@@ -160,5 +160,5 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
         }
     }
 
-    override fun onCleared() = job?.cancel() ?: Unit
+    override fun onCleared() = job.cancel()
 }

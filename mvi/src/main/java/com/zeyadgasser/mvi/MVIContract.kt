@@ -15,6 +15,7 @@ object ShowDialogInput : MVIInput()
 object UncaughtErrorInput : MVIInput()
 object ErrorInput : MVIInput()
 object NavBackInput : MVIInput()
+object DoNothing : MVIInput()
 data class RemoveTask(val id: Long) : MVIInput()
 data class ChangeTaskChecked(val id: Long, val checked: Boolean) : MVIInput()
 

@@ -9,6 +9,7 @@ private const val TASK_LIST_SIZE = 30
 class FluxTaskRepositoryImpl @Inject constructor(
     private val fluxTaskDTOMapper: FluxTaskDTOMapper
 ) : FluxTaskRepository {
+
     private var tasks = MutableList(TASK_LIST_SIZE) { i -> FluxTaskDTO(i.toLong(), "Task # $i") }
 
     override fun getFluxTasks(): List<FluxTask> = tasks.toList().map { fluxTaskDTOMapper.map(it) }

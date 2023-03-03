@@ -1,5 +1,3 @@
-@file:SuppressWarnings("TooManyFunctions")
-
 package com.zeyadgasser.core
 
 import com.zeyadgasser.core.FluxViewModel.FluxEffect
@@ -52,8 +50,6 @@ fun Throwable.toErrorOutcome(errorMessage: String? = null): FluxOutcome =
     FluxError(Error(errorMessage ?: message.orEmpty(), this))
 
 fun Throwable.toErrorOutcomeFlow(): Flow<FluxOutcome> = toErrorOutcome().toFlow()
-
-fun emptyOutcome() = EmptyFluxOutcome
 
 fun emptyOutcomeFlow() = EmptyFluxOutcome.toFlow()
 

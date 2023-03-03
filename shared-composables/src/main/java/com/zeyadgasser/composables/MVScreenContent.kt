@@ -35,7 +35,8 @@ fun MVScreenContent(
     goBackOnClick: () -> Unit,
     onDismissClick: () -> Unit,
     onCloseTask: (Long) -> Unit,
-    onCheckedTask: (Long, Boolean) -> Unit
+    onCheckedTask: (Long, Boolean) -> Unit,
+    doNothingOnClick: () -> Unit,
 ) = Surface(
     modifier = Modifier.fillMaxSize(),
     color = color,
@@ -48,6 +49,7 @@ fun MVScreenContent(
         Button(onClick = showDialogOnClick) { Text(text = "Show Dialog in parallel") }
         Button(onClick = showErrorStateOnClick) { Text(text = "Show Error State") }
         Button(onClick = showUncaughtErrorOnClick) { Text(text = "Show Uncaught Error") }
+        Button(onClick = doNothingOnClick) { Text(text = "Do nothing!") }
         Button(onClick = goBackOnClick) { Text(text = "Go Back") }
         if (errorMessage.isNotEmpty()) Text(text = errorMessage)
         if (uncaughtErrorMessage.isNotEmpty()) Text(text = uncaughtErrorMessage)
@@ -71,4 +73,3 @@ fun MVScreenContent(
         }
     }
 }
-

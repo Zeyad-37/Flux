@@ -3,6 +3,7 @@ package com.zeyadgasser.mvi
 import com.zeyadgasser.composables.mappers.FluxTaskItemMapper
 import com.zeyadgasser.core.FluxOutcome
 import com.zeyadgasser.core.InputHandler
+import com.zeyadgasser.core.emptyOutcomeFlow
 import com.zeyadgasser.core.executeInParallel
 import com.zeyadgasser.core.toEffectOutcomeFlow
 import com.zeyadgasser.core.toErrorOutcomeFlow
@@ -34,6 +35,7 @@ class MVIInputHandler @Inject constructor(
             ErrorInput -> ErrorResult("Error").toResultOutcomeFlow()
             is ChangeTaskChecked -> onChangeTaskChecked(input, currentState)
             is RemoveTask -> onRemoveTask(input.id)
+            DoNothing -> emptyOutcomeFlow()
         }
 
     private fun onRemoveTask(id: Long): Flow<FluxOutcome> = ChangeBackgroundResult(

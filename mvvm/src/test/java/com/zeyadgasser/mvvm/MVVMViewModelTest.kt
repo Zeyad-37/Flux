@@ -2,12 +2,15 @@ package com.zeyadgasser.mvvm
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
-import com.zeyadgasser.core.toEffectOutcomeFlow
-import com.zeyadgasser.core.toStateOutcomeFlow
-import com.zeyadgasser.core.toErrorOutcomeFlow
-import com.zeyadgasser.core.Progress
-import com.zeyadgasser.core.Output
+import com.zeyadgasser.core.EmptyInput
+import com.zeyadgasser.core.Error
 import com.zeyadgasser.core.InputStrategy.THROTTLE
+import com.zeyadgasser.core.Output
+import com.zeyadgasser.core.Progress
+import com.zeyadgasser.core.emptyOutcomeFlow
+import com.zeyadgasser.core.toEffectOutcomeFlow
+import com.zeyadgasser.core.toErrorOutcomeFlow
+import com.zeyadgasser.core.toStateOutcomeFlow
 import com.zeyadgasser.testBase.CoroutineTestExtension
 import com.zeyadgasser.testBase.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -109,6 +112,19 @@ class MVVMViewModelTest {
             mviViewModel.process(input)
             assertEquals(initialState, awaitItem())
             assertEquals(NavBackEffect, awaitItem())
+            assertEquals(Progress(false, input), awaitItem())
+        }
+    }
+
+    @Test
+    fun doNothingInput() = runTest {
+        val input = DoNothing
+        whenever(inputHandler.handleInputs(input, initialState))
+            .thenReturn(emptyOutcomeFlow())
+        mviViewModel.observe().test {
+            mviViewModel.process(input)
+            assertEquals(initialState, awaitItem())
+            assertEquals(Progress(true, input), awaitItem())
             assertEquals(Progress(false, input), awaitItem())
         }
     }

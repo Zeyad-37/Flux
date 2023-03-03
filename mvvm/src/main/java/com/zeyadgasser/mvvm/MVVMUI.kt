@@ -58,7 +58,8 @@ fun MVVMScreen(
         onDismissClick = { showDialog = false },
         list = successState.evaluateList(),
         onCloseTask = { id -> viewModel.removeTask(id) },
-        onCheckedTask = { id, checked -> viewModel.changeTaskChecked(id, checked) }
+        onCheckedTask = { id, checked -> viewModel.changeTaskChecked(id, checked) },
+        doNothingOnClick = { viewModel.doNothing() },
     )
 }
 

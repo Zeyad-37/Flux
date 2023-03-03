@@ -14,6 +14,7 @@ object ShowDialogInput : MVVMInput()
 object ErrorInput : MVVMInput()
 object UncaughtErrorInput : MVVMInput()
 object NavBackInput : MVVMInput()
+object DoNothing : MVVMInput()
 data class RemoveTask(val id: Long) : MVVMInput()
 data class ChangeTaskChecked(val id: Long, val checked: Boolean) : MVVMInput()
 
