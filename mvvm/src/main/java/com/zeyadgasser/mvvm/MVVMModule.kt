@@ -1,7 +1,6 @@
 package com.zeyadgasser.mvvm
 
 import androidx.lifecycle.SavedStateHandle
-import com.zeyadgasser.composables.mappers.FluxTaskItemMapper
 import com.zeyadgasser.core.ARG_STATE
 import com.zeyadgasser.domainPure.FluxTaskUseCases
 import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
@@ -24,6 +23,5 @@ object MVVMModule {
     fun provideMVIInputHandler(
         getRandomColorIdUseCase: GetRandomColorIdUseCase,
         fluxTaskUseCases: FluxTaskUseCases,
-        fluxTaskItemMapper: FluxTaskItemMapper,
-    ) = MVVMInputHandler(getRandomColorIdUseCase, fluxTaskUseCases, fluxTaskItemMapper)
+    ) = MVVMInputHandler(getRandomColorIdUseCase, fluxTaskUseCases)
 }

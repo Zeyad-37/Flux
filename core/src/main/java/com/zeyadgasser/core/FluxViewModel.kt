@@ -69,7 +69,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
             THROTTLE -> throttledInputs
             DEBOUNCE -> debouncedInputs
         }.emit(input)
-    }.let {} // TODO explore operation cancellation
+    }.let {}
 
     open fun log(): LoggingListenerHelper<I, R, S, E>.() -> Unit = {
         inputs { logger.log(Level.ALL, "${this@FluxViewModel::class.simpleName} - Input: $it") }

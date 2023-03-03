@@ -1,9 +1,12 @@
 package com.zeyadgasser.composables
 
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onSiblings
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
 import com.zeyadgasser.composables.theme.FluxTheme
 import org.junit.Rule
@@ -27,7 +30,7 @@ class MVScreenContentKtTest {
             FluxTheme {
                 MVScreenContent(
                     color, errorMessage, uncaughtErrorMessage, isLoading, showDialog, list,
-                    { }, { }, { }, { }, { }, { }, { }, { _, _ -> },
+                    { }, { }, { }, { }, { }, { }, { }, { _, _ -> }, {},
                 )
             }
         }

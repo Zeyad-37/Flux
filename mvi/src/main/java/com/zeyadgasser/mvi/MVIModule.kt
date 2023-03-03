@@ -1,7 +1,6 @@
 package com.zeyadgasser.mvi
 
 import androidx.lifecycle.SavedStateHandle
-import com.zeyadgasser.composables.mappers.FluxTaskItemMapper
 import com.zeyadgasser.core.ARG_STATE
 import com.zeyadgasser.domainPure.FluxTaskUseCases
 import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
@@ -24,8 +23,7 @@ object MVIModule {
     fun provideMVIInputHandler(
         getRandomColorIdUseCase: GetRandomColorIdUseCase,
         fluxTaskUseCases: FluxTaskUseCases,
-        fluxTaskItemMapper: FluxTaskItemMapper,
-    ) = MVIInputHandler(getRandomColorIdUseCase, fluxTaskUseCases, fluxTaskItemMapper)
+    ) = MVIInputHandler(getRandomColorIdUseCase, fluxTaskUseCases)
 
     @Provides
     @ViewModelScoped

@@ -9,9 +9,6 @@ import dagger.hilt.android.scopes.ViewModelScoped
 @Module
 @InstallIn(ViewModelComponent::class)
 object DataModule {
-    @Provides
-    @ViewModelScoped
-    fun provideFluxTaskDTOMapper(): FluxTaskDTOMapper = FluxTaskDTOMapper()
 
     @Provides
     @ViewModelScoped
@@ -19,8 +16,6 @@ object DataModule {
 
     @Provides
     @ViewModelScoped
-    fun provideFluxTaskRepositoryImpl(
-        fluxTaskAPI: FluxTaskAPI,
-        fluxTaskDTOMapper: FluxTaskDTOMapper,
-    ): FluxTaskRepositoryImpl = FluxTaskRepositoryImpl(fluxTaskAPI, fluxTaskDTOMapper)
+    fun provideFluxTaskRepositoryImpl(fluxTaskAPI: FluxTaskAPI): FluxTaskRepositoryImpl =
+        FluxTaskRepositoryImpl(fluxTaskAPI)
 }

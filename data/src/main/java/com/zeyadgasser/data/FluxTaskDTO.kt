@@ -1,4 +1,9 @@
 package com.zeyadgasser.data
 
-data class FluxTaskDTO(val id: Long, val label: String, val checked: Boolean = false)
-// TODO try MapsTo Interface
+import com.zeyadgasser.domainPure.FluxTask
+
+data class FluxTaskDTO(
+    val id: Long, val label: String, val checked: Boolean = false
+) : MapsTo<FluxTask> {
+    override fun map(): FluxTask = FluxTask(id, label, checked)
+}
