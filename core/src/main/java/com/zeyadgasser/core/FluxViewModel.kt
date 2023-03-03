@@ -89,9 +89,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
                     FluxState(reducer.reduce(state.state, result.result))
                         .apply { input = result.input }
                 }
-        } else {
-            outcome.filter { it is FluxState<*> }.map { it as FluxState<S> }
-        }
+        } else outcome.filter { it is FluxState<*> }.map { it as FluxState<S> }
         val nonStates = outcome.filter { it !is FluxState<*> }.filter { it !is FluxResult<*> }
         job = viewModelScope.launch {
             merge(nonStates, states).onEach { handleOutcome(it) }.flowOn(ioDispatcher).collect()

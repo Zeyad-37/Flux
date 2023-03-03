@@ -15,6 +15,12 @@ object DataModule {
 
     @Provides
     @ViewModelScoped
-    fun provideFluxTaskRepositoryImpl(fluxTaskDTOMapper: FluxTaskDTOMapper): FluxTaskRepositoryImpl =
-        FluxTaskRepositoryImpl(fluxTaskDTOMapper)
+    fun provideFluxTaskAPI(): FluxTaskAPI = FluxTaskAPI()
+
+    @Provides
+    @ViewModelScoped
+    fun provideFluxTaskRepositoryImpl(
+        fluxTaskAPI: FluxTaskAPI,
+        fluxTaskDTOMapper: FluxTaskDTOMapper,
+    ): FluxTaskRepositoryImpl = FluxTaskRepositoryImpl(fluxTaskAPI, fluxTaskDTOMapper)
 }
