@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapMerge
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -30,6 +29,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.logging.Level
 import java.util.logging.Logger
 import kotlin.coroutines.CoroutineContext
@@ -49,6 +49,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     internal data class FluxResult<R>(val result: R) : FluxOutcome()
 
     private lateinit var job: Job
+    private var progress: Progress = Progress(false, EmptyInput)
 
     private val viewModelListener: MutableStateFlow<Output> = MutableStateFlow(currentState)
     private val inputs: MutableSharedFlow<I> = MutableSharedFlow()
@@ -110,18 +111,19 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
                 merge(asyncOutcomes, sequentialOutcomes)
             }
 
-    private fun processInputOutcomeStream(inputOutcomeStream: InputOutcomeStream): Flow<FluxOutcome> {
-        val result = inputOutcomeStream.outcomes
-            .map { it.apply { input = inputOutcomeStream.input } }
-            .catch { emit(createRxError(it, inputOutcomeStream.input as I)) }
-        return if (inputOutcomeStream.input.showProgress) {
-            result.onStart { emit(FluxProgress(Progress(true, inputOutcomeStream.input))) }
-        } else {
-            result
-        }
+    private fun processInputOutcomeStream(stream: InputOutcomeStream): Flow<FluxOutcome> {
+        val result = stream.outcomes
+            .map { it.apply { input = stream.input } }
+            .catch { emit(createFluxError(it, stream.input as I)) }
+        return if (stream.input.showProgress) {
+            runBlocking { progress = Progress(true, stream.input) }
+            result.onStart { emit(FluxProgress(progress)) }
+//            result.flatMapConcat { flowOf(it, FluxProgress(Progress(false, stream.input))) }
+//                .onStart { emit(FluxProgress(Progress(true, stream.input))) }
+        } else result
     }
 
-    private fun createRxError(throwable: Throwable, input: I): FluxError =
+    private fun createFluxError(throwable: Throwable, input: I): FluxError =
         FluxError(Error(throwable.message.orEmpty(), throwable, input)).apply { this.input = input }
 
     private fun logOutcomes(outcome: FluxOutcome) = when (outcome) {
@@ -138,23 +140,24 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
         when (fluxOutcome) {
             is FluxError -> viewModelListener.emit(fluxOutcome.error)
             is FluxEffect<*> -> viewModelListener.emit(fluxOutcome.effect as E)
-            is FluxState<*> -> (fluxOutcome.state as S).let { state ->
-                savedStateHandle?.set(ARG_STATE, state)
-                currentState = state
-                viewModelListener.emit(state)
-            }
-            is FluxProgress ->
-                if (fluxOutcome.input.showProgress) viewModelListener.emit(fluxOutcome.progress)
+            is FluxState<*> -> (fluxOutcome.state as S)
+                .takeIf { it != currentState }?.let { state ->
+                    savedStateHandle?.set(ARG_STATE, state)
+                    currentState = state
+                    viewModelListener.emit(state)
+                }
+            is FluxProgress -> viewModelListener.emit(fluxOutcome.progress)
             is FluxResult<*>, EmptyFluxOutcome -> Unit
         }
-        if (fluxOutcome !is FluxProgress) {
-            flow<Nothing> { // TODO improve
+        runBlocking {
+            if (fluxOutcome !is FluxProgress && progress.isLoading) {
                 delay(DELAY)
                 Progress(false, fluxOutcome.input).let {
+                    progress = it
                     logOutcomes(FluxProgress(it))
                     viewModelListener.emit(it)
                 }
-            }.collect()
+            }
         }
     }
 
