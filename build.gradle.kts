@@ -14,6 +14,8 @@ plugins {
     id("io.gitlab.arturbosch.detekt") version ("1.22.0") apply false
 }
 
+version = "1.0.0"
+
 val detektReportMergeSarif by tasks.registering(ReportMergeTask::class) {
     output.set(layout.buildDirectory.file("reports/detekt/merge.sarif"))
 }
@@ -107,3 +109,25 @@ fun Project.configureDetekt() {
     tasks.withType<DetektCreateBaselineTask>()
         .configureEach { jvmTarget = JavaVersion.VERSION_11.toString() }
 }
+
+//tasks.register("incrementVersionName") {
+//    val currentVersionName = project.version as String
+//    // Parse the current version name into its major, minor, and patch components
+//    val regex = Regex("(\\d+)\\.(\\d+)\\.(\\d+)")
+//    val matcher =
+//        regex.find(currentVersionName) ?: error("Invalid version name: $currentVersionName")
+//    val major = matcher.groupValues[1].toInt()
+//    var minor = matcher.groupValues[2].toInt()
+//    var patch = matcher.groupValues[3].toInt()
+//    // Increment the appropriate component based on the input parameter
+//    when (val inputParam = project.properties["input"] as? String ?: "") {
+//        "hotfix" -> patch++
+//        "release" -> {
+//            patch = 0
+//            minor++
+//        }
+//        else -> error("Invalid increment mode: $inputParam")
+//    }
+//    val newVersionName = "$major.$minor.$patch"
+//    project.version = newVersionName
+//}
