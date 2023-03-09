@@ -1,5 +1,6 @@
 package com.zeyadgasser.core
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -29,7 +31,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.logging.Level
 import java.util.logging.Logger
 import kotlin.coroutines.CoroutineContext
@@ -41,7 +42,6 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     private val reducer: Reducer<S, R>?,
     private val savedStateHandle: SavedStateHandle?,
     private val ioDispatcher: CoroutineContext = Dispatchers.IO,
-    private val logger: Logger = Logger.getLogger("flux logger"),
 ) : ViewModel() {
 
     internal data class FluxState<S>(val state: S) : FluxOutcome()
@@ -73,12 +73,12 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     }.let {}
 
     open fun log(): LoggingListenerHelper<I, R, S, E>.() -> Unit = {
-        inputs { logger.log(Level.ALL, "${this@FluxViewModel::class.simpleName} - Input: $it") }
-        progress { logger.log(Level.ALL, "${this@FluxViewModel::class.simpleName} - $it") }
-        results { logger.log(Level.ALL, "${this@FluxViewModel::class.simpleName} - Result: $it") }
-        effects { logger.log(Level.ALL, "${this@FluxViewModel::class.simpleName} - Effect: $it") }
-        states { logger.log(Level.ALL, "${this@FluxViewModel::class.simpleName} - State: $it") }
-        errors { logger.log(Level.ALL, "${this@FluxViewModel::class.simpleName} - $it") }
+        inputs { Log.d("${this@FluxViewModel::class.simpleName}", " - Input: $it") }
+        progress { Log.d("${this@FluxViewModel::class.simpleName}", " - $it") }
+        results { Log.d("${this@FluxViewModel::class.simpleName}", " - Result: $it") }
+        effects { Log.d("${this@FluxViewModel::class.simpleName}", " - Effect: $it") }
+        states { Log.d("${this@FluxViewModel::class.simpleName}", " - State: $it") }
+        errors { Log.d("${this@FluxViewModel::class.simpleName}", " - $it") }
     }
 
     private fun bindInputs() {
@@ -116,10 +116,9 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
             .map { it.apply { input = stream.input } }
             .catch { emit(createFluxError(it, stream.input as I)) }
         return if (stream.input.showProgress) {
-            runBlocking { progress = Progress(true, stream.input) }
-            result.onStart { emit(FluxProgress(progress)) }
-//            result.flatMapConcat { flowOf(it, FluxProgress(Progress(false, stream.input))) }
-//                .onStart { emit(FluxProgress(Progress(true, stream.input))) }
+            result.flatMapConcat {
+                flowOf(it, FluxProgress(Progress(false, stream.input))).onEach { delay(DELAY) }
+            }.onStart { emit(FluxProgress(Progress(true, stream.input))) }
         } else result
     }
 
@@ -148,16 +147,6 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
                 }
             is FluxProgress -> viewModelListener.emit(fluxOutcome.progress)
             is FluxResult<*>, EmptyFluxOutcome -> Unit
-        }
-        runBlocking {
-            if (fluxOutcome !is FluxProgress && progress.isLoading) {
-                delay(DELAY)
-                Progress(false, fluxOutcome.input).let {
-                    progress = it
-                    logOutcomes(FluxProgress(it))
-                    viewModelListener.emit(it)
-                }
-            }
         }
     }
 
