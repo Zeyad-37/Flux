@@ -9,7 +9,7 @@ import com.zeyadgasser.domainPure.RED_LIGHT
 import com.zeyadgasser.domainPure.WHITE
 import kotlinx.parcelize.Parcelize
 
-sealed class MVIInput : Input()
+sealed class MVIInput(showProgress: Boolean = true) : Input(showProgress)
 object ChangeBackgroundInput : MVIInput()
 object ShowDialogInput : MVIInput()
 object UncaughtErrorInput : MVIInput()
@@ -17,7 +17,7 @@ object ErrorInput : MVIInput()
 object NavBackInput : MVIInput()
 object DoNothing : MVIInput()
 data class RemoveTask(val id: Long) : MVIInput()
-data class ChangeTaskChecked(val id: Long, val checked: Boolean) : MVIInput()
+data class ChangeTaskChecked(val id: Long, val checked: Boolean) : MVIInput(false)
 
 sealed class MVIResult : Result
 data class ChangeBackgroundResult(val color: Long, val list: List<FluxTaskItem>) : MVIResult()
@@ -36,5 +36,6 @@ object InitialState : MVIState()
 data class ErrorState(val message: String) : MVIState(RED_LIGHT)
 
 @Parcelize
-data class ColorBackgroundState(override val color: Long, val list: List<FluxTaskItem>) :
-    MVIState(color)
+data class ColorBackgroundState(
+    override val color: Long, val list: List<FluxTaskItem>
+) : MVIState(color)
