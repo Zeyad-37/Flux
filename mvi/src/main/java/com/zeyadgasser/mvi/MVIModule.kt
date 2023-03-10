@@ -20,12 +20,5 @@ object MVIModule {
 
     @Provides
     @ViewModelScoped
-    fun provideMVIInputHandler(
-        getRandomColorIdUseCase: GetRandomColorIdUseCase,
-        fluxTaskUseCases: FluxTaskUseCases,
-    ) = MVIInputHandler(getRandomColorIdUseCase, fluxTaskUseCases)
-
-    @Provides
-    @ViewModelScoped
     fun provideMVIReducer(): MVIReducer = MVIReducer()
 }

@@ -35,8 +35,7 @@ import kotlin.coroutines.CoroutineContext
 
 @OptIn(FlowPreview::class)
 abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
-    private var currentState: S,
-    private val inputHandler: InputHandler<I, S>,
+    initialState: S,
     private val reducer: Reducer<S, R>?,
     private val savedStateHandle: SavedStateHandle?,
     private val ioDispatcher: CoroutineContext = Dispatchers.IO,
@@ -47,16 +46,15 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     internal data class FluxResult<R>(val result: R) : FluxOutcome()
 
     private lateinit var job: Job
-    private var progress: Progress = Progress(false, EmptyInput)
+    private var currentState: S = initialState
 
     private val viewModelListener: MutableStateFlow<Output> = MutableStateFlow(currentState)
     private val inputs: MutableSharedFlow<I> = MutableSharedFlow()
     private val throttledInputs: MutableSharedFlow<I> = MutableSharedFlow()
     private val debouncedInputs: MutableSharedFlow<I> = MutableSharedFlow()
-    private val loggingListener = LoggingListenerHelper<I, R, S, E>().also { log().invoke(it) }
 
     init {
-        bindInputs()
+        activate()
     }
 
     fun observe(): StateFlow<Output> = viewModelListener.asStateFlow()
@@ -69,21 +67,25 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
         }.emit(input)
     }.let {}
 
-    open fun log(): LoggingListenerHelper<I, R, S, E>.() -> Unit = {
-        inputs { Log.d("${this@FluxViewModel::class.simpleName}", " - Input: $it") }
-        progress { Log.d("${this@FluxViewModel::class.simpleName}", " - $it") }
-        results { Log.d("${this@FluxViewModel::class.simpleName}", " - Result: $it") }
-        effects { Log.d("${this@FluxViewModel::class.simpleName}", " - Effect: $it") }
-        states { Log.d("${this@FluxViewModel::class.simpleName}", " - State: $it") }
-        errors { Log.d("${this@FluxViewModel::class.simpleName}", " - $it") }
+    abstract fun handleInputs(input: I, currentState: S): Flow<FluxOutcome>
+
+    open fun log(loggable: Loggable) = when (loggable) {
+        EmptyFluxOutcome -> Log.d("${this::class.simpleName}", " - EmptyFluxOutcome")
+        is Input -> Log.d("${this::class.simpleName}", " - Input: $loggable")
+        is FluxEffect<*> -> Log.d("${this::class.simpleName}", " - Effect: $loggable")
+        is FluxError -> Log.d("${this::class.simpleName}", " - $loggable")
+        is FluxProgress -> Log.d("${this::class.simpleName}", " - $loggable")
+        is FluxResult<*> -> Log.d("${this::class.simpleName}", " - Result: $loggable")
+        is FluxState<*> -> Log.d("${this::class.simpleName}", " - State: $loggable")
     }
 
-    private fun bindInputs() {
+    private fun activate() {
         val outcome: Flow<FluxOutcome> = createOutcomes()
         val states: Flow<FluxState<S>> = if (reducer != null) {
             outcome.filter { it is FluxResult<*> }
                 .map { it as FluxResult<R> }
                 .scan(FluxState(currentState)) { state: FluxState<S>, result: FluxResult<R> ->
+                    log(result)
                     FluxState(reducer.reduce(state.state, result.result))
                         .apply { input = result.input }
                 }
@@ -94,19 +96,19 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
         }
     }
 
-    private fun createOutcomes(): Flow<FluxOutcome> =
-        merge(inputs, throttledInputs.conflate(), debouncedInputs.debounce(DEBOUNCE.interval))
-            .map {
-                loggingListener.inputs(it)
-                InputOutcomeStream(it, inputHandler.handleInputs(it, currentState))
-            }.run {
-                val asyncOutcomes = filter { it.outcomes is AsyncOutcomeFlow }
-                    .map { it.copy(outcomes = (it.outcomes as AsyncOutcomeFlow).flow) }
-                    .flatMapMerge { processInputOutcomeStream(it) }
-                val sequentialOutcomes = filter { it.outcomes !is AsyncOutcomeFlow }
-                    .flatMapConcat { processInputOutcomeStream(it) }
-                merge(asyncOutcomes, sequentialOutcomes)
-            }
+    private fun createOutcomes(): Flow<FluxOutcome> = merge(
+        inputs, throttledInputs.conflate(), debouncedInputs.debounce(DEBOUNCE.interval)
+    ).map { input ->
+        log(input)
+        InputOutcomeStream(input, handleInputs(input, currentState))
+    }.run {
+        val asyncOutcomes = filter { it.outcomes is AsyncOutcomeFlow }
+            .map { it.copy(outcomes = (it.outcomes as AsyncOutcomeFlow).flow) }
+            .flatMapMerge { processInputOutcomeStream(it) }
+        val sequentialOutcomes = filter { it.outcomes !is AsyncOutcomeFlow }
+            .flatMapConcat { processInputOutcomeStream(it) }
+        merge(asyncOutcomes, sequentialOutcomes)
+    }
 
     private fun processInputOutcomeStream(stream: InputOutcomeStream): Flow<FluxOutcome> {
         val result = stream.outcomes
@@ -122,17 +124,8 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     private fun createFluxError(throwable: Throwable, input: I): FluxError =
         FluxError(Error(throwable.message.orEmpty(), throwable, input)).apply { this.input = input }
 
-    private fun logOutcomes(outcome: FluxOutcome) = when (outcome) {
-        is FluxError -> loggingListener.errors(outcome.error)
-        is FluxProgress -> loggingListener.progress(outcome.progress)
-        is FluxState<*> -> loggingListener.states(outcome.state as S)
-        is FluxEffect<*> -> loggingListener.effects(outcome.effect as E)
-        is FluxResult<*> -> loggingListener.results(outcome.result as R)
-        EmptyFluxOutcome -> Unit
-    }
-
     private suspend fun handleOutcome(fluxOutcome: FluxOutcome) {
-        logOutcomes(fluxOutcome)
+        log(fluxOutcome)
         when (fluxOutcome) {
             is FluxError -> viewModelListener.emit(fluxOutcome.error)
             is FluxEffect<*> -> viewModelListener.emit(fluxOutcome.effect as E)

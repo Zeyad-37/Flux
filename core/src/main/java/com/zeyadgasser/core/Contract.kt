@@ -2,7 +2,9 @@ package com.zeyadgasser.core
 
 import android.os.Parcelable
 
-open class Input(val showProgress: Boolean = true)
+sealed interface Loggable
+
+open class Input(val showProgress: Boolean = true) : Loggable
 
 interface Result
 

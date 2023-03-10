@@ -17,11 +17,4 @@ object MVVMModule {
     @ViewModelScoped
     fun provideMVVMInitialState(savedStateHandle: SavedStateHandle): MVVMState =
         savedStateHandle[ARG_STATE] ?: InitialState
-
-    @Provides
-    @ViewModelScoped
-    fun provideMVIInputHandler(
-        getRandomColorIdUseCase: GetRandomColorIdUseCase,
-        fluxTaskUseCases: FluxTaskUseCases,
-    ) = MVVMInputHandler(getRandomColorIdUseCase, fluxTaskUseCases)
 }

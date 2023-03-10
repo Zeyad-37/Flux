@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flowOf
 
 const val ARG_STATE = "arg_state"
-const val DELAY = 30L // TODO remove
+const val DELAY = 50L // TODO remove
 
 class AsyncOutcomeFlow(val flow: Flow<FluxOutcome>) : Flow<FluxOutcome> {
     override suspend fun collect(collector: FlowCollector<FluxOutcome>) = Unit
@@ -18,7 +18,7 @@ data class InputOutcomeStream(val input: Input, val outcomes: Flow<FluxOutcome>)
 
 object EmptyInput : Input()
 
-sealed class FluxOutcome(open var input: Input = EmptyInput)
+sealed class FluxOutcome(open var input: Input = EmptyInput) : Loggable
 
 object EmptyFluxOutcome : FluxOutcome()
 
