@@ -31,8 +31,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.launch
-import java.util.logging.Level
-import java.util.logging.Logger
 import kotlin.coroutines.CoroutineContext
 
 @OptIn(FlowPreview::class)
@@ -55,8 +53,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     private val inputs: MutableSharedFlow<I> = MutableSharedFlow()
     private val throttledInputs: MutableSharedFlow<I> = MutableSharedFlow()
     private val debouncedInputs: MutableSharedFlow<I> = MutableSharedFlow()
-    private val loggingListener: LoggingListener<I, R, S, E> =
-        LoggingListenerHelper<I, R, S, E>().also { log().invoke(it) }
+    private val loggingListener = LoggingListenerHelper<I, R, S, E>().also { log().invoke(it) }
 
     init {
         bindInputs()
