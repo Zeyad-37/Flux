@@ -1,5 +1,6 @@
 package com.zeyadgasser.composables
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,34 +42,36 @@ fun MVScreenContent(
     modifier = Modifier.fillMaxSize(),
     color = color,
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Button(onClick = changeBackgroundOnClick) { Text(text = "Change Background") }
-        Button(onClick = showDialogOnClick) { Text(text = "Show Dialog in parallel") }
-        Button(onClick = showErrorStateOnClick) { Text(text = "Show Error State") }
-        Button(onClick = showUncaughtErrorOnClick) { Text(text = "Show Uncaught Error") }
-        Button(onClick = doNothingOnClick) { Text(text = "Do nothing!") }
-        Button(onClick = goBackOnClick) { Text(text = "Go Back") }
-        if (errorMessage.isNotEmpty()) Text(text = errorMessage)
-        if (uncaughtErrorMessage.isNotEmpty()) Text(text = uncaughtErrorMessage)
+    Box(Modifier, Alignment.Center) {
         if (isLoading) CircularProgressIndicator(Modifier.size(42.dp))
-        if (showDialog) AlertDialog(
-            onDismissRequest = onDismissClick,
-            confirmButton = { TextButton(onDismissClick) { Text("Confirm") } },
-            dismissButton = { TextButton(onDismissClick) { Text("Dismiss") } },
-            title = { Text("Dialog") },
-            text = { Text("Dialog effect!") },
-        )
-        LazyColumn(Modifier.fillMaxWidth()) {
-            items(list, { item -> item.id }) { task ->
-                FluxTask(
-                    taskName = task.label,
-                    checked = task.checked,
-                    onCheckedChange = { checked -> onCheckedTask(task.id, checked) },
-                    onClose = { onCloseTask(task.id) },
-                )
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Button(onClick = changeBackgroundOnClick) { Text(text = "Change Background") }
+            Button(onClick = showDialogOnClick) { Text(text = "Show Dialog in parallel") }
+            Button(onClick = showErrorStateOnClick) { Text(text = "Show Error State") }
+            Button(onClick = showUncaughtErrorOnClick) { Text(text = "Show Uncaught Error") }
+            Button(onClick = doNothingOnClick) { Text(text = "Do nothing!") }
+            Button(onClick = goBackOnClick) { Text(text = "Go Back") }
+            if (errorMessage.isNotEmpty()) Text(text = errorMessage)
+            if (uncaughtErrorMessage.isNotEmpty()) Text(text = uncaughtErrorMessage)
+            if (showDialog) AlertDialog(
+                onDismissRequest = onDismissClick,
+                confirmButton = { TextButton(onDismissClick) { Text("Confirm") } },
+                dismissButton = { TextButton(onDismissClick) { Text("Dismiss") } },
+                title = { Text("Dialog") },
+                text = { Text("Dialog effect!") },
+            )
+            LazyColumn(Modifier.fillMaxWidth()) {
+                items(list, { item -> item.id }) { task ->
+                    FluxTask(
+                        taskName = task.label,
+                        checked = task.checked,
+                        onCheckedChange = { checked -> onCheckedTask(task.id, checked) },
+                        onClose = { onCloseTask(task.id) },
+                    )
+                }
             }
         }
     }
