@@ -28,7 +28,7 @@ fun MVVMScreen(
     onBackClicked: () -> Unit
 ) {
     val outputState: ComposeState<Output> = viewModel.observe().collectAsState(Main)
-    var successState: MVVMState by rememberSaveable { mutableStateOf(InitialState) }
+    var successState: MVVMState by rememberSaveable { mutableStateOf(viewModel.initialState) }
     var showDialog by rememberSaveable { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var uncaughtErrorMessage by remember { mutableStateOf("") }

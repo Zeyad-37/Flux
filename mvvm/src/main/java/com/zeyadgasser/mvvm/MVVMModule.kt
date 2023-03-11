@@ -1,9 +1,7 @@
 package com.zeyadgasser.mvvm
 
 import androidx.lifecycle.SavedStateHandle
-import com.zeyadgasser.core.ARG_STATE
-import com.zeyadgasser.domainPure.FluxTaskUseCases
-import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
+import com.zeyadgasser.core.FluxViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,5 +14,5 @@ object MVVMModule {
     @Provides
     @ViewModelScoped
     fun provideMVVMInitialState(savedStateHandle: SavedStateHandle): MVVMState =
-        savedStateHandle[ARG_STATE] ?: InitialState
+        savedStateHandle[FluxViewModel.ARG_STATE_KEY] ?: InitialState
 }

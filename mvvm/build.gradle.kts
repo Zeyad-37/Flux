@@ -3,7 +3,7 @@ import com.zeyadgasser.flux.gradle.DepVersions.hiltVersion
 import com.zeyadgasser.flux.gradle.DepVersions.junit5Version
 import com.zeyadgasser.flux.gradle.DepVersions.lifecycleVersion
 import com.zeyadgasser.flux.gradle.DepVersions.navVersion
-//project.apply<com.zeyadgasser.flux.gradle.AndroidModulePlugin>()
+
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")

@@ -6,6 +6,8 @@ sealed interface Loggable
 
 open class Input(val showProgress: Boolean = true) : Loggable
 
+object EmptyInput : Input()
+
 interface Result
 
 sealed interface Output

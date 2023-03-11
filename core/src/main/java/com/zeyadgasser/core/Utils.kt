@@ -7,16 +7,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flowOf
 
-const val ARG_STATE = "arg_state"
-const val DELAY = 50L // TODO remove
-
 class AsyncOutcomeFlow(val flow: Flow<FluxOutcome>) : Flow<FluxOutcome> {
     override suspend fun collect(collector: FlowCollector<FluxOutcome>) = Unit
 }
-
-data class InputOutcomeStream(val input: Input, val outcomes: Flow<FluxOutcome>)
-
-object EmptyInput : Input()
 
 sealed class FluxOutcome(open var input: Input = EmptyInput) : Loggable
 
@@ -24,7 +17,7 @@ object EmptyFluxOutcome : FluxOutcome()
 
 data class FluxProgress(val progress: Progress) : FluxOutcome()
 
-internal data class FluxError(var error: Error) : FluxOutcome() {
+data class FluxError(var error: Error) : FluxOutcome() {
     override var input: Input = EmptyInput
         set(value) {
             error = error.copy(input = value)

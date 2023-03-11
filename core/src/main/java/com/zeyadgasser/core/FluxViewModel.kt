@@ -17,14 +17,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
@@ -35,15 +33,22 @@ import kotlin.coroutines.CoroutineContext
 
 @OptIn(FlowPreview::class)
 abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
-    initialState: S,
+    val initialState: S,
     private val reducer: Reducer<S, R>?,
     private val savedStateHandle: SavedStateHandle?,
     private val ioDispatcher: CoroutineContext = Dispatchers.IO,
 ) : ViewModel() {
 
-    internal data class FluxState<S>(val state: S) : FluxOutcome()
-    internal data class FluxEffect<E>(val effect: E) : FluxOutcome()
-    internal data class FluxResult<R>(val result: R) : FluxOutcome()
+    companion object {
+        const val ARG_STATE_KEY = "arg_state"
+        private const val delay = 50L
+    }
+
+    data class FluxState<S>(val state: S) : FluxOutcome()
+    data class FluxEffect<E>(val effect: E) : FluxOutcome()
+    data class FluxResult<R>(val result: R) : FluxOutcome()
+
+    private data class InputOutcomeStream(val input: Input, val outcomes: Flow<FluxOutcome>)
 
     private lateinit var job: Job
     private var currentState: S = initialState
@@ -77,11 +82,11 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
         is FluxProgress -> Log.d("${this::class.simpleName}", " - $loggable")
         is FluxResult<*> -> Log.d("${this::class.simpleName}", " - Result: $loggable")
         is FluxState<*> -> Log.d("${this::class.simpleName}", " - State: $loggable")
-    }
+    }.let {}
 
     private fun activate() {
         val outcome: Flow<FluxOutcome> = createOutcomes()
-        val states: Flow<FluxState<S>> = if (reducer != null) {
+        val states: Flow<FluxState<S>> = if (reducer != null) { // MVI
             outcome.filter { it is FluxResult<*> }
                 .map { it as FluxResult<R> }
                 .scan(FluxState(currentState)) { state: FluxState<S>, result: FluxResult<R> ->
@@ -89,11 +94,10 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
                     FluxState(reducer.reduce(state.state, result.result))
                         .apply { input = result.input }
                 }
-        } else outcome.filter { it is FluxState<*> }.map { it as FluxState<S> }
+        } else outcome.filter { it is FluxState<*> }.map { it as FluxState<S> } // MVVM
         val nonStates = outcome.filter { it !is FluxState<*> }.filter { it !is FluxResult<*> }
-        job = viewModelScope.launch {
-            merge(nonStates, states).onEach { handleOutcome(it) }.flowOn(ioDispatcher).collect()
-        }
+        job = viewModelScope
+            .launch(ioDispatcher) { merge(nonStates, states).collect { handleOutcome(it) } }
     }
 
     private fun createOutcomes(): Flow<FluxOutcome> = merge(
@@ -112,11 +116,11 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
 
     private fun processInputOutcomeStream(stream: InputOutcomeStream): Flow<FluxOutcome> {
         val result = stream.outcomes
-            .map { it.apply { input = stream.input } }
-            .catch { emit(createFluxError(it, stream.input as I)) }
+            .map { fluxOutcome: FluxOutcome -> fluxOutcome.apply { input = stream.input } }
+            .catch { cause: Throwable -> emit(createFluxError(cause, stream.input as I)) }
         return if (stream.input.showProgress) {
             result.flatMapConcat {
-                flowOf(it, FluxProgress(Progress(false, stream.input))).onEach { delay(DELAY) }
+                flowOf(it, FluxProgress(Progress(false, stream.input))).onEach { delay(delay) }
             }.onStart { emit(FluxProgress(Progress(true, stream.input))) }
         } else result
     }
@@ -131,7 +135,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
             is FluxEffect<*> -> viewModelListener.emit(fluxOutcome.effect as E)
             is FluxState<*> -> (fluxOutcome.state as S)
                 .takeIf { it != currentState }?.let { state ->
-                    savedStateHandle?.set(ARG_STATE, state)
+                    savedStateHandle?.set(ARG_STATE_KEY, state)
                     currentState = state
                     viewModelListener.emit(state)
                 }
