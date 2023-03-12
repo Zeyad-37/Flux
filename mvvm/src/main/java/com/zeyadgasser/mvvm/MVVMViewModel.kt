@@ -2,25 +2,17 @@ package com.zeyadgasser.mvvm
 
 import androidx.lifecycle.SavedStateHandle
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
+import com.zeyadgasser.core.EmptyFluxOutcome.emptyOutcomeFlow
 import com.zeyadgasser.core.FluxOutcome
 import com.zeyadgasser.core.FluxViewModel
 import com.zeyadgasser.core.InputStrategy.THROTTLE
-import com.zeyadgasser.core.emptyOutcomeFlow
 import com.zeyadgasser.core.executeInParallel
-import com.zeyadgasser.core.toEffectOutcomeFlow
 import com.zeyadgasser.core.toErrorOutcomeFlow
-import com.zeyadgasser.core.toStateOutcomeFlow
 import com.zeyadgasser.domainPure.FluxTaskUseCases
 import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
-
-private const val DELAY = 1000L
 
 @HiltViewModel
 class MVVMViewModel @Inject constructor(
@@ -28,10 +20,7 @@ class MVVMViewModel @Inject constructor(
     private val fluxTaskUseCases: FluxTaskUseCases,
     initialState: MVVMState,
     handle: SavedStateHandle?,
-    dispatcher: CoroutineDispatcher = Dispatchers.IO,
-) : FluxViewModel<MVVMInput, Nothing, MVVMState, MVVMEffect>(
-    initialState, null, handle, dispatcher
-) {
+) : FluxViewModel<MVVMInput, Nothing, MVVMState, MVVMEffect>(initialState, handle) {
     fun changeBackground() = process(ChangeBackgroundInput, THROTTLE)
     fun showDialogInput() = process(ShowDialogInput)
     fun errorInput() = process(ErrorInput)
@@ -46,7 +35,7 @@ class MVVMViewModel @Inject constructor(
             ChangeBackgroundInput -> ColorBackgroundState(
                 getRandomColorIdUseCase.getRandomColorId(),
                 fluxTaskUseCases.getFluxTasks().map { FluxTaskItem(it) }
-            ).toStateOutcomeFlow().onStart { delay(DELAY) }
+            ).toStateOutcomeFlow()
             ShowDialogInput -> ShowDialogEffect.toEffectOutcomeFlow().executeInParallel()
             UncaughtErrorInput -> IllegalStateException("UncaughtError").toErrorOutcomeFlow()
             NavBackInput -> NavBackEffect.toEffectOutcomeFlow()
