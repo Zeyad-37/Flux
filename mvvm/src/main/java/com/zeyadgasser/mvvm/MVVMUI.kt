@@ -25,7 +25,7 @@ import androidx.compose.runtime.State as ComposeState
 @Composable
 fun MVVMScreen(
     viewModel: MVVMViewModel = hiltViewModel(),
-    onBackClicked: () -> Unit
+    onBackClicked: () -> Unit,
 ) {
     val outputState: ComposeState<Output> = viewModel.observe().collectAsState(Main)
     var successState: MVVMState by rememberSaveable { mutableStateOf(viewModel.initialState) }
@@ -50,16 +50,16 @@ fun MVVMScreen(
         uncaughtErrorMessage = uncaughtErrorMessage,
         isLoading = isLoading,
         showDialog = showDialog,
-        changeBackgroundOnClick = { viewModel.changeBackground() },
-        showDialogOnClick = { viewModel.showDialogInput() },
-        showErrorStateOnClick = { viewModel.errorInput() },
-        showUncaughtErrorOnClick = { viewModel.uncaughtErrorInput() },
-        goBackOnClick = { viewModel.navBackInput() },
+        changeBackgroundOnClick = { viewModel.process(ChangeBackgroundInput) },
+        showDialogOnClick = { viewModel.process(ShowDialogInput) },
+        showErrorStateOnClick = { viewModel.process(ErrorInput) },
+        showUncaughtErrorOnClick = { viewModel.process(UncaughtErrorInput) },
+        goBackOnClick = { viewModel.process(NavBackInput) },
         onDismissClick = { showDialog = false },
         list = successState.evaluateList(),
-        onCloseTask = { id -> viewModel.removeTask(id) },
-        onCheckedTask = { id, checked -> viewModel.changeTaskChecked(id, checked) },
-        doNothingOnClick = { viewModel.doNothing() },
+        onCloseTask = { id -> viewModel.process(RemoveTask(id)) },
+        onCheckedTask = { id, checked -> viewModel.process(ChangeTaskChecked(id, checked)) },
+        doNothingOnClick = { viewModel.process(DoNothing) },
     )
 }
 

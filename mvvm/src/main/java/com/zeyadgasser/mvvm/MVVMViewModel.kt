@@ -5,7 +5,6 @@ import com.zeyadgasser.composables.presentationModels.FluxTaskItem
 import com.zeyadgasser.core.EmptyFluxOutcome.emptyOutcomeFlow
 import com.zeyadgasser.core.FluxOutcome
 import com.zeyadgasser.core.FluxViewModel
-import com.zeyadgasser.core.InputStrategy.THROTTLE
 import com.zeyadgasser.core.executeInParallel
 import com.zeyadgasser.core.toErrorOutcomeFlow
 import com.zeyadgasser.domainPure.FluxTaskUseCases
@@ -21,14 +20,6 @@ class MVVMViewModel @Inject constructor(
     initialState: MVVMState,
     handle: SavedStateHandle?,
 ) : FluxViewModel<MVVMInput, Nothing, MVVMState, MVVMEffect>(initialState, handle) {
-    fun changeBackground() = process(ChangeBackgroundInput, THROTTLE)
-    fun showDialogInput() = process(ShowDialogInput)
-    fun errorInput() = process(ErrorInput)
-    fun uncaughtErrorInput() = process(UncaughtErrorInput)
-    fun navBackInput() = process(NavBackInput)
-    fun removeTask(id: Long) = process(RemoveTask(id))
-    fun changeTaskChecked(id: Long, checked: Boolean) = process(ChangeTaskChecked(id, checked))
-    fun doNothing() = process(DoNothing)
 
     override fun handleInputs(input: MVVMInput, currentState: MVVMState): Flow<FluxOutcome> =
         when (input) {

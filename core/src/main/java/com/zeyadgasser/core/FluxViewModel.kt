@@ -4,15 +4,12 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zeyadgasser.core.InputStrategy.DEBOUNCE
-import com.zeyadgasser.core.InputStrategy.NONE
-import com.zeyadgasser.core.InputStrategy.THROTTLE
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,48 +21,30 @@ import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
-
-class AsyncOutcomeFlow(val flow: Flow<FluxOutcome>) : Flow<FluxOutcome> {
-    override suspend fun collect(collector: FlowCollector<FluxOutcome>) = Unit
-}
-
-sealed class FluxOutcome(open var input: Input = EmptyInput) : Loggable
-
-object EmptyFluxOutcome : FluxOutcome() {
-    fun emptyOutcomeFlow() = flowOf(EmptyFluxOutcome)
-}
-
-data class FluxProgress(val progress: Progress) : FluxOutcome()
-
-data class FluxError(var error: Error, override var input: Input = EmptyInput) : FluxOutcome(input)
-
-interface Reducer<S : State, R : Result> {
-    fun reduce(state: S, result: R): S
-}
 
 @OptIn(FlowPreview::class)
-abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect> @JvmOverloads constructor(
+abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     val initialState: S,
     private val savedStateHandle: SavedStateHandle? = null,
     private val reducer: Reducer<S, R>? = null,
-    private val bgDispatcher: CoroutineContext = Dispatchers.IO,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : ViewModel() {
 
     companion object {
         const val ARG_STATE_KEY = "arg_state_key"
-        private const val DELAY = 50L
+        private const val DELAY = 100L
     }
 
     data class FluxEffect<E>(val effect: E) : FluxOutcome()
     data class FluxResult<R>(val result: R) : FluxOutcome()
     data class FluxState<S>(
-        val state: S, override var input: Input = EmptyInput
+        val state: S, override var input: Input = EmptyInput,
     ) : FluxOutcome(input)
 
     private data class InputOutcomeStream(val input: Input, val outcomes: Flow<FluxOutcome>)
@@ -73,49 +52,60 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect> @JvmO
     private lateinit var job: Job
     private var currentState: S = initialState
 
-    private val viewModelListener: MutableStateFlow<Output> = MutableStateFlow(currentState)
+    private val tag = this::class.simpleName
     private val inputs: MutableSharedFlow<I> = MutableSharedFlow()
     private val throttledInputs: MutableSharedFlow<I> = MutableSharedFlow()
     private val debouncedInputs: MutableSharedFlow<I> = MutableSharedFlow()
+    private val viewModelListener: MutableStateFlow<Output> = MutableStateFlow(currentState)
 
     init {
         activate()
     }
 
+    /**
+     * Call observe from view to listen to state and effect updates.
+     */
     fun observe(): StateFlow<Output> = viewModelListener.asStateFlow()
 
-    fun process(input: I, inputStrategy: InputStrategy = NONE) = viewModelScope.launch {
-        when (inputStrategy) {
+    /**
+     * Send inputs: I to be processed by ViewModel.
+     */
+    fun process(input: I): Unit = viewModelScope.launch {
+        when (input.inputStrategy) {
             NONE -> inputs
-            THROTTLE -> throttledInputs//.onEach { delay(THROTTLE.interval) }.let { throttledInputs }
-            DEBOUNCE -> debouncedInputs//.debounce(DEBOUNCE.interval).let { debouncedInputs }
+            is Throttle -> throttledInputs
+            is Debounce -> debouncedInputs
         }.emit(input)
     }.let {}
 
+    /**
+     * Map inputs: I with current state: S to a Flow of FluxOutcomes.
+     */
     protected abstract fun handleInputs(input: I, currentState: S): Flow<FluxOutcome>
 
-    protected open fun log(loggable: Loggable) = when (loggable) {
-        EmptyFluxOutcome -> Log.d("${this::class.simpleName}", " - EmptyFluxOutcome")
-        is Input -> Log.d("${this::class.simpleName}", " - Input: $loggable")
-        is FluxEffect<*> -> Log.d("${this::class.simpleName}", " - Effect: $loggable")
-        is FluxError -> Log.d("${this::class.simpleName}", " - $loggable")
-        is FluxProgress -> Log.d("${this::class.simpleName}", " - $loggable")
-        is FluxResult<*> -> Log.d("${this::class.simpleName}", " - Result: $loggable")
-        is FluxState<*> -> Log.d("${this::class.simpleName}", " - State: $loggable")
+    /**
+     * Override to implement with your preferred logger.
+     */
+    protected open fun log(loggable: Loggable): Unit = when (loggable) {
+        is Input -> Log.d("$tag", " - Input: $loggable")
+        is FluxProgress -> Log.d("$tag", " - $loggable")
+        is FluxError -> Log.d("$tag", " - $loggable")
+        EmptyFluxOutcome -> Log.d("$tag", " - EmptyFluxOutcome")
+        is FluxEffect<*> -> Log.d("$tag", " - Effect: $loggable")
+        is FluxResult<*> -> Log.d("$tag", " - Result: $loggable")
+        is FluxState<*> -> Log.d("$tag", " - State: $loggable")
     }.let {}
 
-    private fun activate() {
-        val outcome = createOutcomes()
-        val states = createStates(outcome, reducer)
-        val nonStates = outcome.filter { it !is FluxState<*> && it !is FluxResult<*> }
-        job = viewModelScope
-            .launch(bgDispatcher) { merge(nonStates, states).collect { it.handleOutcome() } }
+    private fun activate(): Unit = createOutcomes().let { outcomeFlow ->
+        val states = createStates(outcomeFlow, reducer)
+        val nonStates = outcomeFlow.filter { it !is FluxState<*> && it !is FluxResult<*> }
+        job = viewModelScope.launch(dispatcher) { merge(nonStates, states).collect { it.handleOutcome() } }
     }
 
     private fun createOutcomes(): Flow<FluxOutcome> = merge(
         inputs,
-        throttledInputs.onEach { delay(THROTTLE.interval) },
-        debouncedInputs.debounce(DEBOUNCE.interval)
+        throttledInputs.onEach { delay(it.inputStrategy.interval) },
+        debouncedInputs.debounce { it.inputStrategy.interval }
     ).map { input ->
         log(input)
         InputOutcomeStream(input, handleInputs(input, currentState))
@@ -128,34 +118,26 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect> @JvmO
         merge(asyncOutcomes, sequentialOutcomes)
     }
 
-    private fun createStates(
-        outcome: Flow<FluxOutcome>, reducer: Reducer<S, R>?
-    ): Flow<FluxState<S>> = if (reducer == null) { // MVVM
-        outcome.filter { it is FluxState<*> }.map { it as FluxState<S> }
-    } else { // MVI
-        outcome.filter { it is FluxResult<*> }.map { it as FluxResult<R> }
-            .scan(FluxState(currentState)) { state: FluxState<S>, result: FluxResult<R> ->
-                log(result)
-                FluxState(reducer.reduce(state.state, result.result), result.input)
-            }
-    }
-
     private fun processInputOutcomeStream(stream: InputOutcomeStream): Flow<FluxOutcome> {
-        val fluxOutcomeFlow = stream.outcomes.map { fluxOutcome: FluxOutcome ->
-            fluxOutcome.apply {
-                input = stream.input
-            }
-        }.catch { cause: Throwable ->
-            emit(FluxError(Error(cause.message.orEmpty(), cause, stream.input), stream.input))
-        }
+        val fluxOutcomeFlow = stream.outcomes
+            .map { fluxOutcome -> fluxOutcome.apply { input = stream.input } }
+            .catch { cause -> emit(FluxError(cause, input = stream.input)) }
         return if (stream.input.showProgress) {
             fluxOutcomeFlow.flatMapConcat {
-                flowOf(it, FluxProgress(Progress(false, it.input))).onEach { delay(DELAY) }
-            }.onStart { emit(FluxProgress(Progress(true, stream.input))) }
+                flowOf(it, FluxProgress(false, it.input)).onEach { delay(DELAY) }
+            }.onStart { emit(FluxProgress(true, stream.input)) }
         } else fluxOutcomeFlow
     }
 
-    private suspend fun FluxOutcome.handleOutcome() = when (this) {
+    private fun createStates(outcome: Flow<FluxOutcome>, reducer: Reducer<S, R>?): Flow<FluxState<S>> =
+        if (reducer == null)
+            outcome.mapNotNull { if (it is FluxState<*>) it as FluxState<S> else null } // MVVM
+        else outcome.mapNotNull { if (it is FluxResult<*>) it as FluxResult<R> else null } // MVI
+            .scan(FluxState(currentState)) { state: FluxState<S>, result: FluxResult<R> ->
+                FluxState(reducer.reduce(state.state, result.result), result.input).also { log(result) }
+            }
+
+    private suspend fun FluxOutcome.handleOutcome(): Unit = when (this) {
         is FluxError -> viewModelListener.emit(error)
         is FluxEffect<*> -> viewModelListener.emit(effect as Output)
         is FluxProgress -> viewModelListener.emit(progress)
@@ -163,9 +145,9 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect> @JvmO
             savedStateHandle?.set(ARG_STATE_KEY, state)
             currentState = state
             viewModelListener.emit(state)
-        }
+        } ?: Unit
         is FluxResult<*>, EmptyFluxOutcome -> Unit
     }.also { log(this) }
 
-    override fun onCleared() = job.cancel()
+    final override fun onCleared(): Unit = job.cancel()
 }

@@ -1,21 +1,28 @@
 package com.zeyadgasser.mvi
 
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
+import com.zeyadgasser.core.Debounce
 import com.zeyadgasser.core.Effect
 import com.zeyadgasser.core.Input
+import com.zeyadgasser.core.InputStrategy
+import com.zeyadgasser.core.NONE
 import com.zeyadgasser.core.Result
 import com.zeyadgasser.core.State
+import com.zeyadgasser.core.Throttle
 import com.zeyadgasser.domainPure.RED_LIGHT
 import com.zeyadgasser.domainPure.WHITE
 import kotlinx.parcelize.Parcelize
 
-sealed class MVIInput(showProgress: Boolean = true) : Input(showProgress)
-object ChangeBackgroundInput : MVIInput()
+sealed class MVIInput(
+    showProgress: Boolean = true, inputStrategy: InputStrategy = NONE
+) : Input(showProgress, inputStrategy)
+
+object ChangeBackgroundInput : MVIInput(inputStrategy = Debounce())
 object ShowDialogInput : MVIInput()
-object UncaughtErrorInput : MVIInput()
+object UncaughtErrorInput : MVIInput(inputStrategy = Throttle(300L))
 object ErrorInput : MVIInput()
 object NavBackInput : MVIInput()
-object DoNothing : MVIInput()
+object DoNothing : MVIInput(inputStrategy = Throttle(500L))
 data class RemoveTask(val id: Long) : MVIInput()
 data class ChangeTaskChecked(val id: Long, val checked: Boolean) : MVIInput(false)
 

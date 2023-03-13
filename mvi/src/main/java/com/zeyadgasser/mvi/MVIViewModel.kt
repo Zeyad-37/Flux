@@ -5,7 +5,6 @@ import com.zeyadgasser.composables.presentationModels.FluxTaskItem
 import com.zeyadgasser.core.EmptyFluxOutcome.emptyOutcomeFlow
 import com.zeyadgasser.core.FluxOutcome
 import com.zeyadgasser.core.FluxViewModel
-import com.zeyadgasser.core.InputStrategy.THROTTLE
 import com.zeyadgasser.core.executeInParallel
 import com.zeyadgasser.core.toErrorOutcomeFlow
 import com.zeyadgasser.domainPure.FluxTaskUseCases
@@ -22,14 +21,6 @@ class MVIViewModel @Inject constructor(
     reducer: MVIReducer,
     handle: SavedStateHandle?,
 ) : FluxViewModel<MVIInput, MVIResult, MVIState, MVIEffect>(initialState, handle, reducer) {
-    fun changeBackground() = process(ChangeBackgroundInput, THROTTLE)
-    fun showDialogInput() = process(ShowDialogInput)
-    fun errorInput() = process(ErrorInput)
-    fun uncaughtErrorInput() = process(UncaughtErrorInput)
-    fun navBackInput() = process(NavBackInput)
-    fun removeTask(id: Long) = process(RemoveTask(id))
-    fun changeTaskChecked(id: Long, checked: Boolean) = process(ChangeTaskChecked(id, checked))
-    fun doNothing() = process(DoNothing)
 
     override fun handleInputs(input: MVIInput, currentState: MVIState): Flow<FluxOutcome> =
         when (input) {
@@ -52,7 +43,7 @@ class MVIViewModel @Inject constructor(
     ).toResultOutcomeFlow()
 
     private fun onChangeTaskChecked(
-        input: ChangeTaskChecked, currentState: MVIState
+        input: ChangeTaskChecked, currentState: MVIState,
     ): Flow<FluxOutcome> = ChangeBackgroundResult(
         currentState.color,
         fluxTaskUseCases.onChangeTaskChecked(input.id, input.checked).map { FluxTaskItem(it) }

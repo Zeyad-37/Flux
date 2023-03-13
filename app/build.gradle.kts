@@ -5,7 +5,11 @@ plugins {
 
 android {
     namespace = "com.zeyadgasser.flux"
-    defaultConfig.applicationId = "com.zeyadgasser.flux"
+    defaultConfig {
+        versionCode = 1
+        versionName = "1.0.0"
+        applicationId = "com.zeyadgasser.flux"
+    }
 }
 
 dependencies {
