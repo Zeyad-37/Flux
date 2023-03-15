@@ -31,13 +31,13 @@ jobs:
         run: ./gradlew clean build detekt
 
       - name: Unit tests with Koverage check
-        run: ./gradlew koverMergedHtmlReport
+        run: ./gradlew koverMergedXmlReport
 
       - name: Upload coverage report
-          uses: actions/upload-artifact@v2
-          with:
-            name: coverage-report
-            path: build/reports/jacoco/test/html/index.html
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report
+          path: build/reports/kover/result.xml
 
       - name: Android App size difference
         uses: microsoft/android-app-size-diff@v1.0.5
