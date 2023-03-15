@@ -33,11 +33,11 @@ jobs:
       - name: Unit tests with Koverage check
         run: ./gradlew koverMergedXmlReport
 
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v2
-        with:
-          name: coverage-report
-          path: build/reports/kover/result.xml
-
-      - name: Android App size difference
-        uses: microsoft/android-app-size-diff@v1.0.5
+#      - name: Upload coverage report
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: coverage-report
+#          path: build/reports/kover/result.xml
+#
+#      - name: Android App size difference
+#        uses: microsoft/android-app-size-diff@v1.0.5
