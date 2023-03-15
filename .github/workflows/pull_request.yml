@@ -1,0 +1,43 @@
+name: Pull Request
+
+on:
+  pull_request:
+    branches:
+      - 'feature/**'
+      - 'hotfix/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 11
+
+      - name: Set up Android SDK
+        uses: actions/setup-android@v2
+        with:
+          android-sdk-tools: latest
+
+      - name: Lint check
+        run: ./gradlew clean build lint
+
+      - name: Detekt check
+        run: ./gradlew clean build detekt
+
+      - name: Unit tests with Koverage check
+        run: ./gradlew koverMergedHtmlReport
+
+      - name: Upload coverage report
+          uses: actions/upload-artifact@v2
+          with:
+            name: coverage-report
+            path: build/reports/jacoco/test/html/index.html
+
+      - name: Android App size difference
+        uses: microsoft/android-app-size-diff@v1.0.5

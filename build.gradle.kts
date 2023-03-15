@@ -56,11 +56,11 @@ fun Project.configureKover() {
             // set of test tasks names to exclude from instrumentation. The results of their execution will not be presented in the report
             excludeTasks += "dummy-tests"
         }
-        htmlReport {
+        xmlReport {
             // set to true to run koverHtmlReport task during the execution of the check task (if it exists) of the current project
             onCheck.set(false)
             // change report directory
-            reportDir.set(layout.buildDirectory.dir("my-project-report/html-result"))
+            reportFile.set(layout.buildDirectory.file("reports/kover/html-result.xml"))
         }
     }
     koverMerged {
@@ -83,11 +83,11 @@ fun Project.configureKover() {
                 )
             }
         }
-        htmlReport {
+        xmlReport {
             // set to true to run koverMergedHtmlReport task during the execution of the check task (if it exists) of the current project
             onCheck.set(false)
             // change report directory
-            reportDir.set(layout.buildDirectory.dir("my-merged-report/html-result"))
+            reportFile.set(layout.buildDirectory.file("reports/kover/html-result.xml"))
         }
     }
 }
