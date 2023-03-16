@@ -1,0 +1,31 @@
+name: Alpha Release
+
+on:
+  pull_request:
+    branches:
+      - 'feature/**'
+      - 'hotfix/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 11
+
+      - name: Set up Android SDK
+        uses: actions/setup-android@v2
+        with:
+          android-sdk-tools: latest
+
+      - name: Assemble Release
+        run: ./gradlew assembleAlpha
+
+      - name: Upload Alpha
+        run:
