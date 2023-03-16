@@ -19,13 +19,11 @@ jobs:
         with:
           java-version: 11
 
-      - name: Set up Android SDK
-        uses: actions/setup-android@v2
-        with:
-          android-sdk-tools: latest
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2.0.10
 
       - name: Assemble Release
         run: ./gradlew assembleRelease
 
-      - name: Upload Release
-        run:
+#      - name: Upload Release
+#        run:

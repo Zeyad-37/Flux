@@ -23,14 +23,14 @@ jobs:
           android-sdk-tools: latest
 
       - name: Increment version
-          env:
-            VERSION_FILE: version.properties
-            VERSION_PROPERTY: versionName
-          run: |
-            #!/bin/bash
-            current_version=$(grep "^${VERSION_PROPERTY}=" "${VERSION_FILE}" | cut -d= -f2)
-            new_version=$((current_version + 1))
-            sed -i "s/^${VERSION_PROPERTY}=.*/${VERSION_PROPERTY}=${new_version}/" "${VERSION_FILE}"
+        env:
+          VERSION_FILE: version.properties
+          VERSION_PROPERTY: versionName
+        run: |
+          #!/bin/bash
+          current_version=$(grep "^${VERSION_PROPERTY}=" "${VERSION_FILE}" | cut -d= -f2)
+          new_version=$((current_version + 1))
+          sed -i "s/^${VERSION_PROPERTY}=.*/${VERSION_PROPERTY}=${new_version}/" "${VERSION_FILE}"
 
       - name: Commit changes
         uses: actions/commit@v2
@@ -40,11 +40,11 @@ jobs:
           message: "Bump version to ${new_version}"
 
       - name: Create release branch
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          run: |
-            #!/bin/bash
-            new_version=${{ env.new_version }}
-            branch_name="release/${new_version}"
-            git checkout -b "${branch_name}"
-            git push --set-upstream origin "${branch_name}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          #!/bin/bash
+          new_version=${{ env.new_version }}
+          branch_name="release/${new_version}"
+          git checkout -b "${branch_name}"
+          git push --set-upstream origin "${branch_name}"

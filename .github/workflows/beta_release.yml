@@ -27,5 +27,5 @@ jobs:
       - name: Assemble Release
         run: ./gradlew assembleBeta
 
-      - name: Upload Beta
-        run:
+#      - name: Upload Beta
+#        run:
