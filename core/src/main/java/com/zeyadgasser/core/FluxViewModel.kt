@@ -86,15 +86,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     /**
      * Override to implement with your preferred logger.
      */
-    protected open fun log(loggable: Loggable): Unit = when (loggable) {
-        is Input -> Log.d("$tag", " - Input: $loggable")
-        is FluxProgress -> Log.d("$tag", " - $loggable")
-        is FluxError -> Log.d("$tag", " - $loggable")
-        EmptyFluxOutcome -> Log.d("$tag", " - EmptyFluxOutcome")
-        is FluxEffect<*> -> Log.d("$tag", " - Effect: $loggable")
-        is FluxResult<*> -> Log.d("$tag", " - Result: $loggable")
-        is FluxState<*> -> Log.d("$tag", " - State: $loggable")
-    }.let {}
+    protected open fun log(loggable: Loggable): Unit = Log.d("$tag", "$loggable").let { }
 
     private fun activate(): Unit = createOutcomes().let { outcomeFlow ->
         val states = createStates(outcomeFlow, reducer)
@@ -132,10 +124,11 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     private fun createStates(outcome: Flow<FluxOutcome>, reducer: Reducer<S, R>?): Flow<FluxState<S>> =
         if (reducer == null)
             outcome.mapNotNull { if (it is FluxState<*>) it as FluxState<S> else null } // MVVM
-        else outcome.mapNotNull { if (it is FluxResult<*>) it as FluxResult<R> else null } // MVI
-            .scan(FluxState(currentState)) { state: FluxState<S>, result: FluxResult<R> ->
-                FluxState(reducer.reduce(state.state, result.result), result.input).also { log(result) }
-            }
+        else
+            outcome.mapNotNull { if (it is FluxResult<*>) it as FluxResult<R> else null } // MVI
+                .scan(FluxState(currentState)) { state: FluxState<S>, result: FluxResult<R> ->
+                    FluxState(reducer.reduce(state.state, result.result), result.input).also { log(result) }
+                }
 
     private suspend fun FluxOutcome.handleOutcome(): Unit = when (this) {
         is FluxError -> viewModelListener.emit(error)

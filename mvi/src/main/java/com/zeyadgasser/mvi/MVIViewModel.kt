@@ -32,20 +32,19 @@ class MVIViewModel @Inject constructor(
             UncaughtErrorInput -> IllegalStateException("UncaughtError").toErrorOutcomeFlow()
             NavBackInput -> NavBackEffect.toEffectOutcomeFlow()
             ErrorInput -> ErrorResult("Error").toResultOutcomeFlow()
-            is ChangeTaskChecked -> onChangeTaskChecked(input, currentState)
-            is RemoveTask -> onRemoveTask(input.id)
+            is ChangeTaskChecked -> onChangeTaskChecked(input, currentState.color)
+            is RemoveTask -> onRemoveTask(input.id, currentState.color)
             DoNothing -> emptyOutcomeFlow()
         }
 
-    private fun onRemoveTask(id: Long): Flow<FluxOutcome> = ChangeBackgroundResult(
-        getRandomColorIdUseCase.getRandomColorId(),
-        fluxTaskUseCases.removeTask(id).map { FluxTaskItem(it) }
+    private fun onRemoveTask(id: Long, color: Long): Flow<FluxOutcome> = ChangeBackgroundResult(
+        color, fluxTaskUseCases.removeTask(id).map { FluxTaskItem(it) }
     ).toResultOutcomeFlow()
 
     private fun onChangeTaskChecked(
-        input: ChangeTaskChecked, currentState: MVIState,
+        input: ChangeTaskChecked, color: Long,
     ): Flow<FluxOutcome> = ChangeBackgroundResult(
-        currentState.color,
+        color,
         fluxTaskUseCases.onChangeTaskChecked(input.id, input.checked).map { FluxTaskItem(it) }
     ).toResultOutcomeFlow()
 }

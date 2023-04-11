@@ -31,19 +31,18 @@ class MVVMViewModel @Inject constructor(
             UncaughtErrorInput -> IllegalStateException("UncaughtError").toErrorOutcomeFlow()
             NavBackInput -> NavBackEffect.toEffectOutcomeFlow()
             ErrorInput -> ErrorState("Error").toStateOutcomeFlow()
-            is ChangeTaskChecked -> onChangeTaskChecked(input)
-            is RemoveTask -> onRemoveTask(input.id)
+            is ChangeTaskChecked -> onChangeTaskChecked(input, currentState.color)
+            is RemoveTask -> onRemoveTask(input.id, currentState.color)
             DoNothing -> emptyOutcomeFlow()
         }
 
-    private fun onRemoveTask(id: Long): Flow<FluxOutcome> = ColorBackgroundState(
-        getRandomColorIdUseCase.getRandomColorId(),
-        fluxTaskUseCases.removeTask(id).map { FluxTaskItem(it) }
+    private fun onRemoveTask(id: Long, color: Long): Flow<FluxOutcome> = ColorBackgroundState(
+        color, fluxTaskUseCases.removeTask(id).map { FluxTaskItem(it) }
     ).toStateOutcomeFlow()
 
-    private fun onChangeTaskChecked(input: ChangeTaskChecked): Flow<FluxOutcome> =
+    private fun onChangeTaskChecked(input: ChangeTaskChecked, color: Long): Flow<FluxOutcome> =
         ColorBackgroundState(
-            getRandomColorIdUseCase.getRandomColorId(),
+            color,
             fluxTaskUseCases.onChangeTaskChecked(input.id, input.checked).map { FluxTaskItem(it) }
         ).toStateOutcomeFlow()
 }

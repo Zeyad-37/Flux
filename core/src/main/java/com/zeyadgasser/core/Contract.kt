@@ -49,7 +49,7 @@ object EmptyFluxOutcome : FluxOutcome() {
     fun emptyOutcomeFlow() = flowOf(EmptyFluxOutcome)
 }
 
-data class FluxProgress(val progress: Progress) : FluxOutcome() {
+internal data class FluxProgress(val progress: Progress) : FluxOutcome() {
     constructor(isLoading: Boolean, input: Input) : this(Progress(isLoading, input))
 }
 
