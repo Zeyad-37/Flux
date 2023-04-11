@@ -17,8 +17,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
+import com.zeyadgasser.composables.theme.FluxTheme
 
 @SuppressWarnings("FunctionNaming", "LongParameterList")
 @Composable
@@ -76,3 +78,17 @@ fun MVScreenContent(
         }
     }
 }
+
+@SuppressWarnings("FunctionNaming")
+@Preview(showBackground = true)
+@Composable
+fun MVScreenContentPreview() =
+    FluxTheme {
+        MVScreenContent(
+            Color(737),
+            "Error Message",
+            "Uncaught Error Message",
+            true, false, emptyList(),
+            { }, { }, { }, { }, { }, { }, { }, { _, _ -> }, {},
+        )
+    }

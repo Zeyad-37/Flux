@@ -11,7 +11,9 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.zeyadgasser.composables.theme.FluxTheme
 
 @SuppressWarnings("FunctionNaming")
 @Composable
@@ -31,3 +33,8 @@ fun FluxTask(
     Checkbox(checked = checked, onCheckedChange = onCheckedChange)
     IconButton(onClick = onClose) { Icon(Icons.Filled.Close, "Close") }
 }
+
+@SuppressWarnings("FunctionNaming")
+@Preview(showBackground = true)
+@Composable
+fun FluxTaskPreview() = FluxTheme { FluxTask("Task 1") }

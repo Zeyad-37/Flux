@@ -5,8 +5,13 @@ plugins {
 
 android {
     namespace = "com.zeyadgasser.composables"
+
+    testOptions.unitTests.isIncludeAndroidResources = true
 }
 
 dependencies {
     implementation(project(":domain"))
+    testImplementation("org.robolectric:robolectric:4.9")
+    testImplementation("androidx.compose.ui:ui-test-junit4:1.4.1")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.4.1")
 }
