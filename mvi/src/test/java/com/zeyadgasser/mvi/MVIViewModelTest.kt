@@ -2,9 +2,8 @@ package com.zeyadgasser.mvi
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
-import com.zeyadgasser.core.Error
-import com.zeyadgasser.core.Output
-import com.zeyadgasser.core.Progress
+import com.zeyadgasser.composables.presentationModels.FluxTaskItem
+import com.zeyadgasser.core.*
 import com.zeyadgasser.domainPure.FluxTask
 import com.zeyadgasser.domainPure.FluxTaskUseCases
 import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
@@ -49,6 +48,21 @@ class MVIViewModelTest {
     }
 
     @Test
+    fun handleInputsChangeBackground() = runTest {
+        whenever(getRandomColorIdUseCase.getRandomColorId()).thenReturn(PURPLE_200)
+        whenever(fluxTaskUseCases.getFluxTasks()).thenReturn(
+            List(10) { i -> FluxTask(i.toLong(), "Task # $i") }
+        )
+        mviViewModel.handleInputs(ChangeBackgroundInput, initialState).test {
+            assertEquals(ChangeBackgroundResult(
+                getRandomColorIdUseCase.getRandomColorId(),
+                fluxTaskUseCases.getFluxTasks().map { FluxTaskItem(it) }
+            ).toResultOutcome() as FluxViewModel.FluxResult<MVIResult>, awaitItem())
+            awaitComplete()
+        }
+    }
+
+    @Test
     fun changeBackground() = runTest {
         val input = ChangeBackgroundInput
         whenever(getRandomColorIdUseCase.getRandomColorId()).thenReturn(PURPLE_200)
@@ -77,6 +91,14 @@ class MVIViewModelTest {
     }
 
     @Test
+    fun handleInputsErrorInput() = runTest {
+        mviViewModel.handleInputs(ErrorInput, initialState).test {
+            assertEquals(ErrorResult("Error").toResultOutcome() as FluxViewModel.FluxResult<MVIResult>, awaitItem())
+            awaitComplete()
+        }
+    }
+
+    @Test
     fun errorInput() = runTest {
         val input = ErrorInput
         mviViewModel.observe().test {
@@ -85,6 +107,16 @@ class MVIViewModelTest {
             assertEquals(Progress(true, input), awaitItem())
             assertEquals(ErrorState("Error"), awaitItem())
             assertEquals(Progress(false, input), awaitItem())
+        }
+    }
+
+    @Test
+    fun handleInputsUncaughtErrorInput() = runTest {
+       mviViewModel.handleInputs(UncaughtErrorInput, initialState).test {
+            val error = awaitItem()
+            assertTrue(error is FluxError)
+            assertEquals("UncaughtError", (error as FluxError).error.message)
+            awaitComplete()
         }
     }
 
@@ -103,6 +135,14 @@ class MVIViewModelTest {
     }
 
     @Test
+    fun handleInputsNavBackInput() = runTest { // TODO
+        mviViewModel.handleInputs(NavBackInput, initialState).test {
+            assertEquals(ErrorResult("Error").toResultOutcome() as FluxViewModel.FluxResult<MVIResult>, awaitItem())
+            awaitComplete()
+        }
+    }
+
+    @Test
     fun navBackInput() = runTest {
         val input = NavBackInput
         mviViewModel.observe().test {
@@ -111,6 +151,14 @@ class MVIViewModelTest {
             assertEquals(Progress(true, input), awaitItem())
             assertEquals(NavBackEffect, awaitItem())
             assertEquals(Progress(false, input), awaitItem())
+        }
+    }
+
+    @Test
+    fun handleInputsDoNothing() = runTest { // TODO
+        mviViewModel.handleInputs(DoNothing, initialState).test {
+            assertEquals(ErrorResult("Error").toResultOutcome() as FluxViewModel.FluxResult<MVIResult>, awaitItem())
+            awaitComplete()
         }
     }
 

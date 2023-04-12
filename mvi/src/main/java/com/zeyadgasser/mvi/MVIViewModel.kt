@@ -39,14 +39,11 @@ class MVIViewModel @Inject constructor(
             DoNothing -> emptyOutcomeFlow()
         }
 
-    private fun onRemoveTask(id: Long, color: Long): Flow<FluxOutcome> = ChangeBackgroundResult(
-        color, fluxTaskUseCases.removeTask(id).map { FluxTaskItem(it) }
-    ).toResultOutcomeFlow()
+    private fun onRemoveTask(id: Long, color: Long): Flow<FluxOutcome> =
+        ChangeBackgroundResult(color, fluxTaskUseCases.removeTask(id).map { FluxTaskItem(it) }).toResultOutcomeFlow()
 
-    private fun onChangeTaskChecked(
-        input: ChangeTaskChecked, color: Long,
-    ): Flow<FluxOutcome> = ChangeBackgroundResult(
-        color,
-        fluxTaskUseCases.onChangeTaskChecked(input.id, input.checked).map { FluxTaskItem(it) }
-    ).toResultOutcomeFlow()
+    private fun onChangeTaskChecked(input: ChangeTaskChecked, color: Long): Flow<FluxOutcome> =
+        ChangeBackgroundResult(
+            color, fluxTaskUseCases.onChangeTaskChecked(input.id, input.checked).map { FluxTaskItem(it) }
+        ).toResultOutcomeFlow()
 }

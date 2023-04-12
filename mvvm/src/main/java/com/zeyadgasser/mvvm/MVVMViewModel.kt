@@ -38,13 +38,11 @@ class MVVMViewModel @Inject constructor(
             DoNothing -> emptyOutcomeFlow()
         }
 
-    private fun onRemoveTask(id: Long, color: Long): Flow<FluxOutcome> = ColorBackgroundState(
-        color, fluxTaskUseCases.removeTask(id).map { FluxTaskItem(it) }
-    ).toStateOutcomeFlow()
+    private fun onRemoveTask(id: Long, color: Long): Flow<FluxOutcome> =
+        ColorBackgroundState(color, fluxTaskUseCases.removeTask(id).map { FluxTaskItem(it) }).toStateOutcomeFlow()
 
     private fun onChangeTaskChecked(input: ChangeTaskChecked, color: Long): Flow<FluxOutcome> =
         ColorBackgroundState(
-            color,
-            fluxTaskUseCases.onChangeTaskChecked(input.id, input.checked).map { FluxTaskItem(it) }
+            color, fluxTaskUseCases.onChangeTaskChecked(input.id, input.checked).map { FluxTaskItem(it) }
         ).toStateOutcomeFlow()
 }

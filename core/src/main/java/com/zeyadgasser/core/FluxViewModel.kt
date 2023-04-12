@@ -81,7 +81,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     /**
      * Map inputs: I with current state: S to a Flow of FluxOutcomes.
      */
-    protected abstract fun handleInputs(input: I, currentState: S): Flow<FluxOutcome>
+    abstract fun handleInputs(input: I, currentState: S): Flow<FluxOutcome>
 
     /**
      * Override to implement with your preferred logger.
