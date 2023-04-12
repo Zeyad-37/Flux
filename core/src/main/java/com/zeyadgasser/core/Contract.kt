@@ -37,7 +37,7 @@ interface Effect : Output {
     fun toEffectOutcomeFlow(): Flow<FluxOutcome> = flowOf(toEffectOutcome())
 }
 
-data class Progress internal constructor(val isLoading: Boolean, val input: Input) : Output
+data class Progress constructor(val isLoading: Boolean, val input: Input) : Output
 
 class AsyncOutcomeFlow(val flow: Flow<FluxOutcome>) : Flow<FluxOutcome> {
     override suspend fun collect(collector: FlowCollector<FluxOutcome>) = Unit

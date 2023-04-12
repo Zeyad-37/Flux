@@ -12,4 +12,5 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":domain"))
     implementation(project(":shared-composables"))
+    testImplementation(project(":test-base"))
 }

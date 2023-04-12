@@ -1,5 +1,6 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
-    id("java-library")
     id("org.jetbrains.kotlin.jvm")
 }
 
@@ -8,10 +9,25 @@ java {
     targetCompatibility = JavaVersion.VERSION_11
 }
 
+tasks.test {
+    useJUnitPlatform {
+        // includeTags("fast", "smoke & feature-a")
+        // excludeTags("slow", "ci")
+        includeEngines("junit-jupiter")
+        // excludeEngines("junit-vintage")
+    }
+    testLogging { events("passed", "skipped", "failed") }
+}
+
+tasks.withType<JavaCompile>().configureEach { options.release.set(11) }
+
+tasks.withType<KotlinCompile>().configureEach { kotlinOptions.jvmTarget = "11" }
+
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.10")
 
     testImplementation(platform("org.junit:junit-bom:5.9.2"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher") {
         because("Only needed to run tests in a version of IntelliJ IDEA that bundles older versions")
     }

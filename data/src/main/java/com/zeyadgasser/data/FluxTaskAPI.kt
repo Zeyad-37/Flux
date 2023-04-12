@@ -3,8 +3,7 @@ package com.zeyadgasser.data
 private const val TASK_LIST_SIZE = 37
 
 class FluxTaskAPI {
-    private var fluxTasks =
-        MutableList(TASK_LIST_SIZE) { i -> FluxTaskDTO(i.toLong(), "Task # $i") }
+    private var fluxTasks = MutableList(TASK_LIST_SIZE) { i -> FluxTaskDTO(i.toLong(), "Task # $i") }
 
     fun getFluxTasks(): List<FluxTaskDTO> = fluxTasks.toList()
 

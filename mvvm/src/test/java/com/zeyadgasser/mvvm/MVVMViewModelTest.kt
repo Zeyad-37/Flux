@@ -3,7 +3,6 @@ package com.zeyadgasser.mvvm
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.zeyadgasser.core.Error
-import com.zeyadgasser.core.InputStrategy.THROTTLE
 import com.zeyadgasser.core.Output
 import com.zeyadgasser.core.Progress
 import com.zeyadgasser.domainPure.FluxTask
@@ -54,7 +53,7 @@ class MVVMViewModelTest {
             List(10) { i -> FluxTask(i.toLong(), "Task # $i") }
         )
         mviViewModel.observe().test {
-            mviViewModel.process(input, THROTTLE)
+            mviViewModel.process(input)
             assertEquals(initialState, awaitItem())
             assertEquals(Progress(true, input), awaitItem())
             assertTrue(awaitItem() is ColorBackgroundState)

@@ -10,6 +10,7 @@ import com.zeyadgasser.core.toErrorOutcomeFlow
 import com.zeyadgasser.domainPure.FluxTaskUseCases
 import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -19,7 +20,8 @@ class MVVMViewModel @Inject constructor(
     private val fluxTaskUseCases: FluxTaskUseCases,
     initialState: MVVMState,
     handle: SavedStateHandle?,
-) : FluxViewModel<MVVMInput, Nothing, MVVMState, MVVMEffect>(initialState, handle) {
+    dispatcher: CoroutineDispatcher,
+) : FluxViewModel<MVVMInput, Nothing, MVVMState, MVVMEffect>(initialState, handle, dispatcher = dispatcher) {
 
     override fun handleInputs(input: MVVMInput, currentState: MVVMState): Flow<FluxOutcome> =
         when (input) {
