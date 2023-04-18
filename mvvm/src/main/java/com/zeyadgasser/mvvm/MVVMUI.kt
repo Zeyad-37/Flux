@@ -29,7 +29,7 @@ fun MVVMScreen(
 ) {
     val outputState: ComposeState<Output> = viewModel.observe().collectAsState(Main)
     var successState: MVVMState by rememberSaveable { mutableStateOf(viewModel.initialState) }
-    var showDialog by rememberSaveable { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var uncaughtErrorMessage by remember { mutableStateOf("") }
     when (val output = outputState.value) {
@@ -85,4 +85,3 @@ private fun MVVMState.evaluateList(): List<FluxTaskItem> = when (this) {
     is ErrorState, InitialState -> emptyList()
     is ColorBackgroundState -> list.toMutableStateList()
 }
-

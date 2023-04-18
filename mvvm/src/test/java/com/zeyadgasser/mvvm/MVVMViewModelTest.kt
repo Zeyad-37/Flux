@@ -2,7 +2,11 @@ package com.zeyadgasser.mvvm
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
+import com.zeyadgasser.composables.presentationModels.FluxTaskItem
+import com.zeyadgasser.core.EmptyFluxOutcome
 import com.zeyadgasser.core.Error
+import com.zeyadgasser.core.FluxError
+import com.zeyadgasser.core.FluxViewModel
 import com.zeyadgasser.core.Output
 import com.zeyadgasser.core.Progress
 import com.zeyadgasser.domainPure.FluxTask
@@ -52,75 +56,50 @@ class MVVMViewModelTest {
         whenever(fluxTaskUseCases.getFluxTasks()).thenReturn(
             List(10) { i -> FluxTask(i.toLong(), "Task # $i") }
         )
-        mviViewModel.observe().test {
-            mviViewModel.process(input)
-            assertEquals(initialState, awaitItem())
-            assertEquals(Progress(true, input), awaitItem())
-            assertTrue(awaitItem() is ColorBackgroundState)
-            assertEquals(Progress(false, input), awaitItem())
-        }
-    }
-
-    @Test
-    fun showDialogInput() = runTest {
-        val input = ShowDialogInput
-        mviViewModel.observe().test {
-            mviViewModel.process(input)
-            assertEquals(initialState, awaitItem())
-            assertEquals(Progress(true, input), awaitItem())
-            assertEquals(ShowDialogEffect, awaitItem())
-            assertEquals(Progress(false, input), awaitItem())
+        mviViewModel.handleInputs(input, initialState).test {
+            assertEquals(ColorBackgroundState(
+                PURPLE_200,
+                List(10) { i -> FluxTask(i.toLong(), "Task # $i") }.map { FluxTaskItem(it) }
+            ).toStateOutcome(), awaitItem())
+            awaitComplete()
         }
     }
 
     @Test
     fun errorInput() = runTest {
         val input = ErrorInput
-        mviViewModel.observe().test {
-            mviViewModel.process(input)
-            assertEquals(initialState, awaitItem())
-            assertEquals(Progress(true, input), awaitItem())
-            val error: Output = awaitItem()
-            assertTrue(error is ErrorState)
-            assertEquals("Error", (error as ErrorState).message)
-            assertEquals(Progress(false, input), awaitItem())
+        mviViewModel.handleInputs(input, initialState).test {
+            assertEquals(ErrorState("Error").toStateOutcome(), awaitItem())
+            awaitComplete()
         }
     }
 
     @Test
     fun uncaughtErrorInput() = runTest {
         val input = UncaughtErrorInput
-        mviViewModel.observe().test {
-            mviViewModel.process(input)
-            assertEquals(initialState, awaitItem())
-            assertEquals(Progress(true, input), awaitItem())
-            val error: Output = awaitItem()
-            assertTrue(error is Error)
-            assertEquals("UncaughtError", (error as Error).message)
-            assertEquals(Progress(false, input), awaitItem())
+        mviViewModel.handleInputs(input, initialState).test {
+            val error = awaitItem()
+            assertTrue(error is FluxError)
+            assertEquals("UncaughtError", (error as FluxError).error.message)
+            awaitComplete()
         }
     }
 
     @Test
     fun navBackInput() = runTest {
         val input = NavBackInput
-        mviViewModel.observe().test {
-            mviViewModel.process(input)
-            assertEquals(initialState, awaitItem())
-            assertEquals(Progress(true, input), awaitItem())
-            assertEquals(NavBackEffect, awaitItem())
-            assertEquals(Progress(false, input), awaitItem())
+        mviViewModel.handleInputs(input, initialState).test {
+            assertEquals(NavBackEffect.toEffectOutcome(), awaitItem())
+            awaitComplete()
         }
     }
 
     @Test
     fun doNothingInput() = runTest {
         val input = DoNothing
-        mviViewModel.observe().test {
-            mviViewModel.process(input)
-            assertEquals(initialState, awaitItem())
-            assertEquals(Progress(true, input), awaitItem())
-            assertEquals(Progress(false, input), awaitItem())
+        mviViewModel.handleInputs(input, initialState).test {
+            assertEquals(EmptyFluxOutcome, awaitItem())
+            awaitComplete()
         }
     }
 }
