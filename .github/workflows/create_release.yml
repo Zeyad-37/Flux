@@ -1,0 +1,50 @@
+name: Create Release Branch
+
+on:
+  branches:
+    - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 11
+
+      - name: Set up Android SDK
+        uses: actions/setup-android@v2
+        with:
+          android-sdk-tools: latest
+
+      - name: Increment version
+        env:
+          VERSION_FILE: version.properties
+          VERSION_PROPERTY: versionName
+        run: |
+          #!/bin/bash
+          new_version=$(${GRADLEW} -q getVersion -PversionProperty=${VERSION_PROPERTY})
+          ${GRADLEW} setVersion -PnewVersion=${new_version} -PversionProperty=${VERSION_PROPERTY}
+          echo "::set-output name=new_version::${new_version}"
+
+      - name: Commit changes
+        uses: actions/commit@v2
+        with:
+          author_name: Your Name
+          author_email: your-email@example.com
+          message: "Bump version to ${new_version}"
+
+      - name: Create release branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          #!/bin/bash
+          new_version=${{ env.new_version }}
+          branch_name="release/${new_version}"
+          git checkout -b "${branch_name}"
+          git push --set-upstream origin "${branch_name}"

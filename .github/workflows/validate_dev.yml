@@ -1,0 +1,35 @@
+name: Gitflow - Merge Feature Branch
+
+on:
+  pull_request:
+    types: [closed]
+  push:
+    branches:
+      - develop
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - uses: actions/checkout@v2
+      - name: Merge feature branch
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git fetch origin develop
+          git checkout -b develop origin/develop
+          git merge --no-ff ${{ github.event.pull_request.head.ref }} -m "Merge branch '${{ github.event.pull_request.head.ref }}' into develop"
+          git push origin develop
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 11
+
+      - name: Set up Android SDK
+        uses: actions/setup-android@v2
+        with:
+          android-sdk-tools: latest
+
+      - name: Assemble Release
+        run: ./gradlew assembleAlpha

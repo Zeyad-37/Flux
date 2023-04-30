@@ -1,0 +1,20 @@
+name: Validate Master
+
+on:
+  merge:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Assemble Alpha
+        run: ./gradlew --stacktrace assembleAlpha
+
+      - name: Assemble Beta
+        run: ./gradlew --stacktrace assembleBeta
+
+      - name: Assemble Release
+        run: ./gradlew --stacktrace assembleRelease
