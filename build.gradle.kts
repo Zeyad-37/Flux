@@ -12,6 +12,7 @@ plugins {
     id("org.jetbrains.kotlinx.kover") version "0.6.1"
     id("org.jetbrains.kotlin.jvm") version "1.8.0" apply false
     id("io.gitlab.arturbosch.detekt") version ("1.22.0") apply false
+    id("app.cash.paparazzi") version ("1.2.0") apply false
 }
 
 version = "1.0.0"
@@ -53,11 +54,12 @@ fun Project.configureKover() {
             }
         }
         instrumentation {
-            // set of test tasks names to exclude from instrumentation. The results of their execution will not be presented in the report
+            // set of test tasks names to exclude from instrumentation.
+            // The results of their execution will not be presented in the report
             excludeTasks += "dummy-tests"
         }
         htmlReport {
-            // set to true to run koverHtmlReport task during the execution of the check task (if it exists) of the current project
+            //set true to run koverHtmlReport task during the exec of the check task (if exists) of the current project
             onCheck.set(false)
             // change report directory
             reportDir.set(layout.buildDirectory.dir("my-project-report/html-result"))
@@ -84,7 +86,8 @@ fun Project.configureKover() {
             }
         }
         htmlReport {
-            // set to true to run koverMergedHtmlReport task during the execution of the check task (if it exists) of the current project
+            //set to true to run koverMergedHtmlReport task during the exec of the check task (if exists)
+            // of the current project
             onCheck.set(false)
             // change report directory
             reportDir.set(layout.buildDirectory.dir("my-merged-report/html-result"))
