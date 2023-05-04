@@ -5,8 +5,8 @@ import kotlinx.kover.api.DefaultIntellijEngine
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id("com.android.application") version "7.4.0" apply false
-    id("com.android.library") version "7.4.0" apply false
+    id("com.android.application") version "8.0.0" apply false
+    id("com.android.library") version "8.0.0" apply false
     id("org.jetbrains.kotlin.android") version "1.8.21" apply false
     id("com.google.dagger.hilt.android") version "2.46" apply false
     id("org.jetbrains.kotlinx.kover") version "0.6.1"
@@ -100,7 +100,7 @@ fun Project.configureDetekt() {
     tasks.withType<Detekt>().configureEach {
         buildUponDefaultConfig = true
 //        baseline.set(file("$rootDir/config/detekt/baseline.xml"))
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = JavaVersion.VERSION_17.toString()
         reports {
             html.required.set(true)
             sarif.required.set(true)

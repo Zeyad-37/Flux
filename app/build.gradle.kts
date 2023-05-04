@@ -1,5 +1,5 @@
 plugins {
-    id("com.zeyadgasser.gradle.plugins.android-module-plugin") version "1.0.6"
+    id("com.zeyadgasser.gradle.plugins.android-module-plugin") version "1.0.9"
     id("de.mannodermaus.android-junit5") version "1.9.3.0"
 }
 
@@ -10,6 +10,7 @@ android {
         versionName = "1.0.0"
         applicationId = "com.zeyadgasser.flux"
     }
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
 }
 
 dependencies {

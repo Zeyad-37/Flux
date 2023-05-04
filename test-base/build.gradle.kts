@@ -17,9 +17,9 @@ android {
             )
         }
     }
-    compileOptions.sourceCompatibility = JavaVersion.VERSION_11
-    compileOptions.targetCompatibility = JavaVersion.VERSION_11
-    kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
+    compileOptions.sourceCompatibility = JavaVersion.VERSION_17
+    compileOptions.targetCompatibility = JavaVersion.VERSION_17
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
     packagingOptions.resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
 }
 
@@ -31,5 +31,5 @@ dependencies {
     implementation("junit:junit:4.13.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
     implementation("androidx.test:runner:1.5.2")
-    implementation("com.google.dagger:hilt-android-testing:2.44.2")
+    implementation("com.google.dagger:hilt-android-testing:2.46")
 }

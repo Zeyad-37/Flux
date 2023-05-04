@@ -5,8 +5,8 @@ plugins {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 tasks.test {
@@ -19,12 +19,12 @@ tasks.test {
     testLogging { events("passed", "skipped", "failed") }
 }
 
-tasks.withType<JavaCompile>().configureEach { options.release.set(11) }
+tasks.withType<JavaCompile>().configureEach { options.release.set(JavaVersion.VERSION_17.toString().toInt()) }
 
-tasks.withType<KotlinCompile>().configureEach { kotlinOptions.jvmTarget = "11" }
+tasks.withType<KotlinCompile>().configureEach { kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString() }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.21")
 
     testImplementation(platform("org.junit:junit-bom:5.9.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -35,7 +35,7 @@ dependencies {
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
-    testImplementation("app.cash.turbine:turbine:0.12.1")
-    testImplementation("org.mockito:mockito-core:5.1.1")
+    testImplementation("app.cash.turbine:turbine:0.12.3")
+    testImplementation("org.mockito:mockito-core:5.3.1")
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
 }
