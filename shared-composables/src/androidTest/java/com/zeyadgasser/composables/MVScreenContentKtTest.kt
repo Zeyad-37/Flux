@@ -7,23 +7,25 @@ import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onSiblings
+import com.google.testing.junit.testparameterinjector.TestParameter
+import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
 import com.zeyadgasser.composables.theme.FluxTheme
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(TestParameterInjector::class)
 class MVScreenContentKtTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
     @Test
-    fun mVScreenContent() {
+    fun mVScreenContent(@TestParameter showDialog: Boolean, @TestParameter isLoading: Boolean) {
 //        composeTestRule.onRoot().printToLog("Flux")
         val color = Color.Black
         val errorMessage = "error"
         val uncaughtErrorMessage = "uncaught error"
-        val isLoading = false
-        val showDialog = false
         val taskName = "Task1"
         val list = listOf(FluxTaskItem(1, taskName))
         composeTestRule.setContent {
