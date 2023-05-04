@@ -11,10 +11,8 @@ import com.zeyadgasser.domainPure.FluxTaskRepository
 import com.zeyadgasser.domainPure.FluxTaskUseCases
 import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
 import com.zeyadgasser.testBase.CoroutineTestExtension
-import com.zeyadgasser.testBase.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Rule
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -24,9 +22,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(CoroutineTestExtension::class)
 class MVIViewModelIntegrationTest {
-
-    @get:Rule
-    val mainDispatcherRule = MainDispatcherRule()
 
     private val initialState: MVIState = InitialState
     private val reducer: MVIReducer = MVIReducer()
@@ -48,7 +43,6 @@ class MVIViewModelIntegrationTest {
             initialState,
             reducer,
             SavedStateHandle(),
-            mainDispatcherRule.testDispatcher
         )
     }
 

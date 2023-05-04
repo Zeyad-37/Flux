@@ -5,16 +5,15 @@ import app.cash.turbine.test
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
 import com.zeyadgasser.core.EmptyFluxOutcome
 import com.zeyadgasser.core.FluxError
-import com.zeyadgasser.core.FluxViewModel
+import com.zeyadgasser.core.FluxViewModel.FluxEffect
+import com.zeyadgasser.core.FluxViewModel.FluxResult
 import com.zeyadgasser.domainPure.FluxTask
 import com.zeyadgasser.domainPure.FluxTaskUseCases
 import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
 import com.zeyadgasser.domainPure.PURPLE_200
 import com.zeyadgasser.testBase.CoroutineTestExtension
-import com.zeyadgasser.testBase.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Rule
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -27,25 +26,18 @@ import org.mockito.kotlin.whenever
 @ExtendWith(CoroutineTestExtension::class)
 class MVIViewModelTest {
 
-    @get:Rule
-    val mainDispatcherRule = MainDispatcherRule()
-
     private val initialState: MVIState = InitialState
     private val reducer: MVIReducer = MVIReducer()
     private val getRandomColorIdUseCase: GetRandomColorIdUseCase = mock()
     private val fluxTaskUseCases: FluxTaskUseCases = mock()
+    private val savedStateHandle: SavedStateHandle = mock()
 
     private lateinit var mviViewModel: MVIViewModel
 
     @BeforeEach
     fun before() {
         mviViewModel = MVIViewModel(
-            getRandomColorIdUseCase,
-            fluxTaskUseCases,
-            initialState,
-            reducer,
-            SavedStateHandle(),
-            mainDispatcherRule.testDispatcher
+            getRandomColorIdUseCase, fluxTaskUseCases, initialState, reducer, savedStateHandle,
         )
     }
 
@@ -59,7 +51,7 @@ class MVIViewModelTest {
             assertEquals(ChangeBackgroundResult(
                 getRandomColorIdUseCase.getRandomColorId(),
                 fluxTaskUseCases.getFluxTasks().map { FluxTaskItem(it) }
-            ).toResultOutcome() as FluxViewModel.FluxResult<MVIResult>, awaitItem())
+            ).toResultOutcome() as FluxResult<MVIResult>, awaitItem())
             awaitComplete()
         }
     }
@@ -67,7 +59,7 @@ class MVIViewModelTest {
     @Test
     fun handleInputsErrorInput() = runTest {
         mviViewModel.handleInputs(ErrorInput, initialState).test {
-            assertEquals(ErrorResult("Error").toResultOutcome() as FluxViewModel.FluxResult<MVIResult>, awaitItem())
+            assertEquals(ErrorResult("Error").toResultOutcome() as FluxResult<MVIResult>, awaitItem())
             awaitComplete()
         }
     }
@@ -85,7 +77,7 @@ class MVIViewModelTest {
     @Test
     fun handleInputsNavBackInput() = runTest {
         mviViewModel.handleInputs(NavBackInput, initialState).test {
-            assertEquals(NavBackEffect.toEffectOutcome() as FluxViewModel.FluxEffect<MVIEffect>, awaitItem())
+            assertEquals(NavBackEffect.toEffectOutcome() as FluxEffect<MVIEffect>, awaitItem())
             awaitComplete()
         }
     }

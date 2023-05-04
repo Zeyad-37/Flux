@@ -11,10 +11,8 @@ import com.zeyadgasser.domainPure.FluxTaskRepository
 import com.zeyadgasser.domainPure.FluxTaskUseCases
 import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
 import com.zeyadgasser.testBase.CoroutineTestExtension
-import com.zeyadgasser.testBase.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Rule
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -24,9 +22,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(CoroutineTestExtension::class)
 class MVVMViewModelIntegrationTest {
-
-    @get:Rule
-    val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var mviViewModel: MVVMViewModel
     private lateinit var fluxTaskUseCases: FluxTaskUseCases
@@ -41,11 +36,7 @@ class MVVMViewModelIntegrationTest {
         fluxTaskRepository = FluxTaskRepositoryImpl(fluxTaskAPI)
         fluxTaskUseCases = FluxTaskUseCases(fluxTaskRepository)
         mviViewModel = MVVMViewModel(
-            getRandomColorIdUseCase,
-            fluxTaskUseCases,
-            initialState,
-            SavedStateHandle(),
-            mainDispatcherRule.testDispatcher
+            getRandomColorIdUseCase, fluxTaskUseCases, initialState, SavedStateHandle(),
         )
     }
 

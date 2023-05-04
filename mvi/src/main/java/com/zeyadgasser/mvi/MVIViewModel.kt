@@ -11,6 +11,7 @@ import com.zeyadgasser.domainPure.FluxTaskUseCases
 import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -21,7 +22,7 @@ class MVIViewModel @Inject constructor(
     initialState: MVIState,
     reducer: MVIReducer,
     handle: SavedStateHandle?,
-    dispatcher: CoroutineDispatcher,
+    dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : FluxViewModel<MVIInput, MVIResult, MVIState, MVIEffect>(initialState, handle, reducer, dispatcher) {
 
     override fun handleInputs(input: MVIInput, currentState: MVIState): Flow<FluxOutcome> =

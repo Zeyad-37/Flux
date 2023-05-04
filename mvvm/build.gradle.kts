@@ -13,4 +13,5 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":shared-composables"))
     testImplementation(project(":test-base"))
+    testImplementation("com.google.testparameterinjector:test-parameter-injector-junit5:1.11")
 }

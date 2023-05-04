@@ -4,20 +4,14 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
 import com.zeyadgasser.core.EmptyFluxOutcome
-import com.zeyadgasser.core.Error
 import com.zeyadgasser.core.FluxError
-import com.zeyadgasser.core.FluxViewModel
-import com.zeyadgasser.core.Output
-import com.zeyadgasser.core.Progress
 import com.zeyadgasser.domainPure.FluxTask
 import com.zeyadgasser.domainPure.FluxTaskUseCases
 import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
 import com.zeyadgasser.domainPure.PURPLE_200
 import com.zeyadgasser.testBase.CoroutineTestExtension
-import com.zeyadgasser.testBase.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Rule
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -30,22 +24,16 @@ import org.mockito.kotlin.whenever
 @ExtendWith(CoroutineTestExtension::class)
 class MVVMViewModelTest {
 
-    @get:Rule
-    val mainDispatcherRule = MainDispatcherRule()
-
     private lateinit var mviViewModel: MVVMViewModel
     private val initialState: MVVMState = InitialState
     private val getRandomColorIdUseCase: GetRandomColorIdUseCase = mock()
     private val fluxTaskUseCases: FluxTaskUseCases = mock()
+    private val savedStateHandle: SavedStateHandle = mock()
 
     @BeforeEach
     fun before() {
         mviViewModel = MVVMViewModel(
-            getRandomColorIdUseCase,
-            fluxTaskUseCases,
-            initialState,
-            SavedStateHandle(),
-            mainDispatcherRule.testDispatcher
+            getRandomColorIdUseCase, fluxTaskUseCases, initialState, savedStateHandle
         )
     }
 
