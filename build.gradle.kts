@@ -13,6 +13,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "1.8.21" apply false
     id("io.gitlab.arturbosch.detekt") version ("1.22.0") apply false
     id("app.cash.paparazzi") version ("1.2.0") apply false
+    id("com.android.test") version "8.0.1" apply false
 }
 
 version = "1.0.0"

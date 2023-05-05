@@ -11,6 +11,13 @@ android {
         applicationId = "com.zeyadgasser.flux"
     }
     kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
+    buildTypes {
+        create("benchmark") {
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
+            isDebuggable = false
+        }
+    }
 }
 
 dependencies {

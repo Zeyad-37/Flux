@@ -23,4 +23,5 @@ include(
     ":shared-composables",
     ":test-base",
     ":data",
+    ":benchmark",
 )
