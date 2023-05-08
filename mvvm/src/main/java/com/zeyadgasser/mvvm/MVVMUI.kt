@@ -1,5 +1,6 @@
 package com.zeyadgasser.mvvm
 
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -50,6 +51,7 @@ fun MVVMScreen(
         uncaughtErrorMessage = uncaughtErrorMessage,
         isLoading = isLoading,
         showDialog = showDialog,
+        listState = rememberLazyListState(),
         changeBackgroundOnClick = { viewModel.process(ChangeBackgroundInput) },
         showDialogOnClick = { viewModel.process(ShowDialogInput) },
         showErrorStateOnClick = { viewModel.process(ErrorInput) },

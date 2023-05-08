@@ -13,5 +13,7 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":domain"))
     implementation(project(":shared-composables"))
+    implementation("androidx.metrics:metrics-performance:1.0.0-alpha04")
+
     testImplementation(project(":test-base"))
 }

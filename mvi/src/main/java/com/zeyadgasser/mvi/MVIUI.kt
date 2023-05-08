@@ -1,16 +1,22 @@
 package com.zeyadgasser.mvi
 
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalView
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.metrics.performance.PerformanceMetricsState
 import com.zeyadgasser.composables.MVScreenContent
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
 import com.zeyadgasser.core.Effect
@@ -44,12 +50,26 @@ fun MVIScreen(
             uncaughtErrorMessage = ""
         }
     }
+    val listState: LazyListState = rememberLazyListState()
+    // [START compose_jank_metrics]
+    val metricsStateHolder = rememberMetricsStateHolder()
+    // Reporting scrolling state from compose should be done from side effect to prevent recomposition.
+    LaunchedEffect(metricsStateHolder, listState) {
+        snapshotFlow { listState.isScrollInProgress }.collect { isScrolling ->
+            if (isScrolling) {
+                metricsStateHolder.state?.putState("LazyList", "Scrolling")
+            } else {
+                metricsStateHolder.state?.removeState("LazyList")
+            }
+        }
+    }
     MVScreenContent(
         color = successState.evaluateColor(),
         errorMessage = successState.evaluateErrorMessage(),
         uncaughtErrorMessage = uncaughtErrorMessage,
         isLoading = isLoading,
         showDialog = showDialog,
+        listState = listState,
         changeBackgroundOnClick = { viewModel.process(ChangeBackgroundInput) },
         showDialogOnClick = { viewModel.process(ShowDialogInput) },
         showErrorStateOnClick = { viewModel.process(ErrorInput) },
@@ -84,3 +104,7 @@ private fun MVIState.evaluateList(): List<FluxTaskItem> = when (this) {
     is ErrorState, InitialState -> emptyList()
     is ColorBackgroundState -> list.toMutableStateList()
 }
+
+@Composable
+fun rememberMetricsStateHolder(): PerformanceMetricsState.Holder =
+    LocalView.current.let { remember(it) { PerformanceMetricsState.getHolderForHierarchy(it) } }

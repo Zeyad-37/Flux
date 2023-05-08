@@ -24,4 +24,7 @@ dependencies {
     implementation(project(":mvi"))
     implementation(project(":mvvm"))
     implementation(project(":shared-composables"))
+    implementation("androidx.metrics:metrics-performance:1.0.0-alpha04")
+    implementation("androidx.tracing:tracing:1.1.0")
+    implementation("androidx.tracing:tracing-ktx:1.1.0")
 }
