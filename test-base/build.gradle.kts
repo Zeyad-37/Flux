@@ -24,12 +24,12 @@ android {
 }
 
 dependencies {
-    val junit5Version = "5.9.2"
+    val junit5Version = "5.9.3"
     implementation("org.junit.jupiter:junit-jupiter-api:$junit5Version")
     runtimeOnly("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
     runtimeOnly("org.junit.vintage:junit-vintage-engine:$junit5Version")
     implementation("junit:junit:4.13.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.1")
     implementation("androidx.test:runner:1.5.2")
     implementation("com.google.dagger:hilt-android-testing:2.46")
 }

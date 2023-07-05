@@ -1,5 +1,6 @@
 package com.zeyadgasser.composables
 
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
@@ -31,7 +32,7 @@ class MVScreenContentKtTest {
         composeTestRule.setContent {
             FluxTheme {
                 MVScreenContent(
-                    color, errorMessage, uncaughtErrorMessage, isLoading, showDialog, list,
+                    color, errorMessage, uncaughtErrorMessage, isLoading, showDialog, list, LazyListState(),
                     { }, { }, { }, { }, { }, { }, { }, { _, _ -> }, {},
                 )
             }

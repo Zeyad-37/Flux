@@ -1,5 +1,6 @@
 package com.zeyadgasser.composables
 
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.graphics.Color
 import app.cash.paparazzi.DeviceConfig.Companion.PIXEL_6
 import app.cash.paparazzi.Paparazzi
@@ -33,6 +34,7 @@ class MVScreenContentScreenShotTest {
                 isLoading = isLoading,
                 showDialog = showDialog,
                 listOf(FluxTaskItem(1, "Label", checked)),
+                LazyListState(),
                 changeBackgroundOnClick = {},
                 showDialogOnClick = {},
                 showErrorStateOnClick = {},
