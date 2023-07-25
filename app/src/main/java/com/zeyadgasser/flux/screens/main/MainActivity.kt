@@ -28,9 +28,7 @@ class MainActivity : ComponentActivity() {
                 "MainActivity",
                 "*** Jank Report ($reason), totalFrames = $totalFrames, jankFrames = ${jankFrameData.size}"
             )
-            jankFrameData.forEach { frameData ->
-                Log.v("MainActivity", frameData.toString())
-            }
+            jankFrameData.forEach { frameData -> Log.v("MainActivity", frameData.toString()) }
         }
     }
 

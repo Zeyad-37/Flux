@@ -19,11 +19,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.metrics.performance.PerformanceMetricsState
 import com.zeyadgasser.composables.MVScreenContent
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
-import com.zeyadgasser.core.Effect
-import com.zeyadgasser.core.Error
-import com.zeyadgasser.core.Output
-import com.zeyadgasser.core.Progress
-import com.zeyadgasser.core.State
+import com.zeyadgasser.core.api.Effect
+import com.zeyadgasser.core.api.Error
+import com.zeyadgasser.core.api.Output
+import com.zeyadgasser.core.api.Progress
+import com.zeyadgasser.core.api.State
 import kotlinx.coroutines.Dispatchers.Main
 import androidx.compose.runtime.State as ComposeState
 

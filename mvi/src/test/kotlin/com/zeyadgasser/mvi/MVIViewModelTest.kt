@@ -3,10 +3,9 @@ package com.zeyadgasser.mvi
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
-import com.zeyadgasser.core.EmptyFluxOutcome
-import com.zeyadgasser.core.FluxError
-import com.zeyadgasser.core.FluxViewModel.FluxEffect
-import com.zeyadgasser.core.FluxViewModel.FluxResult
+import com.zeyadgasser.core.FluxViewModel.EffectOutcome
+import com.zeyadgasser.core.FluxViewModel.ResultOutcome
+import com.zeyadgasser.core.Outcome
 import com.zeyadgasser.domainPure.FluxTask
 import com.zeyadgasser.domainPure.FluxTaskUseCases
 import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
@@ -49,7 +48,7 @@ class MVIViewModelTest {
             assertEquals(ChangeBackgroundResult(
                 getRandomColorIdUseCase.getRandomColorId(),
                 fluxTaskUseCases.getFluxTasks().map { FluxTaskItem(it) }
-            ).toResultOutcome() as FluxResult<MVIResult>, awaitItem())
+            ).toResultOutcome() as ResultOutcome<MVIResult>, awaitItem())
             awaitComplete()
         }
     }
@@ -57,7 +56,7 @@ class MVIViewModelTest {
     @Test
     fun handleInputsErrorInput() = runTest {
         mviViewModel.handleInputs(ErrorInput, initialState).test {
-            assertEquals(ErrorResult("Error").toResultOutcome() as FluxResult<MVIResult>, awaitItem())
+            assertEquals(ErrorResult("Error").toResultOutcome() as ResultOutcome<MVIResult>, awaitItem())
             awaitComplete()
         }
     }
@@ -66,8 +65,8 @@ class MVIViewModelTest {
     fun handleInputsUncaughtErrorInput() = runTest {
         mviViewModel.handleInputs(UncaughtErrorInput, initialState).test {
             val error = awaitItem()
-            assertTrue(error is FluxError)
-            assertEquals("UncaughtError", (error as FluxError).error.message)
+            assertTrue(error is Outcome.ErrorOutcome)
+            assertEquals("UncaughtError", (error as Outcome.ErrorOutcome).error.message)
             awaitComplete()
         }
     }
@@ -75,7 +74,7 @@ class MVIViewModelTest {
     @Test
     fun handleInputsNavBackInput() = runTest {
         mviViewModel.handleInputs(NavBackInput, initialState).test {
-            assertEquals(NavBackEffect.toEffectOutcome() as FluxEffect<MVIEffect>, awaitItem())
+            assertEquals(NavBackEffect.toEffectOutcome() as EffectOutcome<MVIEffect>, awaitItem())
             awaitComplete()
         }
     }
@@ -83,7 +82,7 @@ class MVIViewModelTest {
     @Test
     fun handleInputsDoNothing() = runTest {
         mviViewModel.handleInputs(DoNothing, initialState).test {
-            assertEquals(EmptyFluxOutcome, awaitItem())
+            assertEquals(Outcome.EmptyOutcome, awaitItem())
             awaitComplete()
         }
     }

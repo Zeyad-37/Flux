@@ -2,11 +2,11 @@ package com.zeyadgasser.mvvm
 
 import androidx.lifecycle.SavedStateHandle
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
-import com.zeyadgasser.core.EmptyFluxOutcome.emptyOutcomeFlow
-import com.zeyadgasser.core.FluxOutcome
 import com.zeyadgasser.core.FluxViewModel
-import com.zeyadgasser.core.executeInParallel
-import com.zeyadgasser.core.toErrorOutcomeFlow
+import com.zeyadgasser.core.Outcome
+import com.zeyadgasser.core.Outcome.EmptyOutcome.emptyOutcomeFlow
+import com.zeyadgasser.core.api.executeInParallel
+import com.zeyadgasser.core.api.toErrorOutcomeFlow
 import com.zeyadgasser.domainPure.FluxTaskUseCases
 import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,12 +24,13 @@ class MVVMViewModel @Inject constructor(
     dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : FluxViewModel<MVVMInput, Nothing, MVVMState, MVVMEffect>(initialState, handle, dispatcher = dispatcher) {
 
-    override fun handleInputs(input: MVVMInput, currentState: MVVMState): Flow<FluxOutcome> =
+    override fun handleInputs(input: MVVMInput, currentState: MVVMState): Flow<Outcome> =
         when (input) {
             ChangeBackgroundInput -> ColorBackgroundState(
                 getRandomColorIdUseCase.getRandomColorId(),
                 fluxTaskUseCases.getFluxTasks().map { FluxTaskItem(it) }
             ).toStateOutcomeFlow()
+
             ShowDialogInput -> ShowDialogEffect.toEffectOutcomeFlow().executeInParallel()
             UncaughtErrorInput -> IllegalStateException("UncaughtError").toErrorOutcomeFlow()
             NavBackInput -> NavBackEffect.toEffectOutcomeFlow()
@@ -39,10 +40,10 @@ class MVVMViewModel @Inject constructor(
             DoNothing -> emptyOutcomeFlow()
         }
 
-    private fun onRemoveTask(id: Long, color: Long): Flow<FluxOutcome> =
+    private fun onRemoveTask(id: Long, color: Long): Flow<Outcome> =
         ColorBackgroundState(color, fluxTaskUseCases.removeTask(id).map { FluxTaskItem(it) }).toStateOutcomeFlow()
 
-    private fun onChangeTaskChecked(input: ChangeTaskChecked, color: Long): Flow<FluxOutcome> =
+    private fun onChangeTaskChecked(input: ChangeTaskChecked, color: Long): Flow<Outcome> =
         ColorBackgroundState(
             color, fluxTaskUseCases.onChangeTaskChecked(input.id, input.checked).map { FluxTaskItem(it) }
         ).toStateOutcomeFlow()

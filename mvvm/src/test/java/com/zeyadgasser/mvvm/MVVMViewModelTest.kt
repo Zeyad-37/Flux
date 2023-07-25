@@ -3,14 +3,12 @@ package com.zeyadgasser.mvvm
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
-import com.zeyadgasser.core.EmptyFluxOutcome
-import com.zeyadgasser.core.FluxError
+import com.zeyadgasser.core.Outcome
 import com.zeyadgasser.domainPure.FluxTask
 import com.zeyadgasser.domainPure.FluxTaskUseCases
 import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
 import com.zeyadgasser.domainPure.PURPLE_200
 import com.zeyadgasser.testBase.CoroutineTestExtension
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -20,7 +18,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(CoroutineTestExtension::class)
 class MVVMViewModelTest {
 
@@ -67,8 +64,8 @@ class MVVMViewModelTest {
         val input = UncaughtErrorInput
         mviViewModel.handleInputs(input, initialState).test {
             val error = awaitItem()
-            assertTrue(error is FluxError)
-            assertEquals("UncaughtError", (error as FluxError).error.message)
+            assertTrue(error is Outcome.ErrorOutcome)
+            assertEquals("UncaughtError", (error as Outcome.ErrorOutcome).error.message)
             awaitComplete()
         }
     }
@@ -86,7 +83,7 @@ class MVVMViewModelTest {
     fun doNothingInput() = runTest {
         val input = DoNothing
         mviViewModel.handleInputs(input, initialState).test {
-            assertEquals(EmptyFluxOutcome, awaitItem())
+            assertEquals(Outcome.EmptyOutcome, awaitItem())
             awaitComplete()
         }
     }

@@ -2,11 +2,11 @@ package com.zeyadgasser.mvi
 
 import androidx.lifecycle.SavedStateHandle
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
-import com.zeyadgasser.core.EmptyFluxOutcome.emptyOutcomeFlow
-import com.zeyadgasser.core.FluxOutcome
 import com.zeyadgasser.core.FluxViewModel
-import com.zeyadgasser.core.executeInParallel
-import com.zeyadgasser.core.toErrorOutcomeFlow
+import com.zeyadgasser.core.Outcome
+import com.zeyadgasser.core.Outcome.EmptyOutcome.emptyOutcomeFlow
+import com.zeyadgasser.core.api.executeInParallel
+import com.zeyadgasser.core.api.toErrorOutcomeFlow
 import com.zeyadgasser.domainPure.FluxTaskUseCases
 import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,7 +25,7 @@ class MVIViewModel @Inject constructor(
     dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : FluxViewModel<MVIInput, MVIResult, MVIState, MVIEffect>(initialState, handle, reducer, dispatcher) {
 
-    override fun handleInputs(input: MVIInput, currentState: MVIState): Flow<FluxOutcome> =
+    override fun handleInputs(input: MVIInput, currentState: MVIState): Flow<Outcome> =
         when (input) {
             ChangeBackgroundInput -> ChangeBackgroundResult(
                 getRandomColorIdUseCase.getRandomColorId(),
@@ -40,10 +40,10 @@ class MVIViewModel @Inject constructor(
             DoNothing -> emptyOutcomeFlow()
         }
 
-    private fun onRemoveTask(id: Long, color: Long): Flow<FluxOutcome> =
+    private fun onRemoveTask(id: Long, color: Long): Flow<Outcome> =
         ChangeBackgroundResult(color, fluxTaskUseCases.removeTask(id).map { FluxTaskItem(it) }).toResultOutcomeFlow()
 
-    private fun onChangeTaskChecked(input: ChangeTaskChecked, color: Long): Flow<FluxOutcome> =
+    private fun onChangeTaskChecked(input: ChangeTaskChecked, color: Long): Flow<Outcome> =
         ChangeBackgroundResult(
             color, fluxTaskUseCases.onChangeTaskChecked(input.id, input.checked).map { FluxTaskItem(it) }
         ).toResultOutcomeFlow()
