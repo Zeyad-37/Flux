@@ -29,7 +29,7 @@ dependencies {
     runtimeOnly("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
     runtimeOnly("org.junit.vintage:junit-vintage-engine:$junit5Version")
     implementation("junit:junit:4.13.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.2")
     implementation("androidx.test:runner:1.5.2")
     implementation("com.google.dagger:hilt-android-testing:2.46")
 }
