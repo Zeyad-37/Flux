@@ -24,6 +24,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core"))
     val junit5Version = "5.9.3"
     implementation("org.junit.jupiter:junit-jupiter-api:$junit5Version")
     runtimeOnly("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
@@ -32,4 +33,5 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.2")
     implementation("androidx.test:runner:1.5.2")
     implementation("com.google.dagger:hilt-android-testing:2.46")
+    implementation("app.cash.turbine:turbine:1.0.0")
 }
