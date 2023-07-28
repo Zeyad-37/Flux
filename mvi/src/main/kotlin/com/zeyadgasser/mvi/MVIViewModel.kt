@@ -25,7 +25,7 @@ class MVIViewModel @Inject constructor(
     dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : FluxViewModel<MVIInput, MVIResult, MVIState, MVIEffect>(initialState, handle, reducer, dispatcher) {
 
-    override fun handleInputs(input: MVIInput, currentState: MVIState): Flow<Outcome> =
+    override fun handleInputs(input: MVIInput, state: MVIState): Flow<Outcome> =
         when (input) {
             ChangeBackgroundInput -> ChangeBackgroundResult(
                 getRandomColorIdUseCase.getRandomColorId(),
@@ -35,8 +35,8 @@ class MVIViewModel @Inject constructor(
             UncaughtErrorInput -> IllegalStateException("UncaughtError").toErrorOutcomeFlow()
             NavBackInput -> NavBackEffect.toEffectOutcomeFlow()
             ErrorInput -> ErrorResult("Error").toResultOutcomeFlow()
-            is ChangeTaskChecked -> onChangeTaskChecked(input, currentState.color)
-            is RemoveTask -> onRemoveTask(input.id, currentState.color)
+            is ChangeTaskChecked -> onChangeTaskChecked(input, state.color)
+            is RemoveTask -> onRemoveTask(input.id, state.color)
             DoNothing -> emptyOutcomeFlow()
         }
 

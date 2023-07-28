@@ -24,7 +24,7 @@ class MVVMViewModel @Inject constructor(
     dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : FluxViewModel<MVVMInput, Nothing, MVVMState, MVVMEffect>(initialState, handle, dispatcher = dispatcher) {
 
-    override fun handleInputs(input: MVVMInput, currentState: MVVMState): Flow<Outcome> =
+    override fun handleInputs(input: MVVMInput, state: MVVMState): Flow<Outcome> =
         when (input) {
             ChangeBackgroundInput -> ColorBackgroundState(
                 getRandomColorIdUseCase.getRandomColorId(),
@@ -35,8 +35,8 @@ class MVVMViewModel @Inject constructor(
             UncaughtErrorInput -> IllegalStateException("UncaughtError").toErrorOutcomeFlow()
             NavBackInput -> NavBackEffect.toEffectOutcomeFlow()
             ErrorInput -> ErrorState("Error").toStateOutcomeFlow()
-            is ChangeTaskChecked -> onChangeTaskChecked(input, currentState.color)
-            is RemoveTask -> onRemoveTask(input.id, currentState.color)
+            is ChangeTaskChecked -> onChangeTaskChecked(input, state.color)
+            is RemoveTask -> onRemoveTask(input.id, state.color)
             DoNothing -> emptyOutcomeFlow()
         }
 
