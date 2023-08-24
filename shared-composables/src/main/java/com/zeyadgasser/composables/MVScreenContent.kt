@@ -35,6 +35,7 @@ fun MVScreenContent(
     list: List<FluxTaskItem>,
     listState: LazyListState,
     changeBackgroundOnClick: () -> Unit,
+    cancelChangeBackgroundOnClick: () -> Unit,
     showDialogOnClick: () -> Unit,
     showErrorStateOnClick: () -> Unit,
     showUncaughtErrorOnClick: () -> Unit,
@@ -54,6 +55,7 @@ fun MVScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Button(onClick = changeBackgroundOnClick) { Text(text = "Change Background") }
+            Button(onClick = cancelChangeBackgroundOnClick) { Text(text = "Cancel Change Background") }
             Button(onClick = showDialogOnClick) { Text(text = "Show Dialog in parallel") }
             Button(onClick = showErrorStateOnClick) { Text(text = "Show Error State") }
             Button(onClick = showUncaughtErrorOnClick) { Text(text = "Show Uncaught Error") }
@@ -92,6 +94,6 @@ fun MVScreenContentPreview() =
             "Error Message",
             "Uncaught Error Message",
             true, false, emptyList(), rememberLazyListState(),
-            { }, { }, { }, { }, { }, { }, { }, { _, _ -> }, {},
+            { }, { }, { }, { }, { }, { }, { }, { }, { _, _ -> }, {},
         )
     }

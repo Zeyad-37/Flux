@@ -19,9 +19,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.Lazily
 import kotlinx.coroutines.flow.StateFlow
@@ -38,7 +38,6 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
@@ -69,9 +68,9 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     private var currentState: S = initialState
 
     private val tag: String = this::class.simpleName.orEmpty()
-    private val inputs: Channel<I> = Channel()
-    private val throttledInputs: Channel<I> = Channel()
-    private val debouncedInputs: Channel<I> = Channel()
+    private val inputs: MutableSharedFlow<I> = MutableSharedFlow()
+    private val throttledInputs: MutableSharedFlow<I> = MutableSharedFlow()
+    private val debouncedInputs: MutableSharedFlow<I> = MutableSharedFlow()
     private val viewModelListener: MutableStateFlow<Output> = MutableStateFlow(currentState)
 
     init {
@@ -95,7 +94,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
             NONE -> inputs
             is Throttle -> throttledInputs
             is Debounce -> debouncedInputs
-        }.send(input)
+        }.emit(input)
     }.let {}
 
     /**
@@ -128,9 +127,9 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
      * [processInputOutcomeStream] to apply the Loading, Success & Error (LSE) pattern.
      */
     private fun createOutcomes(): Flow<Outcome> = merge(
-        inputs.receiveAsFlow(),
-        throttledInputs.receiveAsFlow().onEach { delay(it.inputStrategy.interval) },
-        debouncedInputs.receiveAsFlow().debounce { it.inputStrategy.interval }
+        inputs,
+        throttledInputs.onEach { delay(it.inputStrategy.interval) },
+        debouncedInputs.debounce { it.inputStrategy.interval }
     ).map { input ->
         log(input)
         InputOutcomeStream(input, handleInputs(input, currentState))

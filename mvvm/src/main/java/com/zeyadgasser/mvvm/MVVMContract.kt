@@ -17,6 +17,7 @@ object NavBackInput : MVVMInput()
 object DoNothing : MVVMInput()
 data class RemoveTask(val id: Long) : MVVMInput()
 data class ChangeTaskChecked(val id: Long, val checked: Boolean) : MVVMInput(false)
+object CancelChangeBackgroundInput : MVVMInput()
 
 sealed class MVVMEffect : Effect
 object NavBackEffect : MVVMEffect()
