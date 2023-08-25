@@ -26,7 +26,6 @@ object NavBackInput : MVIInput()
 object DoNothing : MVIInput(inputStrategy = Throttle(500L))
 data class RemoveTask(val id: Long) : MVIInput()
 data class ChangeTaskChecked(val id: Long, val checked: Boolean) : MVIInput(false)
-object CancelChangeBackgroundInput : MVIInput()
 sealed class MVIResult : Result
 data class ChangeBackgroundResult(val color: Long, val list: List<FluxTaskItem>) : MVIResult()
 data class ErrorResult(val message: String) : MVIResult()

@@ -19,8 +19,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.metrics.performance.PerformanceMetricsState
 import com.zeyadgasser.composables.MVScreenContent
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
+import com.zeyadgasser.core.api.Cancel
 import com.zeyadgasser.core.api.Effect
 import com.zeyadgasser.core.api.Error
+import com.zeyadgasser.core.api.Input
 import com.zeyadgasser.core.api.Output
 import com.zeyadgasser.core.api.Progress
 import com.zeyadgasser.core.api.State
@@ -71,7 +73,7 @@ fun MVIScreen(
         showDialog = showDialog,
         listState = listState,
         changeBackgroundOnClick = { viewModel.process(ChangeBackgroundInput) },
-        cancelChangeBackgroundOnClick = { viewModel.process(CancelChangeBackgroundInput) },
+        cancelChangeBackgroundOnClick = { viewModel.process(Cancel(ChangeBackgroundInput)) },
         showDialogOnClick = { viewModel.process(ShowDialogInput) },
         showErrorStateOnClick = { viewModel.process(ErrorInput) },
         showUncaughtErrorOnClick = { viewModel.process(UncaughtErrorInput) },

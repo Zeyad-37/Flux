@@ -39,3 +39,5 @@ open class Input(val showProgress: Boolean = true, val inputStrategy: InputStrat
  * so we use this EmptyInput.
  */
 object EmptyInput : Input()
+
+class Cancel(val input: Input) : Input()

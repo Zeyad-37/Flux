@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zeyadgasser.core.Outcome.EmptyOutcome.emptyOutcomeFlow
 import com.zeyadgasser.core.api.AsyncOutcomeFlow
+import com.zeyadgasser.core.api.Cancel
 import com.zeyadgasser.core.api.Debounce
 import com.zeyadgasser.core.api.Effect
 import com.zeyadgasser.core.api.EmptyInput
@@ -41,6 +43,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * A base viewModel class that implements a UnidirectionalDataFlow (UDF) pattern using [Flow]s.
@@ -67,10 +70,11 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     private lateinit var job: Job
     private var currentState: S = initialState
 
+    val cancellableInputsMap: MutableMap<I, AtomicBoolean> = mutableMapOf()
     private val tag: String = this::class.simpleName.orEmpty()
-    private val inputs: MutableSharedFlow<I> = MutableSharedFlow()
-    private val throttledInputs: MutableSharedFlow<I> = MutableSharedFlow()
-    private val debouncedInputs: MutableSharedFlow<I> = MutableSharedFlow()
+    private val inputs: MutableSharedFlow<Input> = MutableSharedFlow()
+    private val throttledInputs: MutableSharedFlow<Input> = MutableSharedFlow()
+    private val debouncedInputs: MutableSharedFlow<Input> = MutableSharedFlow()
     private val viewModelListener: MutableStateFlow<Output> = MutableStateFlow(currentState)
 
     init {
@@ -89,7 +93,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
      *
      * @param input the input to be processed.
      */
-    fun process(input: I): Unit = viewModelScope.launch {
+    fun process(input: Input): Unit = viewModelScope.launch {
         when (input.inputStrategy) {
             NONE -> inputs
             is Throttle -> throttledInputs
@@ -132,7 +136,12 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
         debouncedInputs.debounce { it.inputStrategy.interval }
     ).map { input ->
         log(input)
-        InputOutcomeStream(input, handleInputs(input, currentState))
+        InputOutcomeStream(
+            input,
+            if (input is Cancel)
+                emptyOutcomeFlow().also { cancellableInputsMap[input.input as I] = AtomicBoolean(true) }
+            else handleInputs(input as I, currentState)
+        )
     }.flowOn(dispatcher).shareIn(viewModelScope, Lazily).run {
         // create two streams one for sync and one for async processing
         val asyncOutcomes = filter { it.outcomes is AsyncOutcomeFlow }
