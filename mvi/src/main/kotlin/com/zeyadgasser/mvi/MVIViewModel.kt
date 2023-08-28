@@ -15,8 +15,6 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.takeWhile
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,10 +42,7 @@ class MVIViewModel @Inject constructor(
     private fun onChangeBackground(): Flow<Outcome> =
         ChangeBackgroundResult(
             getRandomColorIdUseCase.getRandomColorId(), fluxTaskUseCases.getFluxTasks().map { FluxTaskItem(it) }
-        ).toResultOutcomeFlow().onEach {
-            cancellableInputsMap[ChangeBackgroundInput] = AtomicBoolean(false)
-            delay(1000)
-        }.takeWhile { cancellableInputsMap[ChangeBackgroundInput]?.get() == false }
+        ).toResultOutcomeFlow().onEach { delay(1000) }.makeCancellable(ChangeBackgroundInput::class)
 
     private fun onRemoveTask(id: Long, color: Long): Flow<Outcome> =
         ChangeBackgroundResult(color, fluxTaskUseCases.removeTask(id).map { FluxTaskItem(it) }).toResultOutcomeFlow()

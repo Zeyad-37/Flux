@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zeyadgasser.core.Outcome.EmptyOutcome.emptyOutcomeFlow
+import com.zeyadgasser.core.Outcome.EmptyOutcome.input
 import com.zeyadgasser.core.api.AsyncOutcomeFlow
 import com.zeyadgasser.core.api.Cancel
 import com.zeyadgasser.core.api.Debounce
@@ -38,12 +39,15 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.reflect.KClass
 
 /**
  * A base viewModel class that implements a UnidirectionalDataFlow (UDF) pattern using [Flow]s.
@@ -70,7 +74,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     private lateinit var job: Job
     private var currentState: S = initialState
 
-    val cancellableInputsMap: MutableMap<I, AtomicBoolean> = mutableMapOf()
+    private val cancellableInputsMap: MutableMap<KClass<out I>, AtomicBoolean> = mutableMapOf()
     private val tag: String = this::class.simpleName.orEmpty()
     private val inputs: MutableSharedFlow<Input> = MutableSharedFlow()
     private val throttledInputs: MutableSharedFlow<Input> = MutableSharedFlow()
@@ -100,6 +104,18 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
             is Debounce -> debouncedInputs
         }.emit(input)
     }.let {}
+
+    /**
+     * Returns a new Flow that is cancellable by the [input].
+     * Make sure to cancel while the other action is in progress.
+     *
+     * @param [inputClass] The input that can be used to cancel the flow.
+     * @return A new Flow that is cancellable by [input] I.
+     */
+    fun Flow<Outcome>.makeCancellable(inputClass: KClass<out I>): Flow<Outcome> =
+        onStart { cancellableInputsMap[inputClass] = AtomicBoolean(false) }
+            .takeWhile { cancellableInputsMap[inputClass]?.get() == false }
+            .onCompletion { cancellableInputsMap.remove(inputClass) }
 
     /**
      * Map inputs: I with current state: S to a [Flow] of [Outcome]s.
@@ -138,8 +154,8 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
         log(input)
         InputOutcomeStream(
             input,
-            if (input is Cancel)
-                emptyOutcomeFlow().also { cancellableInputsMap[input.input as I] = AtomicBoolean(true) }
+            if (input is Cancel<*>) emptyOutcomeFlow()
+                .also { cancellableInputsMap[input.clazz as KClass<I>] = AtomicBoolean(true) }
             else handleInputs(input as I, currentState)
         )
     }.flowOn(dispatcher).shareIn(viewModelScope, Lazily).run {

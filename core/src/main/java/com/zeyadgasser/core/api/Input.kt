@@ -1,6 +1,7 @@
 package com.zeyadgasser.core.api
 
 import com.zeyadgasser.core.Loggable
+import kotlin.reflect.KClass
 
 private const val DEFAULT_INTERVAL = 370L
 
@@ -29,7 +30,7 @@ data class Debounce(private val customInterval: Long = DEFAULT_INTERVAL) : Input
  *  @param showProgress used to decide whether to emit a [Progress].
  *  @param inputStrategy used to decide whether to debounce, delay or do nothing to the input.
  */
-open class Input(val showProgress: Boolean = true, val inputStrategy: InputStrategy = NONE) : Loggable {
+open class Input(open val showProgress: Boolean = true, open val inputStrategy: InputStrategy = NONE) : Loggable {
     override fun toString() =
         "${this::class.simpleName}(showProgress=$showProgress, inputStrategy=${inputStrategy}ms)"
 }
@@ -40,4 +41,8 @@ open class Input(val showProgress: Boolean = true, val inputStrategy: InputStrat
  */
 object EmptyInput : Input()
 
-class Cancel(val input: Input) : Input()
+data class Cancel<I : Input>(
+    val clazz: KClass<I>,
+    override val showProgress: Boolean = true,
+    override val inputStrategy: InputStrategy = NONE
+) : Input(showProgress, inputStrategy)
