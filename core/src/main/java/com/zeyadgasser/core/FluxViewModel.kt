@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.zeyadgasser.core.Outcome.EmptyOutcome.emptyOutcomeFlow
 import com.zeyadgasser.core.Outcome.EmptyOutcome.input
 import com.zeyadgasser.core.api.AsyncOutcomeFlow
-import com.zeyadgasser.core.api.Cancel
+import com.zeyadgasser.core.api.CancelInput
 import com.zeyadgasser.core.api.Debounce
 import com.zeyadgasser.core.api.Effect
 import com.zeyadgasser.core.api.EmptyInput
@@ -154,7 +154,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
         log(input)
         InputOutcomeStream(
             input,
-            if (input is Cancel<*>) emptyOutcomeFlow()
+            if (input is CancelInput<*>) emptyOutcomeFlow()
                 .also { cancellableInputsMap[input.clazz as KClass<I>] = AtomicBoolean(true) }
             else handleInputs(input as I, currentState)
         )

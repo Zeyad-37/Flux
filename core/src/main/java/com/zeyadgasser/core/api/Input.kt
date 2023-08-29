@@ -41,7 +41,7 @@ open class Input(open val showProgress: Boolean = true, open val inputStrategy: 
  */
 object EmptyInput : Input()
 
-data class Cancel<I : Input>(
+data class CancelInput<I : Input>(
     val clazz: KClass<I>,
     override val showProgress: Boolean = true,
     override val inputStrategy: InputStrategy = NONE

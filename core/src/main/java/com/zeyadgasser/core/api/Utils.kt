@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.flowOf
 
 fun Flow<Outcome>.executeInParallel(): AsyncOutcomeFlow = AsyncOutcomeFlow(this)
 
+inline fun <reified I : Input> cancelInput(showProgress: Boolean = true) = CancelInput(I::class, showProgress)
+
 fun Throwable.toErrorOutcome(errorMessage: String? = null, input: Input = EmptyInput): Outcome =
     Outcome.ErrorOutcome(this, errorMessage, input)
 
