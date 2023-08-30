@@ -27,7 +27,9 @@ class MVVMViewModel @Inject constructor(
     initialState: MVVMState,
     handle: SavedStateHandle?,
     dispatcher: CoroutineDispatcher = IO,
-) : FluxViewModel<MVVMInput, Nothing, MVVMState, MVVMEffect>(initialState, handle, dispatcher = dispatcher) {
+) : FluxViewModel<MVVMInput, Nothing, MVVMState, MVVMEffect>(
+    initialState, savedStateHandle = handle, dispatcher = dispatcher
+) {
 
     private val cancellationFlag: AtomicBoolean = AtomicBoolean(false)
 

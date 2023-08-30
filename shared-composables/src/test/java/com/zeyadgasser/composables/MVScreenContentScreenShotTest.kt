@@ -44,6 +44,7 @@ class MVScreenContentScreenShotTest {
                 onCloseTask = {},
                 onCheckedTask = { _, _ -> },
                 doNothingOnClick = {},
+                cancelChangeBackgroundOnClick = {}
             )
         }
     }

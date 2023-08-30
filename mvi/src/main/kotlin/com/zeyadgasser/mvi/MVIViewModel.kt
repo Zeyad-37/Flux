@@ -25,7 +25,7 @@ class MVIViewModel @Inject constructor(
     reducer: MVIReducer,
     handle: SavedStateHandle?,
     dispatcher: CoroutineDispatcher = IO,
-) : FluxViewModel<MVIInput, MVIResult, MVIState, MVIEffect>(initialState, handle, reducer, dispatcher) {
+) : FluxViewModel<MVIInput, MVIResult, MVIState, MVIEffect>(initialState, null, handle, reducer, dispatcher) {
 
     override fun handleInputs(input: MVIInput, state: MVIState): Flow<Outcome> =
         when (input) {

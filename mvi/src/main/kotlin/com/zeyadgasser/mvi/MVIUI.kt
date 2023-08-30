@@ -40,12 +40,13 @@ fun MVIScreen(
     var isLoading by remember { mutableStateOf(false) }
     var uncaughtErrorMessage by remember { mutableStateOf("") }
     when (val output = outputState.value) {
+        is Error -> uncaughtErrorMessage = output.message
+        is Progress -> isLoading = output.isLoading
         is Effect -> {
             showDialog = (output as MVIEffect) is ShowDialogEffect
             bindEffects(output, onBackClicked)
         }
-        is Error -> uncaughtErrorMessage = output.message
-        is Progress -> isLoading = output.isLoading
+
         is State -> {
             successState = output as MVIState
             uncaughtErrorMessage = ""

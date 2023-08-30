@@ -20,6 +20,7 @@ import com.zeyadgasser.core.api.State
 import com.zeyadgasser.core.api.Throttle
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -52,9 +53,10 @@ import kotlin.reflect.KClass
 /**
  * A base viewModel class that implements a UnidirectionalDataFlow (UDF) pattern using [Flow]s.
  */
-@OptIn(FlowPreview::class)
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     val initialState: S,
+    initialInput: I? = null,
     private val savedStateHandle: SavedStateHandle? = null,
     private val reducer: Reducer<S, R>? = null,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
@@ -67,9 +69,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
 
     data class EffectOutcome<E>(val effect: E) : Outcome()
     data class ResultOutcome<R>(val result: R) : Outcome()
-    data class StateOutcome<S>(
-        val state: S, override var input: Input = EmptyInput,
-    ) : Outcome(input)
+    data class StateOutcome<S>(val state: S, override var input: Input = EmptyInput, ) : Outcome(input)
 
     private lateinit var job: Job
     private var currentState: S = initialState
@@ -83,6 +83,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
 
     init {
         activate()
+        initialInput?.let { process(it) }
     }
 
     /**
@@ -146,18 +147,14 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
      * that can be executed in ([flatMapConcat]) or out([flatMapMerge]) of order. Also calls
      * [processInputOutcomeStream] to apply the Loading, Success & Error (LSE) pattern.
      */
+
     private fun createOutcomes(): Flow<Outcome> = merge(
         inputs,
         throttledInputs.onEach { delay(it.inputStrategy.interval) },
         debouncedInputs.debounce { it.inputStrategy.interval }
     ).map { input ->
         log(input)
-        InputOutcomeStream(
-            input,
-            if (input is CancelInput<*>) emptyOutcomeFlow()
-                .also { cancellableInputsMap[input.clazz as KClass<I>] = AtomicBoolean(true) }
-            else handleInputs(input as I, currentState)
-        )
+        InputOutcomeStream(input, processInput(input))
     }.flowOn(dispatcher).shareIn(viewModelScope, Lazily).run {
         // create two streams one for sync and one for async processing
         val asyncOutcomes = filter { it.outcomes is AsyncOutcomeFlow }
@@ -167,6 +164,11 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
             .flatMapConcat { processInputOutcomeStream(it) }
         merge(asyncOutcomes, sequentialOutcomes).flowOn(dispatcher)// merge them back into a single stream
     }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun processInput(input: Input) = if (input is CancelInput<*>) emptyOutcomeFlow()
+        .also { cancellableInputsMap[input.clazz as KClass<I>] = AtomicBoolean(true) }
+    else handleInputs(input as I, currentState)
 
     /**
      * Applies the Loading, Success & Error (LSE) pattern to every [Outcome]
