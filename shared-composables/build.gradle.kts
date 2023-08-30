@@ -1,5 +1,5 @@
 plugins {
-    id("com.zeyadgasser.gradle.plugins.android-module-plugin") version "1.1.1"
+    id("com.zeyadgasser.gradle.plugins.android-module-plugin") version "1.1.7"
     id("de.mannodermaus.android-junit5") version "1.9.3.0"
     id("app.cash.paparazzi") version ("1.2.0")
 }
@@ -13,6 +13,6 @@ android {
 
 dependencies {
     implementation(project(":domain"))
-    testImplementation("androidx.compose.ui:ui-test-junit4:1.4.3")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.4.3")
+    testImplementation("androidx.compose.ui:ui-test-junit4:1.5.0")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.0")
 }
