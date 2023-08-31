@@ -150,7 +150,6 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
      * that can be executed in ([flatMapConcat]) or out([flatMapMerge]) of order. Also calls
      * [processInputOutcomeStream] to apply the Loading, Success & Error (LSE) pattern.
      */
-
     private fun createOutcomes(): Flow<Outcome> = merge(
         inputs,
         throttledInputs.onEach { delay(it.inputStrategy.interval) },
@@ -169,7 +168,7 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun processInput(input: Input) = if (input is CancelInput<*>) emptyOutcomeFlow()
+    private fun processInput(input: Input): Flow<Outcome> = if (input is CancelInput<*>) emptyOutcomeFlow()
         .also { cancellableInputsMap[input.clazz as KClass<I>] = AtomicBoolean(true) }
     else handleInputs(input as I, currentState)
 
