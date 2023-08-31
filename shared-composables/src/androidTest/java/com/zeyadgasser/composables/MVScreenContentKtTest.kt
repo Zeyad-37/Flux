@@ -33,7 +33,7 @@ class MVScreenContentKtTest {
             FluxTheme {
                 MVScreenContent(
                     color, errorMessage, uncaughtErrorMessage, isLoading, showDialog, list, LazyListState(),
-                    { }, { }, { }, { }, { }, { }, { }, { _, _ -> }, {},
+                    { }, { }, { }, { }, { }, { }, { }, {}, { _, _ -> }, {},
                 )
             }
         }
