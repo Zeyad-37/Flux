@@ -13,7 +13,7 @@ sealed class InputStrategy(val interval: Long = DEFAULT_INTERVAL)
 /**
  * Indicates that the input should be process normally.
  */
-object NONE : InputStrategy(0L)
+data object NONE : InputStrategy(0L)
 
 /**
  * Indicates that the input should be throttled with the [DEFAULT_INTERVAL] or a provided [customInterval].
@@ -39,7 +39,7 @@ open class Input(open val showProgress: Boolean = true, open val inputStrategy: 
  * All emissions have to be matched with a input, except the initial state that is not matched to an input,
  * so we use this EmptyInput.
  */
-object EmptyInput : Input()
+data object EmptyInput : Input()
 
 data class CancelInput<I : Input>(
     val clazz: KClass<I>,

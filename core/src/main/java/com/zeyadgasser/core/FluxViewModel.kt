@@ -4,8 +4,11 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zeyadgasser.core.Outcome.EmptyOutcome
 import com.zeyadgasser.core.Outcome.EmptyOutcome.emptyOutcomeFlow
 import com.zeyadgasser.core.Outcome.EmptyOutcome.input
+import com.zeyadgasser.core.Outcome.ErrorOutcome
+import com.zeyadgasser.core.Outcome.ProgressOutcome
 import com.zeyadgasser.core.api.AsyncOutcomeFlow
 import com.zeyadgasser.core.api.CancelInput
 import com.zeyadgasser.core.api.Debounce
@@ -176,11 +179,11 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     private fun processInputOutcomeStream(stream: InputOutcomeStream): Flow<Outcome> {
         val fluxOutcomeFlow = stream.outcomes
             .map { fluxOutcome -> fluxOutcome.apply { input = stream.input } } // attribute outcomes to inputs
-            .catch { cause -> emit(Outcome.ErrorOutcome(cause, input = stream.input)) } // wrap uncaught exceptions
+            .catch { cause -> emit(ErrorOutcome(cause, input = stream.input)) } // wrap uncaught exceptions
         return if (stream.input.showProgress) { // emit Progress true and false around the outcome
             fluxOutcomeFlow.flatMapConcat {
-                flowOf(it, Outcome.ProgressOutcome(false, it.input)).onEach { delay(DELAY) }
-            }.onStart { emit(Outcome.ProgressOutcome(true, stream.input)) }
+                flowOf(it, ProgressOutcome(false, it.input)).onEach { delay(DELAY) }
+            }.onStart { emit(ProgressOutcome(true, stream.input)) }
         } else fluxOutcomeFlow
     }
 
@@ -203,10 +206,10 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
      */
     @Suppress("UNCHECKED_CAST")
     private suspend fun Outcome.handleOutcome(): Unit = when (this) {
-        is ResultOutcome<*>, Outcome.EmptyOutcome -> Unit
-        is Outcome.ErrorOutcome -> viewModelListener.emit(error)
+        is ResultOutcome<*>, EmptyOutcome -> Unit
+        is ErrorOutcome -> viewModelListener.emit(error)
         is EffectOutcome<*> -> viewModelListener.emit(effect as Output)
-        is Outcome.ProgressOutcome -> viewModelListener.emit(progress)
+        is ProgressOutcome -> viewModelListener.emit(progress)
         is StateOutcome<*> -> (state as S).takeIf { it != currentState }?.let { state ->
             savedStateHandle?.set(ARG_STATE_KEY, state)
             currentState = state

@@ -14,7 +14,7 @@ sealed class Outcome(open var input: Input = EmptyInput) : Loggable {
     /**
      * An [Outcome] to be ignored
      */
-    object EmptyOutcome : Outcome() {
+    data object EmptyOutcome : Outcome() {
         fun emptyOutcomeFlow() = flowOf(EmptyOutcome)
     }
 
