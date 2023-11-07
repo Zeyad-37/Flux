@@ -53,6 +53,7 @@ class MVIViewModelIntegrationTest {
             assertEquals(Progress(true, input), awaitItem())
             assertTrue(awaitItem() is ColorBackgroundState)
             assertEquals(Progress(false, input), awaitItem())
+            ensureAllEventsConsumed()
         }
     }
 
@@ -65,6 +66,7 @@ class MVIViewModelIntegrationTest {
             assertEquals(Progress(true, input), awaitItem())
             assertEquals(ShowDialogEffect, awaitItem())
             assertEquals(Progress(false, input), awaitItem())
+            ensureAllEventsConsumed()
         }
     }
 
@@ -77,6 +79,7 @@ class MVIViewModelIntegrationTest {
             assertEquals(Progress(true, input), awaitItem())
             assertEquals(ErrorState("Error"), awaitItem())
             assertEquals(Progress(false, input), awaitItem())
+            ensureAllEventsConsumed()
         }
     }
 
@@ -91,6 +94,7 @@ class MVIViewModelIntegrationTest {
             assertTrue(error is Error)
             assertEquals("UncaughtError", (error as Error).message)
             assertEquals(Progress(false, input), awaitItem())
+            ensureAllEventsConsumed()
         }
     }
 
@@ -103,6 +107,7 @@ class MVIViewModelIntegrationTest {
             assertEquals(Progress(true, input), awaitItem())
             assertEquals(NavBackEffect, awaitItem())
             assertEquals(Progress(false, input), awaitItem())
+            ensureAllEventsConsumed()
         }
     }
 
@@ -114,6 +119,7 @@ class MVIViewModelIntegrationTest {
             assertEquals(initialState, awaitItem())
             assertEquals(Progress(true, input), awaitItem())
             assertEquals(Progress(false, input), awaitItem())
+            ensureAllEventsConsumed()
         }
     }
 }

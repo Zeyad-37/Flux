@@ -4,23 +4,21 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zeyadgasser.core.Outcome.EmptyOutcome
-import com.zeyadgasser.core.Outcome.EmptyOutcome.emptyOutcomeFlow
-import com.zeyadgasser.core.Outcome.EmptyOutcome.input
-import com.zeyadgasser.core.Outcome.ErrorOutcome
-import com.zeyadgasser.core.Outcome.ProgressOutcome
-import com.zeyadgasser.core.api.AsyncOutcomeFlow
+import com.zeyadgasser.core.api.AsyncResultFlow
 import com.zeyadgasser.core.api.CancelInput
 import com.zeyadgasser.core.api.Debounce
 import com.zeyadgasser.core.api.Effect
-import com.zeyadgasser.core.api.EmptyInput
+import com.zeyadgasser.core.api.EmptyResult
+import com.zeyadgasser.core.api.Error
 import com.zeyadgasser.core.api.Input
 import com.zeyadgasser.core.api.NONE
 import com.zeyadgasser.core.api.Output
+import com.zeyadgasser.core.api.Progress
 import com.zeyadgasser.core.api.Reducer
 import com.zeyadgasser.core.api.Result
 import com.zeyadgasser.core.api.State
 import com.zeyadgasser.core.api.Throttle
+import com.zeyadgasser.core.api.emptyResultFlow
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -58,7 +56,7 @@ import kotlin.reflect.KClass
  */
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
-    val initialState: S,
+    initialState: S,
     initialInput: I? = null,
     private val savedStateHandle: SavedStateHandle? = null,
     private val reducer: Reducer<S, R>? = null,
@@ -69,10 +67,6 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
         const val ARG_STATE_KEY = "arg_state_key"
         private const val DELAY = 100L
     }
-
-    data class EffectOutcome<E>(val effect: E) : Outcome()
-    data class ResultOutcome<R>(val result: R) : Outcome()
-    data class StateOutcome<S>(val state: S, override var input: Input = EmptyInput, ) : Outcome(input)
 
     private lateinit var job: Job
     private var currentState: S = initialState
@@ -110,25 +104,25 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     }.let {}
 
     /**
-     * Returns a new Flow that is cancellable by the [input].
+     * Returns a new Flow that is cancellable by the [Input].
      * Make sure to cancel while the other action is in progress.
      *
      * @param [inputClass] The input that can be used to cancel the flow.
-     * @return A new Flow that is cancellable by [input] I.
+     * @return A new Flow that is cancellable by [Input] I.
      */
-    fun Flow<Outcome>.makeCancellable(inputClass: KClass<out I>): Flow<Outcome> =
+    fun Flow<Result>.makeCancellable(inputClass: KClass<out I>): Flow<Result> =
         onStart { cancellableInputsMap[inputClass] = AtomicBoolean(false) }
             .takeWhile { cancellableInputsMap[inputClass]?.get() == false }
             .onCompletion { cancellableInputsMap.remove(inputClass) }
 
     /**
-     * Map inputs: I with current state: S to a [Flow] of [Outcome]s.
+     * Map inputs: I with current state: S to a [Flow] of [Result]s.
      *
      * @param input the input to be handled.
      * @param state the current state of the ViewModel.
-     * @return a [Flow] of [Outcome] representing the outcomes of handling the input.
+     * @return a [Flow] of [Result] representing the Results of handling the input.
      */
-    abstract fun handleInputs(input: I, state: S): Flow<Outcome>
+    abstract fun handleInputs(input: I, state: S): Flow<Result>
 
     /**
      * Override to implement with your preferred logger.
@@ -139,18 +133,20 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
      * Activates the UnidirectionalDataFlow (UDF) by creating the stream that connects the inputs streams to
      * the [viewModelListener]
      */
-    private fun activate(): Unit = createOutcomes().shareIn(viewModelScope, Lazily).let { outcomeFlow ->
-        val states = createStates(outcomeFlow, reducer)
-        val nonStates = outcomeFlow.filter { it !is StateOutcome<*> && it !is ResultOutcome<*> }
-        job = viewModelScope.launch(dispatcher) { merge(nonStates, states).collect { it.handleOutcome() } }
+    @Suppress("UNCHECKED_CAST")
+    private fun activate(): Unit = createResults().shareIn(viewModelScope, Lazily).let { resultFlow ->
+        val states: Flow<Output> = resultFlow.createStates(reducer)
+        val nonStates: Flow<Output> =
+            resultFlow.filter { it is Progress || it is Error || it is Effect } as Flow<Output>
+        job = viewModelScope.launch(dispatcher) { merge(nonStates, states).collect { it.handleOutput() } }
     }
 
     /**
      * Merges the input [Flow]s, log each emission, then calls [handleInputs] to map the inputs to actions
      * that can be executed in ([flatMapConcat]) or out([flatMapMerge]) of order. Also calls
-     * [processInputOutcomeStream] to apply the Loading, Success & Error (LSE) pattern.
+     * [processInputResultStream] to apply the Loading, Success & Error (LSE) pattern.
      */
-    private fun createOutcomes(): Flow<Outcome> = merge(
+    private fun createResults(): Flow<Result> = merge(
         inputs,
         throttledInputs.onEach { delay(it.inputStrategy.interval) },
         debouncedInputs.debounce { it.inputStrategy.interval }
@@ -159,57 +155,51 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
         InputOutcomeStream(input, processInput(input))
     }.flowOn(dispatcher).shareIn(viewModelScope, Lazily).run {
         // create two streams one for sync and one for async processing
-        val asyncOutcomes = filter { it.outcomes is AsyncOutcomeFlow }
-            .map { it.copy(outcomes = (it.outcomes as AsyncOutcomeFlow).flow) }
-            .flatMapMerge { processInputOutcomeStream(it) }
-        val sequentialOutcomes = filter { it.outcomes !is AsyncOutcomeFlow }
-            .flatMapConcat { processInputOutcomeStream(it) }
+        val asyncOutcomes = filter { it.resultFlow is AsyncResultFlow }
+            .map { it.copy(resultFlow = (it.resultFlow as AsyncResultFlow).flow) }
+            .flatMapMerge { processInputResultStream(it) }
+        val sequentialOutcomes = filter { it.resultFlow !is AsyncResultFlow }
+            .flatMapConcat { processInputResultStream(it) }
         merge(asyncOutcomes, sequentialOutcomes).flowOn(dispatcher)// merge them back into a single stream
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun processInput(input: Input): Flow<Outcome> = if (input is CancelInput<*>) emptyOutcomeFlow()
+    private fun processInput(input: Input): Flow<Result> = if (input is CancelInput<*>) emptyResultFlow()
         .also { cancellableInputsMap[input.clazz as KClass<I>] = AtomicBoolean(true) }
     else handleInputs(input as I, currentState)
 
     /**
-     * Applies the Loading, Success & Error (LSE) pattern to every [Outcome]
+     * Applies the Loading, Success & Error (LSE) pattern to every [Result]
      */
-    private fun processInputOutcomeStream(stream: InputOutcomeStream): Flow<Outcome> {
-        val fluxOutcomeFlow = stream.outcomes
-            .map { fluxOutcome -> fluxOutcome.apply { input = stream.input } } // attribute outcomes to inputs
-            .catch { cause -> emit(ErrorOutcome(cause, input = stream.input)) } // wrap uncaught exceptions
-        return if (stream.input.showProgress) { // emit Progress true and false around the outcome
-            fluxOutcomeFlow.flatMapConcat {
-                flowOf(it, ProgressOutcome(false, it.input)).onEach { delay(DELAY) }
-            }.onStart { emit(ProgressOutcome(true, stream.input)) }
-        } else fluxOutcomeFlow
+    private fun processInputResultStream(stream: InputOutcomeStream): Flow<Result> {
+        val resultFlow: Flow<Result> = stream.resultFlow
+            .catch { cause -> emit(Error(cause.message.orEmpty(), cause, stream.input)) } // wrap uncaught exceptions
+        return if (stream.input.showProgress) { // emit Progress true and false around the result
+            resultFlow.flatMapConcat { flowOf(it, Progress(false, stream.input)).onEach { delay(DELAY) } }
+                .onStart { emit(Progress(true, stream.input)) }
+        } else resultFlow
     }
 
     /**
-     * Given a [Flow] of [Outcome]s return a [Flow] of [StateOutcome]s by filtering and applying the [reducer]
+     * Given a [Flow] of [Result]s return a [Flow] of [State]s by filtering and applying the [reducer]
      * if exists (MVI vs MVVM).
      */
     @Suppress("UNCHECKED_CAST")
-    private fun createStates(outcome: Flow<Outcome>, reducer: Reducer<S, R>?): Flow<StateOutcome<S>> =
-        if (reducer == null)
-            outcome.mapNotNull { if (it is StateOutcome<*>) it as StateOutcome<S> else null } // MVVM
-        else
-            outcome.mapNotNull { if (it is ResultOutcome<*>) it as ResultOutcome<R> else null } // MVI
-                .scan(StateOutcome(currentState)) { state: StateOutcome<S>, result: ResultOutcome<R> ->
-                    StateOutcome(reducer.reduce(state.state, result.result), result.input).also { log(result) }
-                }
+    private fun Flow<Result>.createStates(reducer: Reducer<S, R>?): Flow<S> =
+        if (reducer == null)  // MVI
+            mapNotNull { if (it is State) it as S else null } // MVVM
+        else mapNotNull { if (it !is Progress && it !is Error && it !is EmptyResult && it !is Effect) it as R else null } // MVI
+            .scan(currentState) { state: S, result: R -> reducer.reduce(state, result).also { log(result) } }
 
     /**
-     * Passes and logs [Outcome]s to [viewModelListener] to be observed by the view
+     * Passes and logs [Result]s to [viewModelListener] to be observed by the view
      */
     @Suppress("UNCHECKED_CAST")
-    private suspend fun Outcome.handleOutcome(): Unit = when (this) {
-        is ResultOutcome<*>, EmptyOutcome -> Unit
-        is ErrorOutcome -> viewModelListener.emit(error)
-        is EffectOutcome<*> -> viewModelListener.emit(effect as Output)
-        is ProgressOutcome -> viewModelListener.emit(progress)
-        is StateOutcome<*> -> (state as S).takeIf { it != currentState }?.let { state ->
+    private suspend fun Output.handleOutput(): Unit = when (this) {
+        is Error -> viewModelListener.emit(this)
+        is Progress -> viewModelListener.emit(this)
+        is Effect -> viewModelListener.emit(this)
+        is State -> (this as S).takeIf { it != currentState }?.let { state ->
             savedStateHandle?.set(ARG_STATE_KEY, state)
             currentState = state
             viewModelListener.emit(state)

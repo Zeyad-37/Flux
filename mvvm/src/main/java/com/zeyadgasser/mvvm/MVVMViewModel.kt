@@ -3,11 +3,11 @@ package com.zeyadgasser.mvvm
 import androidx.lifecycle.SavedStateHandle
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
 import com.zeyadgasser.core.FluxViewModel
-import com.zeyadgasser.core.Outcome
-import com.zeyadgasser.core.Outcome.EmptyOutcome
-import com.zeyadgasser.core.Outcome.EmptyOutcome.emptyOutcomeFlow
-import com.zeyadgasser.core.api.executeInParallel
-import com.zeyadgasser.core.api.toErrorOutcomeFlow
+import com.zeyadgasser.core.api.Result
+import com.zeyadgasser.core.api.emptyResultFlow
+import com.zeyadgasser.core.api.inFlow
+import com.zeyadgasser.core.api.inParallelFlow
+import com.zeyadgasser.core.api.toErrorResultFlow
 import com.zeyadgasser.domainPure.FluxTaskUseCases
 import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,35 +33,35 @@ class MVVMViewModel @Inject constructor(
 
     private val cancellationFlag: AtomicBoolean = AtomicBoolean(false)
 
-    override fun handleInputs(input: MVVMInput, state: MVVMState): Flow<Outcome> =
+    override fun handleInputs(input: MVVMInput, state: MVVMState): Flow<Result> =
         when (input) {
             ChangeBackgroundInput -> onChangeBackground()
             CancelChangeBackgroundInput -> onCancelChangeBackground()
-            ShowDialogInput -> ShowDialogEffect.toEffectOutcomeFlow().executeInParallel()
-            UncaughtErrorInput -> IllegalStateException("UncaughtError").toErrorOutcomeFlow()
-            NavBackInput -> NavBackEffect.toEffectOutcomeFlow()
-            ErrorInput -> ErrorState("Error").toStateOutcomeFlow()
+            ShowDialogInput -> ShowDialogEffect.inParallelFlow()
+            UncaughtErrorInput -> IllegalStateException("UncaughtError").toErrorResultFlow()
+            NavBackInput -> NavBackEffect.inFlow()
+            ErrorInput -> ErrorState("Error").inFlow()
             is ChangeTaskChecked -> onChangeTaskChecked(input, state.color)
             is RemoveTask -> onRemoveTask(input.id, state.color)
-            DoNothing -> emptyOutcomeFlow()
+            DoNothing -> emptyResultFlow()
         }
 
-    private fun onChangeBackground(): Flow<Outcome> =
+    private fun onChangeBackground(): Flow<Result> =
         ColorBackgroundState(
             getRandomColorIdUseCase.getRandomColorId(),
             fluxTaskUseCases.getFluxTasks().map { FluxTaskItem(it) }
-        ).toStateOutcomeFlow().onEach {
+        ).inFlow().onEach {
             cancellationFlag.set(false)
             delay(1000)
         }.takeWhile { !cancellationFlag.get() }
 
-    private fun onCancelChangeBackground(): Flow<EmptyOutcome> = emptyOutcomeFlow().also { cancellationFlag.set(true) }
+    private fun onCancelChangeBackground(): Flow<Result> = emptyResultFlow().also { cancellationFlag.set(true) }
 
-    private fun onRemoveTask(id: Long, color: Long): Flow<Outcome> =
-        ColorBackgroundState(color, fluxTaskUseCases.removeTask(id).map { FluxTaskItem(it) }).toStateOutcomeFlow()
+    private fun onRemoveTask(id: Long, color: Long): Flow<Result> =
+        ColorBackgroundState(color, fluxTaskUseCases.removeTask(id).map { FluxTaskItem(it) }).inFlow()
 
-    private fun onChangeTaskChecked(input: ChangeTaskChecked, color: Long): Flow<Outcome> =
+    private fun onChangeTaskChecked(input: ChangeTaskChecked, color: Long): Flow<Result> =
         ColorBackgroundState(
             color, fluxTaskUseCases.onChangeTaskChecked(input.id, input.checked).map { FluxTaskItem(it) }
-        ).toStateOutcomeFlow()
+        ).inFlow()
 }
