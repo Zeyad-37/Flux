@@ -26,7 +26,9 @@ data class Debounce(private val customInterval: Long = DEFAULT_INTERVAL) : Input
 
 /**
  * All Inputs defined must extend this class.
- *  @param getShowProgress used to decide whether to emit a [Progress].
+ *  @param getShowProgress used to decide whether to emit a [Progress]. Either set a literal value in the lambda on
+ *                         initialization `{ true }` or change the lambda from ViewModel's `handleInput` function
+ *                         `input.showProgress = { Your logic here }`.
  *  @param inputStrategy used to decide whether to debounce, delay or do nothing to the input.
  */
 open class Input(
