@@ -4,21 +4,6 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zeyadgasser.core.api.AsyncResultFlow
-import com.zeyadgasser.core.api.CancelInput
-import com.zeyadgasser.core.api.Debounce
-import com.zeyadgasser.core.api.Effect
-import com.zeyadgasser.core.api.EmptyResult
-import com.zeyadgasser.core.api.Error
-import com.zeyadgasser.core.api.Input
-import com.zeyadgasser.core.api.NONE
-import com.zeyadgasser.core.api.Output
-import com.zeyadgasser.core.api.Progress
-import com.zeyadgasser.core.api.Reducer
-import com.zeyadgasser.core.api.Result
-import com.zeyadgasser.core.api.State
-import com.zeyadgasser.core.api.Throttle
-import com.zeyadgasser.core.api.emptyResultFlow
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -56,7 +41,7 @@ import kotlin.reflect.KClass
  */
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
-    initialState: S,
+    val initialState: S,
     initialInput: I? = null,
     private val savedStateHandle: SavedStateHandle? = null,
     private val reducer: Reducer<S, R>? = null,
@@ -152,13 +137,13 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
         debouncedInputs.debounce { it.inputStrategy.interval }
     ).map { input ->
         log(input)
-        InputOutcomeStream(input, processInput(input))
+        InputResultFlowPair(input, processInput(input))
     }.flowOn(dispatcher).shareIn(viewModelScope, Lazily).run {
         // create two streams one for sync and one for async processing
-        val asyncOutcomes = filter { it.resultFlow is AsyncResultFlow }
+        val asyncOutcomes: Flow<Result> = filter { it.resultFlow is AsyncResultFlow }
             .map { it.copy(resultFlow = (it.resultFlow as AsyncResultFlow).flow) }
             .flatMapMerge { processInputResultStream(it) }
-        val sequentialOutcomes = filter { it.resultFlow !is AsyncResultFlow }
+        val sequentialOutcomes: Flow<Result> = filter { it.resultFlow !is AsyncResultFlow }
             .flatMapConcat { processInputResultStream(it) }
         merge(asyncOutcomes, sequentialOutcomes).flowOn(dispatcher)// merge them back into a single stream
     }
@@ -171,10 +156,10 @@ abstract class FluxViewModel<I : Input, R : Result, S : State, E : Effect>(
     /**
      * Applies the Loading, Success & Error (LSE) pattern to every [Result]
      */
-    private fun processInputResultStream(stream: InputOutcomeStream): Flow<Result> {
+    private fun processInputResultStream(stream: InputResultFlowPair): Flow<Result> {
         val resultFlow: Flow<Result> = stream.resultFlow
             .catch { cause -> emit(Error(cause.message.orEmpty(), cause, stream.input)) } // wrap uncaught exceptions
-        return if (stream.input.showProgress) { // emit Progress true and false around the result
+        return if (stream.input.getShowProgress()) { // emit Progress true and false around the result
             resultFlow.flatMapConcat { flowOf(it, Progress(false, stream.input)).onEach { delay(DELAY) } }
                 .onStart { emit(Progress(true, stream.input)) }
         } else resultFlow

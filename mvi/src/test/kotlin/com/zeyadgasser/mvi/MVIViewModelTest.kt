@@ -2,8 +2,8 @@ package com.zeyadgasser.mvi
 
 import androidx.lifecycle.SavedStateHandle
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
-import com.zeyadgasser.core.api.EmptyResult
-import com.zeyadgasser.core.api.Error
+import com.zeyadgasser.core.EmptyResult
+import com.zeyadgasser.core.Error
 import com.zeyadgasser.domainPure.FluxTask
 import com.zeyadgasser.domainPure.FluxTaskUseCases
 import com.zeyadgasser.domainPure.GetRandomColorIdUseCase

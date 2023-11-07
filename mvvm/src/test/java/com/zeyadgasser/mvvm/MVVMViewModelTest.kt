@@ -3,7 +3,8 @@ package com.zeyadgasser.mvvm
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
-import com.zeyadgasser.core.Outcome
+import com.zeyadgasser.core.EmptyResult
+import com.zeyadgasser.core.Error
 import com.zeyadgasser.domainPure.FluxTask
 import com.zeyadgasser.domainPure.FluxTaskUseCases
 import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
@@ -46,7 +47,7 @@ class MVVMViewModelTest {
             assertEquals(ColorBackgroundState(
                 PURPLE_200,
                 List(10) { i -> FluxTask(i.toLong(), "Task # $i") }.map { FluxTaskItem(it) }
-            ).toStateOutcome(), awaitItem())
+            ), awaitItem())
             awaitComplete()
         }
     }
@@ -54,7 +55,7 @@ class MVVMViewModelTest {
     @Test
     fun showDialogInput() = runTest {
         mviViewModel.handleInputs(ShowDialogInput, initialState).testOutcomeFlow {
-            assertEquals(ShowDialogEffect.toEffectOutcome(), awaitItem())
+            assertEquals(ShowDialogEffect, awaitItem())
             awaitComplete()
         }
     }
@@ -63,7 +64,7 @@ class MVVMViewModelTest {
     fun errorInput() = runTest {
         val input = ErrorInput
         mviViewModel.handleInputs(input, initialState).test {
-            assertEquals(ErrorState("Error").toStateOutcome(), awaitItem())
+            assertEquals(ErrorState("Error"), awaitItem())
             awaitComplete()
         }
     }
@@ -73,8 +74,8 @@ class MVVMViewModelTest {
         val input = UncaughtErrorInput
         mviViewModel.handleInputs(input, initialState).testOutcomeFlow {
             val error = awaitItem()
-            assertTrue(error is Outcome.ErrorOutcome)
-            assertEquals("UncaughtError", (error as Outcome.ErrorOutcome).error.message)
+            assertTrue(error is Error)
+            assertEquals("UncaughtError", (error as Error).message)
             awaitComplete()
         }
     }
@@ -83,7 +84,7 @@ class MVVMViewModelTest {
     fun navBackInput() = runTest {
         val input = NavBackInput
         mviViewModel.handleInputs(input, initialState).testOutcomeFlow {
-            assertEquals(NavBackEffect.toEffectOutcome(), awaitItem())
+            assertEquals(NavBackEffect, awaitItem())
             awaitComplete()
         }
     }
@@ -92,7 +93,7 @@ class MVVMViewModelTest {
     fun doNothingInput() = runTest {
         val input = DoNothing
         mviViewModel.handleInputs(input, initialState).testOutcomeFlow {
-            assertEquals(Outcome.EmptyOutcome, awaitItem())
+            assertEquals(EmptyResult, awaitItem())
             awaitComplete()
         }
     }

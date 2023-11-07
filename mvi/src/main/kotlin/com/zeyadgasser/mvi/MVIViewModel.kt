@@ -3,11 +3,11 @@ package com.zeyadgasser.mvi
 import androidx.lifecycle.SavedStateHandle
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
 import com.zeyadgasser.core.FluxViewModel
-import com.zeyadgasser.core.api.Result
-import com.zeyadgasser.core.api.emptyResultFlow
-import com.zeyadgasser.core.api.inFlow
-import com.zeyadgasser.core.api.inParallelFlow
-import com.zeyadgasser.core.api.toErrorResultParallelFlow
+import com.zeyadgasser.core.Result
+import com.zeyadgasser.core.emptyResultFlow
+import com.zeyadgasser.core.inFlow
+import com.zeyadgasser.core.inParallelFlow
+import com.zeyadgasser.core.toErrorResultParallelFlow
 import com.zeyadgasser.domainPure.FluxTaskUseCases
 import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,7 +30,7 @@ class MVIViewModel @Inject constructor(
 
     override fun handleInputs(input: MVIInput, state: MVIState): Flow<Result> =
         when (input) {
-            ChangeBackgroundInput -> onChangeBackground()
+            ChangeBackgroundInput -> onChangeBackground(input)
             ShowDialogInput -> ShowDialogEffect.inParallelFlow()
             UncaughtErrorInput -> IllegalStateException("UncaughtError").toErrorResultParallelFlow()
             NavBackInput -> NavBackEffect.inParallelFlow()
@@ -40,9 +40,12 @@ class MVIViewModel @Inject constructor(
             DoNothing -> emptyResultFlow()
         }
 
-    private fun onChangeBackground(): Flow<Result> = ChangeBackgroundResult(
-        getRandomColorIdUseCase.getRandomColorId(), fluxTaskUseCases.getFluxTasks().map { FluxTaskItem(it) }
-    ).inFlow().onEach { delay(1000) }.makeCancellable(ChangeBackgroundInput::class)
+    private fun onChangeBackground(input: MVIInput): Flow<Result> {
+        input.getShowProgress = { Math.random() >= 0.5 }
+        return ChangeBackgroundResult(
+            getRandomColorIdUseCase.getRandomColorId(), fluxTaskUseCases.getFluxTasks().map { FluxTaskItem(it) }
+        ).inFlow().onEach { delay(1000) }.makeCancellable(ChangeBackgroundInput::class)
+    }
 
     private fun onRemoveTask(id: Long, color: Long): Flow<Result> =
         ChangeBackgroundResult(color, fluxTaskUseCases.removeTask(id).map { FluxTaskItem(it) }).inParallelFlow()
