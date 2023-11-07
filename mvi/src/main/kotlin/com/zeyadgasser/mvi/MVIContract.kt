@@ -2,21 +2,21 @@ package com.zeyadgasser.mvi
 
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
 
-import com.zeyadgasser.core.api.Debounce
-import com.zeyadgasser.core.api.Effect
-import com.zeyadgasser.core.api.Input
-import com.zeyadgasser.core.api.InputStrategy
-import com.zeyadgasser.core.api.NONE
-import com.zeyadgasser.core.api.Result
-import com.zeyadgasser.core.api.State
-import com.zeyadgasser.core.api.Throttle
+import com.zeyadgasser.core.Debounce
+import com.zeyadgasser.core.Effect
+import com.zeyadgasser.core.Input
+import com.zeyadgasser.core.InputStrategy
+import com.zeyadgasser.core.NONE
+import com.zeyadgasser.core.Result
+import com.zeyadgasser.core.State
+import com.zeyadgasser.core.Throttle
 import com.zeyadgasser.domainPure.RED_LIGHT
 import com.zeyadgasser.domainPure.WHITE
 import kotlinx.parcelize.Parcelize
 
 sealed class MVIInput(
     showProgress: Boolean = true, inputStrategy: InputStrategy = NONE
-) : Input(showProgress, inputStrategy)
+) : Input({ showProgress }, inputStrategy)
 
 object ChangeBackgroundInput : MVIInput(inputStrategy = Debounce())
 object ShowDialogInput : MVIInput()
