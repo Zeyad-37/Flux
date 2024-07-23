@@ -1,5 +1,5 @@
 plugins {
-    id("com.zeyadgasser.gradle.plugins.android-module-plugin") version "1.1.7"
+    id("com.zeyadgasser.gradle.plugins.android-module-plugin") version "1.1.8"
     id("de.mannodermaus.android-junit5") version "1.9.3.0"
 }
 
@@ -13,7 +13,7 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":domain"))
     implementation(project(":shared-composables"))
-    implementation("androidx.metrics:metrics-performance:1.0.0-alpha04")
+    implementation("androidx.metrics:metrics-performance:1.0.0-beta01")
 
     testImplementation(project(":test-base"))
 }

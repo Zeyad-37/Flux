@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.zeyadgasser.test_base"
-    compileSdk = 33
+    compileSdk = 34
     defaultConfig.minSdk = 24
 
     buildTypes {
@@ -25,13 +25,13 @@ android {
 
 dependencies {
     implementation(project(":core"))
-    val junit5Version = "5.9.3"
+    val junit5Version = "5.10.2"
     implementation("org.junit.jupiter:junit-jupiter-api:$junit5Version")
     runtimeOnly("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
     runtimeOnly("org.junit.vintage:junit-vintage-engine:$junit5Version")
     implementation("junit:junit:4.13.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.2")
-    implementation("androidx.test:runner:1.5.2")
-    implementation("com.google.dagger:hilt-android-testing:2.46")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    implementation("androidx.test:runner:1.6.1")
+    implementation("com.google.dagger:hilt-android-testing:2.47")
     implementation("app.cash.turbine:turbine:1.0.0")
 }
