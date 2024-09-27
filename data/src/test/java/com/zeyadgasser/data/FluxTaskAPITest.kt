@@ -7,7 +7,8 @@ import org.junit.jupiter.api.Test
 class FluxTaskAPITest {
 
     private lateinit var fluxTaskAPI: FluxTaskAPI
-    private val list = MutableList(37) { i -> FluxTaskDTO(i.toLong(), "Task # $i") }
+    private val list: MutableList<FluxTaskDTO>
+        get() = MutableList(37) { i -> FluxTaskDTO(i.toLong(), "Task # $i") }
 
     @BeforeEach
     fun setUp() {
@@ -31,8 +32,9 @@ class FluxTaskAPITest {
 
     @Test
     fun removeTask() {
-        list.removeAt(1)
+        val testList = list
+        testList.removeAt(1)
         val actual = fluxTaskAPI.removeTask(1)
-        assertEquals(list, actual)
+        assertEquals(testList, actual)
     }
 }
