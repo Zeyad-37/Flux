@@ -1,6 +1,6 @@
-package com.zeyadgasser.core.api
+package com.zeyadgasser.core.v1.api
 
-import com.zeyadgasser.core.Loggable
+import com.zeyadgasser.core.v1.Loggable
 import kotlin.reflect.KClass
 
 private const val DEFAULT_INTERVAL = 370L

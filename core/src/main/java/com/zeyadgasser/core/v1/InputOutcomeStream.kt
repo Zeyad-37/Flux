@@ -1,6 +1,6 @@
-package com.zeyadgasser.core
+package com.zeyadgasser.core.v1
 
-import com.zeyadgasser.core.api.Input
+import com.zeyadgasser.core.v1.api.Input
 import kotlinx.coroutines.flow.Flow
 
 /**

@@ -1,7 +1,7 @@
 package com.zeyadgasser.mvi
 
 import androidx.lifecycle.SavedStateHandle
-import com.zeyadgasser.core.FluxViewModel
+import com.zeyadgasser.core.v1.FluxViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

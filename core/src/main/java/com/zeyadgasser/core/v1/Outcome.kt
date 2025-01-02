@@ -1,8 +1,8 @@
-package com.zeyadgasser.core
+package com.zeyadgasser.core.v1
 
-import com.zeyadgasser.core.api.Error
-import com.zeyadgasser.core.api.Input
-import com.zeyadgasser.core.api.Progress
+import com.zeyadgasser.core.v1.api.Error
+import com.zeyadgasser.core.v1.api.Input
+import com.zeyadgasser.core.v1.api.Progress
 
 
 /**

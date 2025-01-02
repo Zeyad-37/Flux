@@ -1,6 +1,6 @@
 package com.zeyadgasser.mvi
 
-import com.zeyadgasser.core.api.Reducer
+import com.zeyadgasser.core.v1.api.Reducer
 
 class MVIReducer : Reducer<MVIState, MVIResult> {
     override fun reduce(state: MVIState, result: MVIResult): MVIState = when (result) {

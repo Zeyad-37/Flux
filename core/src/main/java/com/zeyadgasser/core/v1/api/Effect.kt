@@ -1,7 +1,7 @@
-package com.zeyadgasser.core.api
+package com.zeyadgasser.core.v1.api
 
-import com.zeyadgasser.core.FluxViewModel.EffectOutcome
-import com.zeyadgasser.core.Outcome
+import com.zeyadgasser.core.v1.FluxViewModel.EffectOutcome
+import com.zeyadgasser.core.v1.Outcome
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 

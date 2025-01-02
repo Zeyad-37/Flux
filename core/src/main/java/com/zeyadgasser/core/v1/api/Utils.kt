@@ -1,10 +1,10 @@
-package com.zeyadgasser.core.api
+package com.zeyadgasser.core.v1.api
 
 import androidx.lifecycle.SavedStateHandle
-import com.zeyadgasser.core.FluxViewModel.Companion.ARG_STATE_KEY
-import com.zeyadgasser.core.Outcome
-import com.zeyadgasser.core.Outcome.EmptyOutcome
-import com.zeyadgasser.core.Outcome.ErrorOutcome
+import com.zeyadgasser.core.v1.FluxViewModel.Companion.ARG_STATE_KEY
+import com.zeyadgasser.core.v1.Outcome
+import com.zeyadgasser.core.v1.Outcome.EmptyOutcome
+import com.zeyadgasser.core.v1.Outcome.ErrorOutcome
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 

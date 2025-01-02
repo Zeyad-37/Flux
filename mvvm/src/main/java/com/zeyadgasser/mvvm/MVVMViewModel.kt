@@ -2,12 +2,12 @@ package com.zeyadgasser.mvvm
 
 import androidx.lifecycle.SavedStateHandle
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
-import com.zeyadgasser.core.FluxViewModel
-import com.zeyadgasser.core.Outcome
-import com.zeyadgasser.core.Outcome.EmptyOutcome
-import com.zeyadgasser.core.api.emptyOutcomeFlow
-import com.zeyadgasser.core.api.executeInParallel
-import com.zeyadgasser.core.api.toErrorOutcomeFlow
+import com.zeyadgasser.core.v1.FluxViewModel
+import com.zeyadgasser.core.v1.Outcome
+import com.zeyadgasser.core.v1.Outcome.EmptyOutcome
+import com.zeyadgasser.core.v1.api.emptyOutcomeFlow
+import com.zeyadgasser.core.v1.api.executeInParallel
+import com.zeyadgasser.core.v1.api.toErrorOutcomeFlow
 import com.zeyadgasser.domainPure.FluxTaskUseCases
 import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -2,11 +2,11 @@ package com.zeyadgasser.mvi
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
-import com.zeyadgasser.core.api.Error
-import com.zeyadgasser.core.api.Input
-import com.zeyadgasser.core.api.Output
-import com.zeyadgasser.core.api.Progress
-import com.zeyadgasser.core.api.cancelInput
+import com.zeyadgasser.core.v1.api.Error
+import com.zeyadgasser.core.v1.api.Input
+import com.zeyadgasser.core.v1.api.Output
+import com.zeyadgasser.core.v1.api.Progress
+import com.zeyadgasser.core.v1.api.cancelInput
 import com.zeyadgasser.data.FluxTaskAPI
 import com.zeyadgasser.data.FluxTaskRepositoryImpl
 import com.zeyadgasser.domainPure.FluxTaskRepository

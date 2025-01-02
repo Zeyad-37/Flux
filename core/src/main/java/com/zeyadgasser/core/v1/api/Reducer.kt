@@ -1,4 +1,4 @@
-package com.zeyadgasser.core.api
+package com.zeyadgasser.core.v1.api
 
 /**
  * To implement the MVI pattern, a class is created that implements the [Reducer] interface, to indicate the

@@ -2,8 +2,8 @@ package com.zeyadgasser.testBase
 
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
-import com.zeyadgasser.core.Outcome
-import com.zeyadgasser.core.api.AsyncOutcomeFlow
+import com.zeyadgasser.core.v1.Outcome
+import com.zeyadgasser.core.v1.api.AsyncOutcomeFlow
 import kotlinx.coroutines.flow.Flow
 
 suspend fun Flow<Outcome>.testOutcomeFlow(assertAndVerify: suspend ReceiveTurbine<Outcome>.() -> Unit): Unit =

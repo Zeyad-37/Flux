@@ -1,8 +1,8 @@
-package com.zeyadgasser.core.api
+package com.zeyadgasser.core.v1.api
 
 import android.os.Parcelable
-import com.zeyadgasser.core.FluxViewModel.StateOutcome
-import com.zeyadgasser.core.Outcome
+import com.zeyadgasser.core.v1.FluxViewModel.StateOutcome
+import com.zeyadgasser.core.v1.Outcome
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 

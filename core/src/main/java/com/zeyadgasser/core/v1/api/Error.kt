@@ -1,4 +1,4 @@
-package com.zeyadgasser.core.api
+package com.zeyadgasser.core.v1.api
 
 /**
  * All caught exceptions presented to the view and produced by the VM must be wrapped in this [Error] class.

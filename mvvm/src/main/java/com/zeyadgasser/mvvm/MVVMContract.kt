@@ -1,9 +1,9 @@
 package com.zeyadgasser.mvvm
 
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
-import com.zeyadgasser.core.api.Effect
-import com.zeyadgasser.core.api.Input
-import com.zeyadgasser.core.api.State
+import com.zeyadgasser.core.v1.api.Effect
+import com.zeyadgasser.core.v1.api.Input
+import com.zeyadgasser.core.v1.api.State
 import com.zeyadgasser.domainPure.RED_LIGHT
 import com.zeyadgasser.domainPure.WHITE
 import kotlinx.parcelize.Parcelize

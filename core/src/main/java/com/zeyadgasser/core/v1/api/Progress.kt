@@ -1,4 +1,4 @@
-package com.zeyadgasser.core.api
+package com.zeyadgasser.core.v1.api
 
 /**
  * To indicate that there are ongoing background calculations, the framework emits [Progress] objects for
