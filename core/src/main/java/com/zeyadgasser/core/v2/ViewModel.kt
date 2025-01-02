@@ -11,11 +11,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -52,10 +50,10 @@ abstract class ViewModel<I : Input, R : Result, S : State, E : Effect>(
 
     fun process(input: Input): Unit = viewModelScope.launch {
         when (input.inputStrategy) {
-            NONE -> inputs
-            is Throttle -> throttledInputs
-            is Debounce -> debouncedInputs
-        }.emit(input)
+            NONE -> process(input)
+            is Throttle -> delay(input.inputStrategy.interval).also { process(input) }
+            is Debounce -> debouncedInputs.debounce { it.inputStrategy.interval }.map { process(input) } // todo review
+        }
     }.let {}
 
     /**
@@ -64,34 +62,28 @@ abstract class ViewModel<I : Input, R : Result, S : State, E : Effect>(
      *
      * @param input the input to be handled
      */
-    fun process(input: I) {
-        merge(
-            inputs,
-            throttledInputs.onEach { delay(it.inputStrategy.interval) },
-            debouncedInputs.debounce { it.inputStrategy.interval }
-        ).map { input ->
-            log("Input", input)
-            // Cancel any existing job for the same input
-            if (input is CancelInput) {
-                jobs[input]?.cancel()?.also { log("Input Canceled!", input) }
-            } else {
-                jobs[input] = viewModelScope.launch(logUncaughtExceptions) {
-                    resolve(input, _state.value).onEach { result ->
-                        when (result) {
-                            is Effect -> {
-                                log("Effect", result)
-                                _effect.emit(result as E)
-                            }
+    private fun process(input: I) {
+        log("Input", input)
+        // Cancel any existing job for the same input
+        if (input is CancelInput<*>) {
+            jobs[input]?.cancel()?.also { log("Input Canceled!", input) }
+        } else {
+            jobs[input] = viewModelScope.launch(logUncaughtExceptions) {
+                resolve(input, _state.value).onEach { result ->
+                    when (result) {
+                        is Effect -> {
+                            log("Effect", result)
+                            _effect.emit(result as E)
+                        }
 
-                            else -> {
-                                _state.update { state ->
-                                    log("Result", result)
-                                    reducer.reduce(result as R, state).also { log("State", it) }
-                                }
+                        else -> {
+                            _state.update { state ->
+                                log("Result", result)
+                                reducer.reduce(result as R, state).also { log("State", it) }
                             }
                         }
-                    }.launchIn(viewModelScope)
-                }
+                    }
+                }.launchIn(viewModelScope)
             }
         }
     }
