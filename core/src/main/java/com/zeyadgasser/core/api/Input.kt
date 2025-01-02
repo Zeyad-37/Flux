@@ -27,12 +27,11 @@ data class Debounce(private val customInterval: Long = DEFAULT_INTERVAL) : Input
 
 /**
  * All Inputs defined must extend this class.
- *  @param showProgress used to decide whether to emit a [Progress].
  *  @param inputStrategy used to decide whether to debounce, delay or do nothing to the input.
  */
-open class Input(open val showProgress: Boolean = true, open val inputStrategy: InputStrategy = NONE) : Loggable {
+open class Input(open val inputStrategy: InputStrategy = NONE) : Loggable {
     override fun toString() =
-        "${this::class.simpleName}(showProgress=$showProgress, inputStrategy=${inputStrategy}ms)"
+        "${this::class.simpleName}(inputStrategy=${inputStrategy}ms)"
 }
 
 /**
@@ -42,7 +41,5 @@ open class Input(open val showProgress: Boolean = true, open val inputStrategy: 
 data object EmptyInput : Input()
 
 data class CancelInput<I : Input>(
-    val clazz: KClass<I>,
-    override val showProgress: Boolean = true,
-    override val inputStrategy: InputStrategy = NONE
-) : Input(showProgress, inputStrategy)
+    val clazz: KClass<I>, val showProgress: Boolean, override val inputStrategy: InputStrategy = NONE
+) : Input(inputStrategy)

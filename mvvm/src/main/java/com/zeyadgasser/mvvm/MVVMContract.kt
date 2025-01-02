@@ -8,7 +8,7 @@ import com.zeyadgasser.domainPure.RED_LIGHT
 import com.zeyadgasser.domainPure.WHITE
 import kotlinx.parcelize.Parcelize
 
-sealed class MVVMInput(showProgress: Boolean = true) : Input(showProgress)
+sealed class MVVMInput : Input()
 object ChangeBackgroundInput : MVVMInput()
 object ShowDialogInput : MVVMInput()
 object ErrorInput : MVVMInput()
@@ -16,7 +16,7 @@ object UncaughtErrorInput : MVVMInput()
 object NavBackInput : MVVMInput()
 object DoNothing : MVVMInput()
 data class RemoveTask(val id: Long) : MVVMInput()
-data class ChangeTaskChecked(val id: Long, val checked: Boolean) : MVVMInput(false)
+data class ChangeTaskChecked(val id: Long, val checked: Boolean) : MVVMInput()
 object CancelChangeBackgroundInput : MVVMInput()
 
 sealed class MVVMEffect : Effect

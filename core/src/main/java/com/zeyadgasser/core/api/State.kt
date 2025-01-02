@@ -10,7 +10,8 @@ import kotlinx.coroutines.flow.flowOf
  * All states presented to the view and produced/reduced by the VM must implement this [State] interface.
  */
 interface State : Parcelable, Output {
-    fun toStateOutcome(): Outcome = StateOutcome(this)
-    fun toStateOutcomeFlow(): Flow<Outcome> = flowOf(toStateOutcome())
-    fun toStateOutcomeParallelFlow(): Flow<Outcome> = toStateOutcomeFlow().executeInParallel()
+    fun toStateOutcome(showProgress: Boolean = true): Outcome = StateOutcome(this, showProgress)
+    fun toStateOutcomeFlow(showProgress: Boolean = true): Flow<Outcome> = flowOf(toStateOutcome(showProgress))
+    fun toStateOutcomeParallelFlow(showProgress: Boolean = true): Flow<Outcome> =
+        toStateOutcomeFlow(showProgress).executeInParallel()
 }

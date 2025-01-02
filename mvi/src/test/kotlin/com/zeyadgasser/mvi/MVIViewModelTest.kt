@@ -3,6 +3,7 @@ package com.zeyadgasser.mvi
 import androidx.lifecycle.SavedStateHandle
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
 import com.zeyadgasser.core.Outcome
+import com.zeyadgasser.core.api.emptyOutcome
 import com.zeyadgasser.domainPure.FluxTask
 import com.zeyadgasser.domainPure.FluxTaskUseCases
 import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
@@ -88,7 +89,7 @@ class MVIViewModelTest {
     @Test
     fun handleInputsDoNothing() = runTest {
         mviViewModel.handleInputs(DoNothing, initialState).testOutcomeFlow {
-            assertEquals(Outcome.EmptyOutcome, awaitItem())
+            assertEquals(emptyOutcome(), awaitItem())
             awaitComplete()
         }
     }

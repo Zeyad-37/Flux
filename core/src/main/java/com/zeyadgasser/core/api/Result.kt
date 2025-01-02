@@ -9,7 +9,8 @@ import kotlinx.coroutines.flow.flowOf
  * All results defined must implement this interface, to be identifiable by the framework.
  */
 interface Result {
-    fun toResultOutcome(): Outcome = ResultOutcome(this)
-    fun toResultOutcomeFlow(): Flow<Outcome> = flowOf(toResultOutcome())
-    fun toResultOutcomeParallelFlow(): AsyncOutcomeFlow = toResultOutcomeFlow().executeInParallel()
+    fun toResultOutcome(showProgress: Boolean = true): Outcome = ResultOutcome(this, showProgress)
+    fun toResultOutcomeFlow(showProgress: Boolean = true): Flow<Outcome> = flowOf(toResultOutcome(showProgress))
+    fun toResultOutcomeParallelFlow(showProgress: Boolean = true): AsyncOutcomeFlow =
+        toResultOutcomeFlow(showProgress).executeInParallel()
 }

@@ -73,7 +73,7 @@ fun MVIScreen(
         showDialog = showDialog,
         listState = listState,
         changeBackgroundOnClick = { viewModel.process(ChangeBackgroundInput) },
-        cancelChangeBackgroundOnClick = { viewModel.process(cancelInput<ChangeBackgroundInput>()) },
+        cancelChangeBackgroundOnClick = { viewModel.process(cancelInput<ChangeBackgroundInput>(true)) },
         showDialogOnClick = { viewModel.process(ShowDialogInput) },
         showErrorStateOnClick = { viewModel.process(ErrorInput) },
         showUncaughtErrorOnClick = { viewModel.process(UncaughtErrorInput) },

@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.zeyadgasser.composables.presentationModels.FluxTaskItem
 import com.zeyadgasser.core.FluxViewModel
 import com.zeyadgasser.core.Outcome
-import com.zeyadgasser.core.Outcome.EmptyOutcome.emptyOutcomeFlow
+import com.zeyadgasser.core.api.emptyOutcomeFlow
 import com.zeyadgasser.core.api.executeInParallel
 import com.zeyadgasser.core.api.toErrorOutcomeFlow
 import com.zeyadgasser.domainPure.FluxTaskUseCases
@@ -31,12 +31,13 @@ class MVIViewModel @Inject constructor(
         when (input) {
             ChangeBackgroundInput -> onChangeBackground()
             ShowDialogInput -> ShowDialogEffect.toEffectOutcomeFlow().executeInParallel()
-            UncaughtErrorInput -> IllegalStateException("UncaughtError").toErrorOutcomeFlow().executeInParallel()
+            UncaughtErrorInput -> IllegalStateException("UncaughtError").toErrorOutcomeFlow(null, input, true)
+                .executeInParallel()
             NavBackInput -> NavBackEffect.toEffectOutcomeFlow().executeInParallel()
             ErrorInput -> ErrorResult("Error").toResultOutcomeFlow().executeInParallel()
             is ChangeTaskChecked -> onChangeTaskChecked(input, state.color).executeInParallel()
             is RemoveTask -> onRemoveTask(input.id, state.color).executeInParallel()
-            DoNothing -> emptyOutcomeFlow()
+            DoNothing -> emptyOutcomeFlow(true)
         }
 
     private fun onChangeBackground(): Flow<Outcome> =
@@ -45,10 +46,12 @@ class MVIViewModel @Inject constructor(
         ).toResultOutcomeFlow().onEach { delay(1000) }.makeCancellable(ChangeBackgroundInput::class)
 
     private fun onRemoveTask(id: Long, color: Long): Flow<Outcome> =
-        ChangeBackgroundResult(color, fluxTaskUseCases.removeTask(id).map { FluxTaskItem(it) }).toResultOutcomeFlow()
+        ChangeBackgroundResult(
+            color, fluxTaskUseCases.removeTask(id).map { FluxTaskItem(it) }
+        ).toResultOutcomeFlow()
 
     private fun onChangeTaskChecked(input: ChangeTaskChecked, color: Long): Flow<Outcome> =
         ChangeBackgroundResult(
             color, fluxTaskUseCases.onChangeTaskChecked(input.id, input.checked).map { FluxTaskItem(it) }
-        ).toResultOutcomeFlow()
+        ).toResultOutcomeFlow(false)
 }

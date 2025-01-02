@@ -14,9 +14,7 @@ import com.zeyadgasser.domainPure.RED_LIGHT
 import com.zeyadgasser.domainPure.WHITE
 import kotlinx.parcelize.Parcelize
 
-sealed class MVIInput(
-    showProgress: Boolean = true, inputStrategy: InputStrategy = NONE
-) : Input(showProgress, inputStrategy)
+sealed class MVIInput(inputStrategy: InputStrategy = NONE) : Input(inputStrategy)
 
 object ChangeBackgroundInput : MVIInput(inputStrategy = Debounce())
 object ShowDialogInput : MVIInput()
@@ -25,14 +23,14 @@ object ErrorInput : MVIInput()
 object NavBackInput : MVIInput()
 object DoNothing : MVIInput(inputStrategy = Throttle(500L))
 data class RemoveTask(val id: Long) : MVIInput()
-data class ChangeTaskChecked(val id: Long, val checked: Boolean) : MVIInput(false)
+data class ChangeTaskChecked(val id: Long, val checked: Boolean) : MVIInput()
 sealed class MVIResult : Result
 data class ChangeBackgroundResult(val color: Long, val list: List<FluxTaskItem>) : MVIResult()
 data class ErrorResult(val message: String) : MVIResult()
 
 sealed class MVIEffect : Effect
-object ShowDialogEffect : MVIEffect()
-object NavBackEffect : MVIEffect()
+data object ShowDialogEffect : MVIEffect()
+data object NavBackEffect : MVIEffect()
 
 sealed class MVIState(open val color: Long = WHITE) : State
 

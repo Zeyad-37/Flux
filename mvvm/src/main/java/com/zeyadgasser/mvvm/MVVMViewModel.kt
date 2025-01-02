@@ -5,7 +5,7 @@ import com.zeyadgasser.composables.presentationModels.FluxTaskItem
 import com.zeyadgasser.core.FluxViewModel
 import com.zeyadgasser.core.Outcome
 import com.zeyadgasser.core.Outcome.EmptyOutcome
-import com.zeyadgasser.core.Outcome.EmptyOutcome.emptyOutcomeFlow
+import com.zeyadgasser.core.api.emptyOutcomeFlow
 import com.zeyadgasser.core.api.executeInParallel
 import com.zeyadgasser.core.api.toErrorOutcomeFlow
 import com.zeyadgasser.domainPure.FluxTaskUseCases
@@ -13,11 +13,7 @@ import com.zeyadgasser.domainPure.GetRandomColorIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.takeWhile
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,8 +26,6 @@ class MVVMViewModel @Inject constructor(
 ) : FluxViewModel<MVVMInput, Nothing, MVVMState, MVVMEffect>(
     initialState, savedStateHandle = handle, dispatcher = dispatcher
 ) {
-
-    private val cancellationFlag: AtomicBoolean = AtomicBoolean(false)
 
     override fun handleInputs(input: MVVMInput, state: MVVMState): Flow<Outcome> =
         when (input) {
@@ -50,12 +44,9 @@ class MVVMViewModel @Inject constructor(
         ColorBackgroundState(
             getRandomColorIdUseCase.getRandomColorId(),
             fluxTaskUseCases.getFluxTasks().map { FluxTaskItem(it) }
-        ).toStateOutcomeFlow().onEach {
-            cancellationFlag.set(false)
-            delay(1000)
-        }.takeWhile { !cancellationFlag.get() }
+        ).toStateOutcomeFlow()
 
-    private fun onCancelChangeBackground(): Flow<EmptyOutcome> = emptyOutcomeFlow().also { cancellationFlag.set(true) }
+    private fun onCancelChangeBackground(): Flow<EmptyOutcome> = emptyOutcomeFlow()
 
     private fun onRemoveTask(id: Long, color: Long): Flow<Outcome> =
         ColorBackgroundState(color, fluxTaskUseCases.removeTask(id).map { FluxTaskItem(it) }).toStateOutcomeFlow()

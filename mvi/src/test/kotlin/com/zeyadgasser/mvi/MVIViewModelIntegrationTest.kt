@@ -3,8 +3,10 @@ package com.zeyadgasser.mvi
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.zeyadgasser.core.api.Error
+import com.zeyadgasser.core.api.Input
 import com.zeyadgasser.core.api.Output
 import com.zeyadgasser.core.api.Progress
+import com.zeyadgasser.core.api.cancelInput
 import com.zeyadgasser.data.FluxTaskAPI
 import com.zeyadgasser.data.FluxTaskRepositoryImpl
 import com.zeyadgasser.domainPure.FluxTaskRepository
@@ -114,6 +116,21 @@ class MVIViewModelIntegrationTest {
             assertEquals(initialState, awaitItem())
             assertEquals(Progress(true, input), awaitItem())
             assertEquals(Progress(false, input), awaitItem())
+        }
+    }
+
+    @Test
+    fun cancelChangeBackground() = runTest {
+        var input: Input = ChangeBackgroundInput
+        mviViewModel.observe().test {
+            mviViewModel.process(input)
+            input = cancelInput<ChangeBackgroundInput>(true)
+            mviViewModel.process(input)
+            assertEquals(initialState, awaitItem())
+            assertEquals(Progress(true, input), awaitItem())
+            assertEquals(Progress(false, input), awaitItem())
+            ensureAllEventsConsumed()
+            expectNoEvents()
         }
     }
 }
