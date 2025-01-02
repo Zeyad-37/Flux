@@ -24,4 +24,5 @@ include(
     ":test-base",
     ":data",
     ":benchmark",
+    ":lint-rules",
 )
