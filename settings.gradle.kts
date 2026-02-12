@@ -16,13 +16,13 @@ rootProject.name = "Flux"
 include(
     ":app",
     ":core",
-    ":mvi",
-    ":domain",
-    ":domain-pure",
-    ":mvvm",
+    ":feature:mvi",
+    ":feature:domain",
+    ":feature:domain-pure",
+    ":feature:mvvm",
     ":shared-composables",
     ":test-base",
-    ":data",
+    ":feature:data",
     ":benchmark",
     ":lint-rules",
 )

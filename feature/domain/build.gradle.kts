@@ -4,10 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.zeyadgasser.data"
+    namespace = "com.zeyadgasser.domain"
     kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString()
 }
 
 dependencies {
-    implementation(project(":domain"))
+    implementation(project(":core"))
+    api(project(":feature:domain-pure"))
 }

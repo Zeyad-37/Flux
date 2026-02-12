@@ -10,8 +10,8 @@ android {
 
 dependencies {
     implementation(project(":core"))
-    implementation(project(":data"))
-    implementation(project(":domain"))
+    implementation(project(":feature:data"))
+    implementation(project(":feature:domain"))
     implementation(project(":shared-composables"))
     testImplementation(project(":test-base"))
 }

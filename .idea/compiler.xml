@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="17" />
+    <bytecodeTargetLevel target="17">
+      <module name="Flux.data" target="21" />
+      <module name="Flux.domain" target="21" />
+      <module name="Flux.mvi" target="21" />
+      <module name="Flux.mvvm" target="21" />
+    </bytecodeTargetLevel>
   </component>
 </project>

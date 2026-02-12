@@ -25,17 +25,17 @@
             <option value="$PROJECT_DIR$/benchmark" />
             <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/core" />
-            <option value="$PROJECT_DIR$/data" />
-            <option value="$PROJECT_DIR$/domain" />
-            <option value="$PROJECT_DIR$/domain-pure" />
+            <option value="$PROJECT_DIR$/feature" />
+            <option value="$PROJECT_DIR$/feature/data" />
+            <option value="$PROJECT_DIR$/feature/domain" />
+            <option value="$PROJECT_DIR$/feature/domain-pure" />
+            <option value="$PROJECT_DIR$/feature/mvi" />
+            <option value="$PROJECT_DIR$/feature/mvvm" />
             <option value="$PROJECT_DIR$/lint-rules" />
-            <option value="$PROJECT_DIR$/mvi" />
-            <option value="$PROJECT_DIR$/mvvm" />
             <option value="$PROJECT_DIR$/shared-composables" />
             <option value="$PROJECT_DIR$/test-base" />
           </set>
         </option>
-        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
     </option>
   </component>

@@ -92,7 +92,7 @@ class MVVMViewModelTest {
     fun doNothingInput() = runTest {
         val input = DoNothing
         mviViewModel.handleInputs(input, initialState).testOutcomeFlow {
-            assertEquals(Outcome.EmptyOutcome, awaitItem())
+            assertEquals(Outcome.EmptyOutcome(), awaitItem())
             awaitComplete()
         }
     }

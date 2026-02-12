@@ -12,7 +12,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":domain"))
+    implementation(project(":feature:domain"))
     testImplementation("androidx.compose.ui:ui-test-junit4:1.7.6")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.6")
 }
