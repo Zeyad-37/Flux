@@ -1,12 +1,17 @@
 package com.zeyadgasser.flux.gradle
 
 import org.gradle.api.Project
+import org.gradle.api.internal.provider.DefaultProviderFactory
+import org.gradle.api.provider.ProviderFactory
+import org.gradle.process.ExecOperations
+import org.gradle.process.internal.DefaultExecOperations
+import sun.jvmstat.monitor.MonitoredVmUtil.commandLine
 import java.io.ByteArrayOutputStream
 import java.io.File
 
 fun getUncomittedFiles(project: Project): List<String> {
     val stdout = ByteArrayOutputStream()
-    project.exec {
+    DefaultProviderFactory().exec {
         workingDir = project.rootProject.projectDir
         commandLine("git", "status", "--porcelain")
         standardOutput = stdout

@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -21,7 +22,7 @@ tasks.test {
 
 tasks.withType<JavaCompile>().configureEach { options.release.set(JavaVersion.VERSION_17.toString().toInt()) }
 
-tasks.withType<KotlinCompile>().configureEach { kotlinOptions.jvmTarget = JavaVersion.VERSION_17.toString() }
+tasks.withType<KotlinCompile>().configureEach { compilerOptions.jvmTarget = JvmTarget.JVM_17 }
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.23")

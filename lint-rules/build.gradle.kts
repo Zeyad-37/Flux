@@ -11,8 +11,8 @@ java {
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.0")
 
-    compileOnly("com.android.tools.lint:lint-api:31.5.1")
+    compileOnly("com.android.tools.lint:lint-api:32.0.1")
 
-    testImplementation("com.android.tools.lint:lint-tests:30.1.0-alpha03")
+    testImplementation("com.android.tools.lint:lint-tests:32.0.1")
     testImplementation("junit:junit:4.13.2")
 }
